@@ -1,0 +1,11 @@
+[package]
+name = "type_reflect"
+version = "0.1.0"
+authors = ["Spencer Kohan <spencerkohan@gmail.com>"]
+edition = "2021"
+description = "derive macro for type_reflect"
+license = "MIT"
+
+[dependencies]
+type_reflect_macros = { path = "../macros" }
+type_reflect_core = { path = "../type_reflect_core" }

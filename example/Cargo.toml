@@ -1,0 +1,14 @@
+[package]
+name = "example"
+version = "0.1.0"
+authors = ["Spencer Kohan <spencerkohan@gmail.com>"]
+edition = "2021"
+description = "derive macro for type_reflect"
+license = "MIT"
+
+
+[[bin]]
+name = "example"
+
+[dependencies]
+type_reflect = { path = "../type_reflect" }
