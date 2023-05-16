@@ -23,7 +23,7 @@ fn to_zod_type(t: &Type) -> String {
 fn struct_member(member: &StructMember) -> String {
     let name = &member.name;
     let value = to_zod_type(&member.type_);
-    format!("{name}: {value},", name = name, value = value)
+    format!("{name}: {value},\n", name = name, value = value)
 }
 
 fn struct_members(members: &Vec<StructMember>) -> String {
