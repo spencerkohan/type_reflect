@@ -1,0 +1,12 @@
+[package]
+name = "type_reflect_core"
+version = "0.1.0"
+authors = ["Spencer Kohan <spencerkohan@gmail.com>"]
+edition = "2021"
+description = "derive macro for type_reflect"
+license = "MIT"
+
+[dependencies]
+proc-macro2 = "1"
+quote = "1"
+syn = { version = "1", features = ["full", "extra-traits"] }
