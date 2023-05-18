@@ -83,7 +83,7 @@ fn get_field_type(field: &Field) -> Result<Type> {
     println!("Getting tuple member from field: {:#?}", field);
     match &field.ident {
         None => {}
-        Some(ident) => panic!("Tuple fields must not be named: {:#?}", field),
+        Some(_ident) => panic!("Tuple fields must not be named: {:#?}", field),
     };
 
     let type_ = field.ty.to_type()?;

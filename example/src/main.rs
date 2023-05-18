@@ -8,6 +8,7 @@ use type_reflect::{export_types, Reflect};
 
 // First version: use Rust types
 #[derive(Debug, Reflect, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct SDParameters {
     prompt: String,
     negative_prompt: Option<String>,

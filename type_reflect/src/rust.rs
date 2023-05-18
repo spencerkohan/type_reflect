@@ -1,5 +1,3 @@
-use std::fmt::format;
-
 pub use super::struct_type::*;
 pub use super::type_description::Type;
 pub use super::*;

@@ -1,10 +1,12 @@
 use super::syn_type_utils::*;
 use super::type_utils::*;
+use super::InflectionTokenProvider;
 use super::RustTypeEmitter;
+use crate::attribute_utils::RenameAllAttr;
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
-use syn::{Field, FieldsNamed, ItemStruct, Result};
-use type_reflect_core::type_description::StructMember;
+use syn::{ItemStruct, Result};
+use type_reflect_core::{type_description::StructMember, Inflection};
 
 #[derive(Clone, Debug)]
 pub struct StructDef {
@@ -49,6 +51,7 @@ impl StructDef {
         let name_literal = format!("{}", ident);
         let members = &self.emit_members();
         let rust = format!("{}", self.tokens());
+        let inflection = &self.inflection.to_tokens();
         quote! {
 
             impl Emittable for #ident {
@@ -60,6 +63,9 @@ impl StructDef {
             impl StructType for #ident {
                 fn name() -> &'static str {
                     #name_literal
+                }
+                fn inflection() -> Inflection {
+                    #inflection
                 }
                 fn members() -> Vec<StructMember> {
                     vec![
