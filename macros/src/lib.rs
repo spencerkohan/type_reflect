@@ -1,3 +1,4 @@
+#![feature(specialization)]
 #![macro_use]
 // #![deny(unused)]
 
@@ -27,12 +28,18 @@ pub fn reflect(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
 
 fn entry(input: proc_macro::TokenStream) -> Result<TokenStream> {
     let input = syn::parse::<Item>(input)?;
+
+    // Access the attributes of the input item
+
     let (type_def, _ident, _generics) = match input {
         Item::Struct(s) => {
-            println!("Parsed Item::Struct: {:#?}", s);
+            // println!("Parsed Item::Struct: {:#?}", s);
             (TypeDef::struct_def(&s)?, s.ident, s.generics)
         }
-        Item::Enum(e) => (TypeDef::enum_def(&e), e.ident, e.generics),
+        Item::Enum(e) => {
+            // println!("Parsed Item::Enum: {:#?}", e);
+            (TypeDef::enum_def(&e)?, e.ident, e.generics)
+        }
         _ => {
             syn_err!(input.span(); "unsupported item")
         }
