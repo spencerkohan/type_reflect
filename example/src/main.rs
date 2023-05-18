@@ -43,7 +43,8 @@ enum Status {
     Initial,
     InProgress { progress: f32 },
     Complete { urls: Vec<String> },
-    // Foo(i32, f32),
+    Double(i32, f32),
+    Single(i32),
 }
 
 #[derive(Debug, Reflect, Serialize, Deserialize)]

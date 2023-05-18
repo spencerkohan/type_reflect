@@ -15,5 +15,5 @@ enum SimpleEnumsExample { Foo, }
 #[serde(tag = "_case", content = "data")] enum Status
 {
     Initial, InProgress { progress : f32 }, Complete
-    { urls : Vec < String > },
+    { urls : Vec < String > }, Double(i32, f32), Single(i32),
 }

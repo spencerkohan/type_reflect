@@ -46,7 +46,8 @@ pub trait EnumCaseBridge {
                 let mut types = quote! {};
 
                 for type_ in inner {
-                    types.extend(type_.emit_type());
+                    let t = type_.emit_type();
+                    types.extend(quote! {#t, });
                 }
 
                 quote! { EnumCaseType::Tuple(vec![#types]) }
@@ -55,7 +56,8 @@ pub trait EnumCaseBridge {
                 let mut mermbers = quote! {};
 
                 for member in inner {
-                    mermbers.extend(member.emit_member());
+                    let m = member.emit_member();
+                    mermbers.extend(quote! {#m, });
                 }
 
                 quote! { EnumCaseType::Struct(vec![#mermbers]) }

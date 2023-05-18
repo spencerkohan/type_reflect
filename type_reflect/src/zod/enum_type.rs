@@ -137,18 +137,27 @@ export enum {name} {{
         let additional_fields = match &case.type_ {
             type_reflect_core::EnumCaseType::Simple => String::new(),
             type_reflect_core::EnumCaseType::Tuple(inner) => {
-                let tuple_items: String = inner
-                    .into_iter()
-                    .map(|item| format!("        {},\n", to_zod_type(&item)))
-                    .collect();
-                // TODO: WARNING: this implementaiton is not compatible with the default Serde
-                // It assumes the "content"" field is `data`: i/e #[serde(content="data"")]
-                format!(
-                    r#"    {content_key} : z.tuple([
+                if inner.len() == 1 {
+                    let type_ = to_zod_type(&inner[0]);
+                    format!(
+                        r#"    {content_key}: {type_}"#,
+                        type_ = type_,
+                        content_key = content_key,
+                    )
+                } else {
+                    let tuple_items: String = inner
+                        .into_iter()
+                        .map(|item| format!("        {},\n", to_zod_type(&item)))
+                        .collect();
+                    // TODO: WARNING: this implementaiton is not compatible with the default Serde
+                    // It assumes the "content"" field is `data`: i/e #[serde(content="data"")]
+                    format!(
+                        r#"    {content_key}: z.tuple([
 {tuple_items}    ])"#,
-                    tuple_items = tuple_items,
-                    content_key = content_key,
-                )
+                        tuple_items = tuple_items,
+                        content_key = content_key,
+                    )
+                }
             }
             type_reflect_core::EnumCaseType::Struct(inner) => {
                 let struct_items: String = inner
@@ -162,7 +171,7 @@ export enum {name} {{
                     })
                     .collect();
                 format!(
-                    r#"    {content_key} : z.object({{
+                    r#"    {content_key}: z.object({{
 {struct_items}    }})"#,
                     struct_items = struct_items,
                     content_key = content_key,
