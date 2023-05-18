@@ -1,11 +1,14 @@
 use std::ops::Deref;
 
+use crate::utils::*;
 use proc_macro2::*;
 use quote::*;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::*;
 use syn::token::Bracket;
 use syn::*;
+
+use crate::utils::Inflection;
 
 #[derive(Debug, Clone)]
 struct ItemsList {
@@ -104,14 +107,11 @@ fn emit_destination(dest: &Destination, types: &Vec<&Ident>) -> TokenStream {
     let mut result = quote! {};
     for dest in &dest.destinations {
         result.extend(quote! {
-            let mut file = match #emitter::init_destination_file(#dest) {
-                Ok(file) => file,
-                Err(e) => panic!("{}", e)
-            };
+            let mut file = #emitter::init_destination_file(#dest)?;
         });
         for type_ in types {
             result.extend(quote! {
-                #emitter::emit_into::<#type_>(&mut file);
+                file.write_all(#emitter::emit::<#type_>().as_bytes())?;
             });
         }
     }
@@ -121,7 +121,7 @@ fn emit_destination(dest: &Destination, types: &Vec<&Ident>) -> TokenStream {
 pub fn export_types_impl(input: proc_macro::TokenStream) -> Result<TokenStream> {
     println!("EXPORT TYPES input: {:#?}", input);
     let input = syn::parse::<Input>(input)?;
-    println!("parse result: {:#?}", input);
+    // println!("parse result: {:#?}", input);
 
     let types = input.items.args();
     let destinations = input.destinations.args();
@@ -130,6 +130,13 @@ pub fn export_types_impl(input: proc_macro::TokenStream) -> Result<TokenStream> 
     for dest in destinations {
         result.extend(emit_destination(&dest, &types))
     }
+
+    let result = quote! {
+        (|| -> Result<(), std::io::Error> {
+            #result
+            Ok(())
+        })()
+    };
 
     println!("Emitting: {}", result);
     // Ok(input)

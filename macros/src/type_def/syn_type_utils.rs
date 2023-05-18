@@ -1,5 +1,5 @@
-use syn::{GenericArgument, PathArguments, Result, Type as SynType, TypePath};
-use type_reflect_core::{syn_err, Type};
+use syn::{Field, GenericArgument, PathArguments, Result, Type as SynType, TypePath};
+use type_reflect_core::{syn_err, StructMember, Type};
 
 fn leading_segment(path: &TypePath) -> String {
     path.path.segments[0].ident.to_string()
@@ -47,6 +47,7 @@ pub trait SynTypeBridge {
                 let generics = generic_args(type_path)?;
                 match leading.as_str() {
                     "Option" if generics.len() == 1 => Ok(Type::Option(generics[0].clone().into())),
+                    "Vec" if generics.len() == 1 => Ok(Type::Array(generics[0].clone().into())),
                     "HashMap" if generics.len() == 2 => Ok(Type::Map {
                         key: generics[1].clone().into(),
                         value: generics[1].clone().into(),
@@ -62,6 +63,62 @@ pub trait SynTypeBridge {
 
 impl SynTypeBridge for syn::Type {
     fn syn_type(&self) -> &syn::Type {
+        self
+    }
+}
+
+fn get_struct_member(field: &Field) -> Result<StructMember> {
+    println!("Getting struct member from field: {:#?}", field);
+    let name = match &field.ident {
+        None => panic!("Struct fields must be named: {:#?}", field),
+        Some(ident) => format!("{}", ident),
+    };
+
+    let type_ = field.ty.to_type()?;
+
+    Ok(StructMember { name, type_ })
+}
+
+fn get_field_type(field: &Field) -> Result<Type> {
+    println!("Getting tuple member from field: {:#?}", field);
+    match &field.ident {
+        None => {}
+        Some(ident) => panic!("Tuple fields must not be named: {:#?}", field),
+    };
+
+    let type_ = field.ty.to_type()?;
+
+    Ok(type_)
+}
+
+pub trait FieldsNamedBridge {
+    fn fields_named(&self) -> &syn::FieldsNamed;
+    fn to_struct_members(&self) -> Result<Vec<StructMember>> {
+        (&self.fields_named().named)
+            .into_iter()
+            .map(|field: &Field| get_struct_member(&field))
+            .collect()
+    }
+}
+
+impl FieldsNamedBridge for syn::FieldsNamed {
+    fn fields_named(&self) -> &syn::FieldsNamed {
+        self
+    }
+}
+
+pub trait FieldsUnmnamedBridge {
+    fn fields_unnamed(&self) -> &syn::FieldsUnnamed;
+    fn to_tuple_members(&self) -> Result<Vec<Type>> {
+        (&self.fields_unnamed().unnamed)
+            .into_iter()
+            .map(|field: &Field| get_field_type(&field))
+            .collect()
+    }
+}
+
+impl FieldsUnmnamedBridge for syn::FieldsUnnamed {
+    fn fields_unnamed(&self) -> &syn::FieldsUnnamed {
         self
     }
 }

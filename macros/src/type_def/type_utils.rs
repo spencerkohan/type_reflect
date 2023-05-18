@@ -36,3 +36,57 @@ impl TypeBridge for Type {
         self
     }
 }
+
+pub trait EnumCaseBridge {
+    fn case(&self) -> &EnumCaseType;
+    fn emit_case(&self) -> TokenStream {
+        match &self.case() {
+            EnumCaseType::Simple => quote! { EnumCaseType::Simple },
+            EnumCaseType::Tuple(inner) => {
+                let mut types = quote! {};
+
+                for type_ in inner {
+                    types.extend(type_.emit_type());
+                }
+
+                quote! { EnumCaseType::Tuple(vec![#types]) }
+            }
+            EnumCaseType::Struct(inner) => {
+                let mut mermbers = quote! {};
+
+                for member in inner {
+                    mermbers.extend(member.emit_member());
+                }
+
+                quote! { EnumCaseType::Struct(vec![#mermbers]) }
+            }
+        }
+    }
+}
+
+impl EnumCaseBridge for EnumCaseType {
+    fn case(&self) -> &EnumCaseType {
+        self
+    }
+}
+
+pub trait StructMemberBridge {
+    fn member(&self) -> &StructMember;
+    fn emit_member(&self) -> TokenStream {
+        let member = &self.member();
+        let name = &member.name;
+        let type_ = member.type_.emit_type();
+        quote! {
+            StructMember {
+                name: #name.to_string(),
+                type_: #type_,
+            }
+        }
+    }
+}
+
+impl StructMemberBridge for StructMember {
+    fn member(&self) -> &StructMember {
+        self
+    }
+}

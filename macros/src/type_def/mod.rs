@@ -1,8 +1,6 @@
 use proc_macro2::{Ident, TokenStream};
-use quote::{quote};
-use syn::{
-    ItemEnum, ItemStruct, Result,
-};
+use quote::quote;
+use syn::{ItemEnum, ItemStruct, Result};
 
 mod enum_def;
 mod struct_def;
@@ -25,14 +23,18 @@ impl TypeDef {
     pub fn struct_def(item: &ItemStruct) -> Result<Self> {
         Ok(TypeDef::Struct(StructDef::new(item)?))
     }
-    pub fn enum_def(item: &ItemEnum) -> Self {
-        TypeDef::Enum(EnumDef::new(item))
+    pub fn enum_def(item: &ItemEnum) -> Result<Self> {
+        println!("ATTRIBUTES:");
+        for attr in &item.attrs {
+            println!("    {:?}", attr);
+        }
+        Ok(TypeDef::Enum(EnumDef::new(item)?))
     }
 
     pub fn emit(&self) -> TokenStream {
         match self {
             TypeDef::Struct(s) => s.emit(),
-            TypeDef::Enum(_) => todo!(),
+            TypeDef::Enum(e) => e.emit(),
         }
     }
 }
