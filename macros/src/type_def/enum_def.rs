@@ -1,5 +1,6 @@
 use std::{error::Error, fs::symlink_metadata};
 
+use crate::attribute_utils::*;
 use crate::utils::Inflection;
 use crate::utils::*;
 use type_reflect_core::EnumType;
@@ -18,6 +19,7 @@ pub struct EnumDef {
     pub tokens: TokenStream,
     pub ident: Ident,
     pub enum_type: EnumType,
+    pub inflection: Inflection,
     pub cases: Vec<EnumCase>,
 }
 
@@ -47,6 +49,7 @@ fn extract_cases(item: &ItemEnum) -> Result<Vec<EnumCase>> {
 impl EnumDef {
     pub fn new(item: &ItemEnum) -> Result<Self> {
         let attributes = EnumAttr::from_attrs(&item.attrs)?;
+        let rename_attr = RenameAllAttr::from_attrs(&item.attrs)?;
 
         let cases = extract_cases(&item)?;
 
@@ -92,6 +95,7 @@ impl EnumDef {
             tokens: quote! { #item },
             ident: item.ident.clone(),
             enum_type,
+            inflection: rename_attr.rename_all,
             cases,
         })
     }
@@ -242,52 +246,5 @@ impl_parse! {
         "tag" => out.0.tag = Some(parse_assign_str(input)?),
         "content" => out.0.content = Some(parse_assign_str(input)?),
         // "untagged" => out.0.untagged = true
-    }
-}
-
-/// Parse all `#[ts(..)]` attributes from the given slice.
-pub fn parse_attrs<'a, A>(attrs: &'a [Attribute]) -> Result<impl Iterator<Item = A>>
-where
-    A: TryFrom<&'a Attribute, Error = syn::Error>,
-{
-    Ok(attrs
-        .iter()
-        .filter(|a| a.path.is_ident("ts"))
-        .map(A::try_from)
-        .collect::<Result<Vec<A>>>()?
-        .into_iter())
-}
-
-/// Parse all `#[serde(..)]` attributes from the given slice.
-// #[cfg(feature = "serde-compat")]
-#[allow(unused)]
-pub fn parse_serde_attrs<'a, A: TryFrom<&'a Attribute, Error = syn::Error>>(
-    attrs: &'a [Attribute],
-) -> impl Iterator<Item = A> {
-    attrs
-        .iter()
-        .filter(|a| a.path.is_ident("serde"))
-        .flat_map(|attr| match A::try_from(attr) {
-            Ok(attr) => Some(attr),
-            Err(_) => {
-                use quote::ToTokens;
-                // warning::print_warning(
-                //     "failed to parse serde attribute",
-                //     format!("{}", attr.to_token_stream()),
-                //     "ts-rs failed to parse this attribute. It will be ignored.",
-                // )
-                // .unwrap();
-                None
-            }
-        })
-        .collect::<Vec<_>>()
-        .into_iter()
-}
-
-fn parse_assign_str(input: ParseStream) -> Result<String> {
-    input.parse::<Token![=]>()?;
-    match Lit::parse(input)? {
-        Lit::Str(string) => Ok(string.value()),
-        other => Err(syn::Error::new(other.span(), "expected string")),
     }
 }

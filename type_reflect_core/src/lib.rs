@@ -1,5 +1,7 @@
 pub mod type_description;
 pub use type_description::*;
+pub mod inflection;
+pub use inflection::*;
 
 #[macro_export]
 macro_rules! syn_err {
