@@ -8,6 +8,7 @@ use syn::{spanned::Spanned, Item, Result};
 
 mod type_def;
 use type_def::*;
+mod attribute_utils;
 
 mod export_types_impl;
 use export_types_impl::*;

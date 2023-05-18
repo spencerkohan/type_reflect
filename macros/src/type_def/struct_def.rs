@@ -9,6 +9,7 @@ use type_reflect_core::type_description::StructMember;
 #[derive(Clone, Debug)]
 pub struct StructDef {
     tokens: TokenStream,
+    inflection: Inflection,
     ident: Ident,
     members: Vec<StructMember>,
 }
@@ -23,8 +24,11 @@ fn extract_members(item: &ItemStruct) -> Result<Vec<StructMember>> {
 
 impl StructDef {
     pub fn new(item: &ItemStruct) -> Result<Self> {
+        let rename_attr = RenameAllAttr::from_attrs(&item.attrs)?;
+
         Ok(Self {
             tokens: quote! { #item },
+            inflection: rename_attr.rename_all,
             ident: item.ident.clone(),
             members: extract_members(&item)?,
         })

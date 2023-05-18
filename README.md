@@ -112,10 +112,5 @@ ToDo:
     - [x] Map
 - [x] Support for Rust export
 - [x] Support for Enums
-- [ ] Coordinate with Serde attributes
-    - [ ] Throw a validation error if the incorrect attributes are applied
-
-
-Problems:
-Currently this implementation assumes the following:
-- The attributes #[serde(tag="_case", content="data"] are applied
+- [x] Coordinate with Serde attributes
+    - [x] Throw a validation error if the incorrect attributes are applied
