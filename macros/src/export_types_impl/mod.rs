@@ -1,14 +1,11 @@
 use std::ops::Deref;
 
-use crate::utils::*;
 use proc_macro2::*;
 use quote::*;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::*;
 use syn::token::Bracket;
 use syn::*;
-
-use crate::utils::Inflection;
 
 #[derive(Debug, Clone)]
 struct ItemsList {

@@ -12,6 +12,7 @@ pub mod type_utils;
 
 pub use enum_def::*;
 pub use struct_def::StructDef;
+use type_reflect_core::Inflection;
 
 #[derive(Clone, Debug)]
 pub enum TypeDef {
@@ -67,5 +68,27 @@ pub trait RustTypeEmitter {
                 }
             }
         }
+    }
+}
+
+pub trait InflectionTokenProvider {
+    fn inflection(&self) -> &Inflection;
+    fn to_tokens(&self) -> TokenStream {
+        match &self.inflection() {
+            Inflection::Lower => quote!(Inflection::Lower),
+            Inflection::Upper => quote!(Inflection::Upper),
+            Inflection::Camel => quote!(Inflection::Camel),
+            Inflection::Snake => quote!(Inflection::Snake),
+            Inflection::Pascal => quote!(Inflection::Pascal),
+            Inflection::ScreamingSnake => quote!(Inflection::ScreamingSnake),
+            Inflection::Kebab => quote!(Inflection::Kebab),
+            Inflection::None => quote!(Inflection::None),
+        }
+    }
+}
+
+impl InflectionTokenProvider for Inflection {
+    fn inflection(&self) -> &Inflection {
+        self
     }
 }

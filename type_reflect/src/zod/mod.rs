@@ -1,5 +1,3 @@
-use std::fmt::format;
-
 pub use super::struct_type::*;
 pub use super::type_description::Type;
 pub use super::*;
@@ -42,7 +40,7 @@ impl TypeEmitter for Zod {
     where
         T: StructType,
     {
-        let members = struct_members(&T::members());
+        let members = struct_members(&T::members(), T::inflection());
         let name = T::name();
 
         format!(

@@ -1,16 +1,15 @@
-use std::{error::Error, fs::symlink_metadata};
-
 use crate::attribute_utils::*;
-use crate::utils::Inflection;
+use crate::type_def::InflectionTokenProvider;
 use crate::utils::*;
 use type_reflect_core::EnumType;
+use type_reflect_core::Inflection;
 
 use super::{syn_type_utils::*, type_utils::EnumCaseBridge, RustTypeEmitter};
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use syn::{
     parse::{Parse, ParseStream},
-    Attribute, Field, FieldsUnnamed, ItemEnum, Lit, Result, Token,
+    Attribute, ItemEnum, Result,
 };
 use type_reflect_core::*;
 
@@ -135,6 +134,8 @@ impl EnumDef {
             },
         };
 
+        let inflection = &self.inflection.to_tokens();
+
         quote! {
 
             impl Emittable for #ident {
@@ -146,6 +147,9 @@ impl EnumDef {
             impl EnumReflectionType for #ident {
                 fn name() -> &'static str {
                     #name_literal
+                }
+                fn inflection() -> Inflection {
+                    #inflection
                 }
                 fn enum_type() -> EnumType {
                     #enum_type
@@ -231,7 +235,7 @@ impl EnumAttr {
 }
 
 impl_parse! {
-    EnumAttr(input, out) {
+    EnumAttr(_input, _out) {
         // "rename" => out.rename = Some(parse_assign_str(input)?),
         // "rename_all" => out.rename_all = Some(parse_assign_inflection(input)?),
         // "export_to" => out.export_to = Some(parse_assign_str(input)?),

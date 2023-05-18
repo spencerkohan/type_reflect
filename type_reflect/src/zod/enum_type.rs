@@ -1,4 +1,4 @@
-use type_reflect_core::{EnumCase, EnumType};
+use type_reflect_core::{EnumCase, EnumType, Inflectable, Inflection};
 
 use crate::EnumReflectionType;
 
@@ -64,7 +64,7 @@ where
     T: EnumReflectionType,
 {
     let cases_enum = T::generate_cases_enum();
-    let union_types = T::generate_union_types(&case_key, &content_key);
+    let union_types = T::generate_union_types(&case_key, &content_key, T::inflection());
     let union_type = T::generate_union_schema();
 
     // Generate case type
@@ -109,17 +109,28 @@ export enum {name} {{
         )
     }
 
-    fn generate_union_types(case_key: &String, content_key: &String) -> String {
+    fn generate_union_types(
+        case_key: &String,
+        content_key: &String,
+        inflection: Inflection,
+    ) -> String {
         let mut result = String::new();
 
         for case in Self::cases() {
-            result.push_str(Self::generate_union_type(&case, &case_key, &content_key).as_str())
+            result.push_str(
+                Self::generate_union_type(&case, &case_key, &content_key, inflection).as_str(),
+            )
         }
 
         result
     }
 
-    fn generate_union_type(case: &EnumCase, case_key: &String, content_key: &String) -> String {
+    fn generate_union_type(
+        case: &EnumCase,
+        case_key: &String,
+        content_key: &String,
+        inflection: Inflection,
+    ) -> String {
         let schema_name = union_type_name(case);
         let id = Self::case_id(case);
 
@@ -142,7 +153,13 @@ export enum {name} {{
             type_reflect_core::EnumCaseType::Struct(inner) => {
                 let struct_items: String = inner
                     .into_iter()
-                    .map(|item| format!("    {}: {},\n", item.name, to_zod_type(&item.type_)))
+                    .map(|item| {
+                        format!(
+                            "    {}: {},\n",
+                            item.name.inflect(inflection),
+                            to_zod_type(&item.type_)
+                        )
+                    })
                     .collect();
                 format!(
                     r#"    {content_key} : z.object({{
@@ -155,7 +172,7 @@ export enum {name} {{
         format!(
             r#"
 export const {schema_name} = z.object({{
-    {case_key}: {id},
+    {case_key}: z.literal({id}),
 {additional_fields}}});
 export type {name} = z.infer<typeof {schema_name}>
             "#,

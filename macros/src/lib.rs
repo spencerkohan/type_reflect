@@ -12,6 +12,7 @@ mod attribute_utils;
 
 mod export_types_impl;
 use export_types_impl::*;
+use type_reflect_core::syn_err;
 
 #[macro_use]
 mod utils;
