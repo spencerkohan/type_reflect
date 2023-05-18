@@ -111,6 +111,9 @@ fn emit_destination(dest: &Destination, types: &Vec<&Ident>) -> TokenStream {
                 file.write_all(#emitter::emit::<#type_>().as_bytes())?;
             });
         }
+        result.extend(quote! {
+            #emitter::finalize(#dest)?;
+        });
     }
     result
 }

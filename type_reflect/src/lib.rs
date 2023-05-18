@@ -1,6 +1,7 @@
 #![feature(specialization)]
 extern crate type_reflect_macros;
 pub use core::convert::AsRef;
+use std::ffi::OsStr;
 use std::fs;
 use std::fs::File;
 pub use std::io::Write;
@@ -38,6 +39,10 @@ pub trait TypeEmitter {
         file.write_all(Self::dependencies().as_bytes())?;
         Ok(file)
     }
+
+    fn finalize<P>(path: P) -> Result<(), std::io::Error>
+    where
+        P: AsRef<OsStr>;
 
     fn dependencies() -> String;
     fn emit<T: Emittable>() -> String

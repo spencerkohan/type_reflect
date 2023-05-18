@@ -194,7 +194,7 @@ export type {name} = z.infer<typeof {schema_name}>
     }
 
     fn union_schema_name() -> String {
-        format!("{}Scema", Self::name())
+        format!("{}Schema", Self::name())
     }
 
     fn generate_union_schema() -> String {
@@ -219,7 +219,7 @@ export type {name} = z.infer<typeof {schema_name}>
 }
 
 fn union_type_name(case: &EnumCase) -> String {
-    format!("{}Scema", case.name)
+    format!("{}Schema", case.name)
 }
 
 impl<T> EnumTypeBridge for T where T: EnumReflectionType {}

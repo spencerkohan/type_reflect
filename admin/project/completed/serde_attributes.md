@@ -53,5 +53,4 @@ export type SerdeContentExampleCaseFoo = z.infer<typeof SerdeContentExampleCaseF
 
 
 - [x] If the "tag" or "content" attribute is missing, an error should be thrown
-
 - [x] The Serde: "rename_all" attribute should be supported

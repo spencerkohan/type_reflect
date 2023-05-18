@@ -1,3 +1,5 @@
+use std::ffi::OsStr;
+
 pub use super::struct_type::*;
 pub use super::type_description::Type;
 pub use super::*;
@@ -64,5 +66,12 @@ export type {name} = z.infer<typeof {name}Schema>;
         T: EnumReflectionType,
     {
         emit_enum_type::<T>()
+    }
+
+    fn finalize<P>(path: P) -> Result<(), std::io::Error>
+    where
+        P: AsRef<OsStr>,
+    {
+        Ok(())
     }
 }
