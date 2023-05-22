@@ -31,6 +31,13 @@ impl TypeEmitter for Rust {
         format!("\n{}\n{}\n", DERIVES, T::rust())
     }
 
+    fn emit_alias<T>() -> String
+    where
+        T: AliasType,
+    {
+        format!("\n{}\n{}\n", DERIVES, T::rust())
+    }
+
     fn finalize<P>(path: P) -> Result<(), std::io::Error>
     where
         P: AsRef<OsStr>,

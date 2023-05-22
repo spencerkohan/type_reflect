@@ -1,3 +1,5 @@
+use crate::Inflection;
+
 #[derive(Clone, Debug)]
 pub enum Type {
     Named(String),
@@ -21,6 +23,7 @@ pub struct StructMember {
 pub struct EnumCase {
     pub name: String,
     pub type_: EnumCaseType,
+    pub inflection: Inflection,
 }
 
 #[derive(Clone, Debug)]
@@ -35,7 +38,7 @@ pub enum EnumType {
     Simple,
     Complex {
         case_key: String,
-        content_key: String,
+        content_key: Option<String>,
     },
 }
 

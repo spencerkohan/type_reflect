@@ -18,7 +18,7 @@ export enum SimpleEnumsExample {
     Foo = "Foo",
 }
 
-export const SimpleEnumsExampleScema = z.enum([
+export const SimpleEnumsExampleSchema = z.enum([
     SimpleEnumsExample.Foo,
 ])
 
@@ -32,45 +32,46 @@ export enum StatusCase {
 }
 
 
-export const InitialScema = z.object({
+export const StatusCaseInitialSchema = z.object({
     _case: z.literal(StatusCase.Initial),
 });
-export type Initial = z.infer<typeof InitialScema>
+export type StatusCaseInitial = z.infer<typeof StatusCaseInitialSchema>
             
-export const InProgressScema = z.object({
+export const StatusCaseInProgressSchema = z.object({
     _case: z.literal(StatusCase.InProgress),
     data: z.object({
-    progress: z.number(),
+        progress: z.number(),
+    shouldConvert: z.bool(),
     })});
-export type InProgress = z.infer<typeof InProgressScema>
+export type StatusCaseInProgress = z.infer<typeof StatusCaseInProgressSchema>
             
-export const CompleteScema = z.object({
+export const StatusCaseCompleteSchema = z.object({
     _case: z.literal(StatusCase.Complete),
     data: z.object({
-    urls: z.array(z.string()),
+        urls: z.array(z.string()),
     })});
-export type Complete = z.infer<typeof CompleteScema>
+export type StatusCaseComplete = z.infer<typeof StatusCaseCompleteSchema>
             
-export const DoubleScema = z.object({
+export const StatusCaseDoubleSchema = z.object({
     _case: z.literal(StatusCase.Double),
     data: z.tuple([
-        z.number(),
+            z.number(),
         z.number(),
     ])});
-export type Double = z.infer<typeof DoubleScema>
+export type StatusCaseDouble = z.infer<typeof StatusCaseDoubleSchema>
             
-export const SingleScema = z.object({
+export const StatusCaseSingleSchema = z.object({
     _case: z.literal(StatusCase.Single),
     data: z.number()});
-export type Single = z.infer<typeof SingleScema>
+export type StatusCaseSingle = z.infer<typeof StatusCaseSingleSchema>
             
 
-export const StatusScema = z.union([
-    InitialScema,
-    InProgressScema,
-    CompleteScema,
-    DoubleScema,
-    SingleScema,
+export const StatusSchema = z.union([
+    StatusCaseInitialSchema,
+    StatusCaseInProgressSchema,
+    StatusCaseCompleteSchema,
+    StatusCaseDoubleSchema,
+    StatusCaseSingleSchema,
 ]);
-export type Status = z.infer<typeof StatusScema>
+export type Status = z.infer<typeof StatusSchema>
             

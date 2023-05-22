@@ -1,4 +1,4 @@
-use type_reflect_core::{EnumCase, EnumType, Inflectable, Inflection};
+use type_reflect_core::{syn_err, EnumCase, EnumType, Inflectable, Inflection};
 
 use crate::EnumReflectionType;
 
@@ -59,7 +59,7 @@ export const {schema_name} = z.enum([
     )
 }
 
-fn emit_complex_enum_type<T>(case_key: &String, content_key: &String) -> String
+fn emit_complex_enum_type<T>(case_key: &String, content_key: &Option<String>) -> String
 where
     T: EnumReflectionType,
 {
@@ -111,7 +111,7 @@ export enum {name} {{
 
     fn generate_union_types(
         case_key: &String,
-        content_key: &String,
+        content_key: &Option<String>,
         inflection: Inflection,
     ) -> String {
         let mut result = String::new();
@@ -128,15 +128,22 @@ export enum {name} {{
     fn generate_union_type(
         case: &EnumCase,
         case_key: &String,
-        content_key: &String,
+        content_key: &Option<String>,
         inflection: Inflection,
     ) -> String {
-        let schema_name = union_type_name(case);
+        let schema_name = union_type_name(case, Self::name());
         let id = Self::case_id(case);
 
         let additional_fields = match &case.type_ {
             type_reflect_core::EnumCaseType::Simple => String::new(),
             type_reflect_core::EnumCaseType::Tuple(inner) => {
+                let content_key = match (content_key) {
+                    Some(content_key) => content_key,
+                    None => {
+                        //TODO: make this a localized Syn error
+                        panic!("Content key required on enums containing at least one tuple-type variant.")
+                    }
+                };
                 if inner.len() == 1 {
                     let type_ = to_zod_type(&inner[0]);
                     format!(
@@ -149,11 +156,10 @@ export enum {name} {{
                         .into_iter()
                         .map(|item| format!("        {},\n", to_zod_type(&item)))
                         .collect();
-                    // TODO: WARNING: this implementaiton is not compatible with the default Serde
-                    // It assumes the "content"" field is `data`: i/e #[serde(content="data"")]
+
                     format!(
                         r#"    {content_key}: z.tuple([
-{tuple_items}    ])"#,
+    {tuple_items}    ])"#,
                         tuple_items = tuple_items,
                         content_key = content_key,
                     )
@@ -165,17 +171,21 @@ export enum {name} {{
                     .map(|item| {
                         format!(
                             "    {}: {},\n",
-                            item.name.inflect(inflection),
+                            item.name.inflect(case.inflection),
                             to_zod_type(&item.type_)
                         )
                     })
                     .collect();
-                format!(
-                    r#"    {content_key}: z.object({{
-{struct_items}    }})"#,
-                    struct_items = struct_items,
-                    content_key = content_key,
-                )
+
+                match content_key {
+                    Some(content_key) => format!(
+                        r#"    {content_key}: z.object({{
+    {struct_items}    }})"#,
+                        struct_items = struct_items,
+                        content_key = content_key,
+                    ),
+                    None => struct_items,
+                }
             }
         };
         format!(
@@ -186,7 +196,7 @@ export const {schema_name} = z.object({{
 export type {name} = z.infer<typeof {schema_name}>
             "#,
             schema_name = schema_name,
-            name = case.name,
+            name = format!("{}Case{}", Self::name(), case.name),
             case_key = case_key,
             id = id,
             additional_fields = additional_fields
@@ -202,7 +212,7 @@ export type {name} = z.infer<typeof {schema_name}>
         let mut cases = String::new();
 
         for case in Self::cases() {
-            cases.push_str(format!("    {},\n", union_type_name(&case)).as_str());
+            cases.push_str(format!("    {},\n", union_type_name(&case, Self::name())).as_str());
         }
 
         format!(
@@ -218,8 +228,8 @@ export type {name} = z.infer<typeof {schema_name}>
     }
 }
 
-fn union_type_name(case: &EnumCase) -> String {
-    format!("{}Schema", case.name)
+fn union_type_name(case: &EnumCase, parent_name: &str) -> String {
+    format!("{}Case{}Schema", parent_name, case.name)
 }
 
 impl<T> EnumTypeBridge for T where T: EnumReflectionType {}

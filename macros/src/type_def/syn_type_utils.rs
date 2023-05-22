@@ -35,7 +35,6 @@ fn simple_type(name: String) -> Type {
 
 pub trait SynTypeBridge {
     fn syn_type(&self) -> &syn::Type;
-
     fn to_type(&self) -> Result<Type> {
         match self.syn_type() {
             SynType::Path(type_path)

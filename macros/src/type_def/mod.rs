@@ -1,9 +1,11 @@
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
-use syn::{ItemEnum, ItemStruct, Result};
+use syn::{ItemEnum, ItemStruct, ItemType, Result};
 
 mod enum_def;
 mod struct_def;
+mod type_alias_def;
+pub use type_alias_def::*;
 
 pub mod syn_type_utils;
 pub use syn_type_utils::*;
@@ -18,11 +20,15 @@ use type_reflect_core::Inflection;
 pub enum TypeDef {
     Struct(StructDef),
     Enum(EnumDef),
+    Alias(TypeAliasDef),
 }
 
 impl TypeDef {
     pub fn struct_def(item: &ItemStruct) -> Result<Self> {
         Ok(TypeDef::Struct(StructDef::new(item)?))
+    }
+    pub fn alias_def(item: &ItemType) -> Result<Self> {
+        Ok(TypeDef::Alias(TypeAliasDef::new(item)?))
     }
     pub fn enum_def(item: &ItemEnum) -> Result<Self> {
         println!("ATTRIBUTES:");
@@ -36,6 +42,7 @@ impl TypeDef {
         match self {
             TypeDef::Struct(s) => s.emit(),
             TypeDef::Enum(e) => e.emit(),
+            TypeDef::Alias(t) => t.emit(),
         }
     }
 }
@@ -47,12 +54,13 @@ impl RustTypeEmitter for TypeDef {
     fn tokens(&self) -> &TokenStream {
         panic!("unimplemented")
     }
-    fn emit_type_def_impl(&self) -> TokenStream {
-        match self {
-            TypeDef::Struct(s) => s.emit_type_def_impl(),
-            TypeDef::Enum(e) => e.emit_type_def_impl(),
-        }
-    }
+    // fn emit_type_def_impl(&self) -> TokenStream {
+    //     match self {
+    //         TypeDef::Struct(s) => s.emit_type_def_impl(),
+    //         TypeDef::Enum(e) => e.emit_type_def_impl(),
+    //         TypeDef::Alias(_) => todo!(),
+    //     }
+    // }
 }
 
 pub trait RustTypeEmitter {

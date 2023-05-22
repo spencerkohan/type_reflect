@@ -27,18 +27,37 @@ fn extract_cases(item: &ItemEnum) -> Result<Vec<EnumCase>> {
         .into_iter()
         .map(|case| {
             let name = format!("{}", case.ident);
+            let inflection: Inflection = match RenameAllAttr::from_attrs(&case.attrs) {
+                Err(e) => {
+                    eprintln!(
+                        "Error extracting inflection: {} from attributes: {:#?}",
+                        e, &case.attrs
+                    );
+                    Inflection::None
+                }
+                Ok(rename_all) => {
+                    println!(
+                        "Extracted inflection: {:?} from attributes: {:#?}",
+                        rename_all, &case.attrs
+                    );
+                    rename_all.rename_all
+                }
+            };
             match &case.fields {
                 syn::Fields::Named(fileds) => Ok(EnumCase {
                     name,
                     type_: EnumCaseType::Struct(fileds.to_struct_members()?),
+                    inflection,
                 }),
                 syn::Fields::Unnamed(fields) => Ok(EnumCase {
                     name,
                     type_: EnumCaseType::Tuple(fields.to_tuple_members()?),
+                    inflection,
                 }),
                 syn::Fields::Unit => Ok(EnumCase {
                     name,
                     type_: EnumCaseType::Simple,
+                    inflection,
                 }),
             }
         })
@@ -74,15 +93,7 @@ impl EnumDef {
                     }
                 };
 
-                let content_key = match attributes.content {
-                    Some(key) => key,
-                    None => {
-                        return Err(syn::Error::new(
-                            item.ident.span().clone(),
-                            r#"The Serde "content" attribute is required for Enum declarations using the Reflect derive macro.  I.e. #[serde(content="data")]"#,
-                        ))
-                    }
-                };
+                let content_key = attributes.content;
                 EnumType::Complex {
                     case_key,
                     content_key,
@@ -105,10 +116,12 @@ impl EnumDef {
             .map(|case| {
                 let name = &case.name;
                 let type_ = case.type_.emit_case();
+                let rename_all = &case.inflection.to_tokens();
                 quote! {
                     EnumCase {
                         name: #name.to_string(),
                         type_: #type_,
+                        inflection: #rename_all,
                     }
                 }
             })
@@ -129,8 +142,13 @@ impl EnumDef {
             EnumType::Complex {
                 case_key,
                 content_key,
-            } => quote! {
-                EnumType::Complex { case_key: #case_key.to_string(), content_key: #content_key.to_string() }
+            } => match content_key {
+                Some(content_key) => quote! {
+                    EnumType::Complex { case_key: #case_key.to_string(), content_key: Some(#content_key.to_string()) }
+                },
+                None => quote! {
+                    EnumType::Complex { case_key: #case_key.to_string(), content_key: None }
+                },
             },
         };
 

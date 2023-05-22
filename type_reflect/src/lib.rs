@@ -18,6 +18,8 @@ pub mod rust;
 pub use rust::Rust;
 pub mod enum_type;
 pub use enum_type::*;
+pub mod alias_type;
+pub use alias_type::*;
 
 pub use serde::{Deserialize, Serialize};
 pub use serde_json;
@@ -63,6 +65,10 @@ pub trait TypeEmitter {
     fn emit_enum<T>() -> String
     where
         T: EnumReflectionType;
+
+    fn emit_alias<T>() -> String
+    where
+        T: AliasType;
 }
 
 pub trait RustType {

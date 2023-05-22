@@ -41,8 +41,14 @@ struct SDParameters {
 #[serde(tag = "_case", content = "data")]
 enum Status {
     Initial,
-    InProgress { progress: f32 },
-    Complete { urls: Vec<String> },
+    #[serde(rename_all = "camelCase")]
+    InProgress {
+        progress: f32,
+        should_convert: bool,
+    },
+    Complete {
+        urls: Vec<String>,
+    },
     Double(i32, f32),
     Single(i32),
 }

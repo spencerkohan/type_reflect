@@ -42,8 +42,9 @@ fn entry(input: proc_macro::TokenStream) -> Result<TokenStream> {
             // println!("Parsed Item::Enum: {:#?}", e);
             (TypeDef::enum_def(&e)?, e.ident, e.generics)
         }
+        Item::Type(t) => (TypeDef::alias_def(&t)?, t.ident, t.generics),
         _ => {
-            syn_err!(input.span(); "unsupported item")
+            syn_err!(input.span(); "Item is not supported by the Reflect macro")
         }
     };
 

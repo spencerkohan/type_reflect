@@ -10,6 +10,9 @@ use struct_type::*;
 mod enum_type;
 use enum_type::*;
 
+mod alias_type;
+use alias_type::*;
+
 pub struct Zod {}
 
 pub trait TypeExporter {
@@ -66,6 +69,13 @@ export type {name} = z.infer<typeof {name}Schema>;
         T: EnumReflectionType,
     {
         emit_enum_type::<T>()
+    }
+
+    fn emit_alias<T>() -> String
+    where
+        T: AliasType,
+    {
+        emit_alias_type::<T>()
     }
 
     fn finalize<P>(path: P) -> Result<(), std::io::Error>
