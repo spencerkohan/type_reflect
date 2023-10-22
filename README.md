@@ -1,6 +1,6 @@
 # Type Reflect
 
-*Be aware: the current status of this project is very incomplete.  I'm using it as
+***This project is currently fairly rough around the edges.  It's already usable in it's current state, but for instance the rust docs are WIP.  You may also expect to run into bugs and limitations, since so far it has only been tested on my own use-cases.  If you run into something, please report it so I can make this a better tool***
 
 This library is implemented to make it easier to bridge between Rust types and Zod schemas for TypeScript.
 
