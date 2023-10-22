@@ -5,6 +5,10 @@ use serde::{Deserialize, Serialize};
 use type_reflect::*;
 use type_reflect::{export_types, Reflect};
 
+// Here we declare a simple struct type with Reflect
+// the serde(rename_all) attribute will rename the keys to
+// camel case, both for the JSON representation, and for
+// the Zod schemas when they are exported
 #[derive(Debug, Reflect, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct SDParameters {
@@ -18,6 +22,11 @@ struct SDParameters {
     headers: HashMap<String, String>,
 }
 
+// Here we declare an enum wiht associated values.
+// The `tag` attribute is required for all enums
+// with associated data and in this case the `data`
+// tag is also required (by serde) since we have
+// tuple-typed enum variants
 #[derive(Debug, Reflect, Serialize, Deserialize)]
 #[serde(tag = "_case", content = "data")]
 enum Status {
@@ -34,17 +43,22 @@ enum Status {
     Single(i32),
 }
 
+// Here we have a simple enum type
 #[derive(Debug, Reflect, Serialize, Deserialize)]
 enum SimpleEnumsExample {
     Foo,
 }
 
+// And here we have an example of a type which depends
+// on a declared type, rather than primitive types
 #[derive(Debug, Reflect, Serialize, Deserialize)]
 struct DependantTypeExample {
     foo: SimpleEnumsExample,
 }
 
 fn main() {
+    // When the example is run, we export the specified
+    // types to both a Zod target, and a Rust target
     export_types! {
         types: [
             SDParameters,
@@ -58,5 +72,3 @@ fn main() {
     }
     .unwrap();
 }
-
-//
