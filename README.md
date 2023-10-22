@@ -98,6 +98,8 @@ will throw an error.  The reason for this is that by default, serde uses externa
 
 This type of enum representation is disallowed by `type_reflect` because it is less convenient to bridge to typescript union types, which are the best analog for ADT's in typescript.
 
+---
+
 # Example Usage:
 
 ## Simple Struct Definition:
