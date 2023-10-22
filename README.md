@@ -102,6 +102,12 @@ This type of enum representation is disallowed by `type_reflect` because it is l
 
 # Example Usage:
 
+A working example can be found at `type_reflect/examples/declare_and_export`.
+
+It can be run with the command: `cargo run -p type_reflect --example declare_and_export`
+
+the output files will be written to: `type_reflect/example_output`
+
 ## Simple Struct Definition:
 
 ```rust

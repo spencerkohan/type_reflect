@@ -1,2 +1,9 @@
 [workspace]
-members = ["macros", "type_reflect", "example"]
+members = [
+    "macros",
+    "type_reflect_core",
+    "type_reflect",
+    "type_reflect/examples/*",
+]
+
+resolver = "2"

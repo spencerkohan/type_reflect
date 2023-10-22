@@ -1,3 +1,4 @@
 /target
 /Cargo.lock
 node_modules/
+type_reflect/example_output
