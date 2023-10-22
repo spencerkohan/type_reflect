@@ -48,11 +48,55 @@ Non-goals:
     - Basically anything which can't be easily serialzied into JSON
 - This crate is not currently optimized for performance, it's optimized for productivity
 
+# Important Details:
 
+## Serde Attributes
 
-## Example Usage:
+The `Reflect` macro has support for certain `serde` attributes to make it easier to keep all representations aligned with the serialized representation.
 
-Type declaration:
+Specifically this includes:
+
+### 1. rename_all
+
+This attribute is commonly used to convert between case conventions, like `snake_case` and `camelCase` for keys.
+
+So for example, a rust `snake_case` representation can be converted to `camelCase` in the Zod output by using this attribute:
+
+```
+#[derive(Reflect, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct Foo {
+    key_1: ...
+    key_2: ...
+}
+```
+
+would result in the `Zod` export using the key names `key1` and `key2`.
+
+### tag
+
+For enum types with associated data, the `tag` attribute is requires.  So for instance this declaration:
+
+```
+#[derive(Reflect, Serialize, Deserialize)]
+enum MyEnum {
+    VariantA { x: u32 }
+    VariantB { text: String }
+}
+```
+
+will throw an error.  The reason for this is that by default, serde uses externally tagged JSON representation of enums.  I.e. the abovev code would serialize to:
+
+```
+{ "VariantA": { "x": 42 }}
+{ "VariantB": { "text": "foo" }}
+```
+
+This type of enum representation is disallowed by `type_reflect` because it is less convenient to bridge to typescript union types, which are the best analog for ADT's in typescript.
+
+# Example Usage:
+
+## Simple Struct Definition:
 
 ```
 #[derive(Reflect)]
@@ -138,8 +182,6 @@ enum Status {
     Complete {
         urls: Vec<String>,
     },
-    Double(i32, f32),
-    Single(i32),
 }
 ```
 
@@ -151,8 +193,6 @@ export enum StatusCase {
     Initial = "Initial",
     InProgress = "InProgress",
     Complete = "Complete",
-    Double = "Double",
-    Single = "Single",
 }
 
 
@@ -176,26 +216,10 @@ export const StatusCaseCompleteSchema = z.object({
     })});
 export type StatusCaseComplete = z.infer<typeof StatusCaseCompleteSchema>
 
-export const StatusCaseDoubleSchema = z.object({
-    _case: z.literal(StatusCase.Double),
-    data: z.tuple([
-            z.number(),
-        z.number(),
-    ])});
-export type StatusCaseDouble = z.infer<typeof StatusCaseDoubleSchema>
-
-export const StatusCaseSingleSchema = z.object({
-    _case: z.literal(StatusCase.Single),
-    data: z.number()});
-export type StatusCaseSingle = z.infer<typeof StatusCaseSingleSchema>
-
-
 export const StatusSchema = z.union([
     StatusCaseInitialSchema,
     StatusCaseInProgressSchema,
     StatusCaseCompleteSchema,
-    StatusCaseDoubleSchema,
-    StatusCaseSingleSchema,
 ]);
 export type Status = z.infer<typeof StatusSchema>
 

@@ -19,7 +19,6 @@ macro_rules! impl_parse {
     ($i:ident ($input:ident, $out:ident) { $($k:pat => $e:expr),* $(,)? }) => {
         impl std::convert::TryFrom<&syn::Attribute> for $i {
             type Error = syn::Error;
-
             fn try_from(attr: &syn::Attribute) -> syn::Result<Self> { attr.parse_args() }
         }
 
