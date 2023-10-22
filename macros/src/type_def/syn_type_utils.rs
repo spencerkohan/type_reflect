@@ -67,7 +67,7 @@ impl SynTypeBridge for syn::Type {
 }
 
 fn get_struct_member(field: &Field) -> Result<StructMember> {
-    println!("Getting struct member from field: {:#?}", field);
+    // println!("Getting struct member from field: {:#?}", field);
     let name = match &field.ident {
         None => panic!("Struct fields must be named: {:#?}", field),
         Some(ident) => format!("{}", ident),
@@ -79,7 +79,7 @@ fn get_struct_member(field: &Field) -> Result<StructMember> {
 }
 
 fn get_field_type(field: &Field) -> Result<Type> {
-    println!("Getting tuple member from field: {:#?}", field);
+    // println!("Getting tuple member from field: {:#?}", field);
     match &field.ident {
         None => {}
         Some(_ident) => panic!("Tuple fields must not be named: {:#?}", field),

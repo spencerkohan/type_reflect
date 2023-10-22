@@ -30,7 +30,6 @@ fn to_zod_type(t: &Type) -> String {
         Type::Option(t) => format!("{}.optional()", to_zod_type(t)),
         Type::Array(t) => format!("z.array({})", to_zod_type(t)),
         Type::Map { key, value } => format!("z.map({}, {})", to_zod_type(key), to_zod_type(value)),
-        // _ => todo!(),
     }
 }
 
@@ -38,9 +37,7 @@ impl TypeEmitter for Zod {
     fn dependencies() -> String {
         "import { z } from 'zod';\n".to_string()
     }
-    // }
 
-    // impl StructTypeEmitter for Zod {
     fn emit_struct<T>() -> String
     where
         T: StructType,
@@ -61,9 +58,7 @@ export type {name} = z.infer<typeof {name}Schema>;
             name = name
         )
     }
-    // }
 
-    // impl EnumTypeEmitter for Zod {
     fn emit_enum<T>() -> String
     where
         T: EnumReflectionType,

@@ -3,6 +3,8 @@ use type_reflect_core::{
     Inflection,
 };
 
+/// A type implementing `EnumReflectionType` can
+/// be used to emit a enum representation
 pub trait EnumReflectionType {
     fn name() -> &'static str;
     fn inflection() -> Inflection;

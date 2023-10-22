@@ -140,7 +140,6 @@ remove_file(export_dir1)
 
 export_dir1.write_all(MyStruct::export<Zod>())
 export_dir1.write_all(MyOtherType::export<Zod>())
-
 ...
 ```
 

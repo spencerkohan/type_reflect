@@ -49,8 +49,8 @@ fn entry(input: proc_macro::TokenStream) -> Result<TokenStream> {
         }
     };
 
-    println!("Type Def Parsed: {:#?}", type_def);
-    println!("Type Def Emits: \n{}", type_def.emit());
+    // println!("Type Def Parsed: {:#?}", type_def);
+    // println!("Type Def Emits: \n{}", type_def.emit());
 
     Ok(type_def.emit())
 

@@ -66,8 +66,8 @@ fn main() {
             Status,
         ],
         destinations: [
-            Zod("./type_reflect/example_output/zod.ts"),
-            Rust("./type_reflect/example_output/rust.rs"),
+            Zod("./type_reflect/example_output/declare_and_export/zod.ts"),
+            Rust("./type_reflect/example_output/declare_and_export/rust.rs", prefix: r#"// We add an extra comment here"#),
         ]
     }
     .unwrap();

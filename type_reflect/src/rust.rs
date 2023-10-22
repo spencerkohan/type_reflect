@@ -12,18 +12,14 @@ impl TypeEmitter for Rust {
     fn dependencies() -> String {
         "use serde::{Deserialize, Serialize};\nuse serde_json;\n".to_string()
     }
-    // }
 
-    // impl StructTypeEmitter for Rust {
     fn emit_struct<T>() -> String
     where
         T: StructType,
     {
         format!("\n{}\n{}\n", DERIVES, T::rust())
     }
-    // }
 
-    // impl EnumTypeEmitter for Rust {
     fn emit_enum<T>() -> String
     where
         T: EnumReflectionType,
@@ -43,12 +39,10 @@ impl TypeEmitter for Rust {
         P: AsRef<OsStr>,
     {
         let output = Command::new("rustfmt").arg(path).output()?;
-
         if !output.status.success() {
             eprintln!("Failed to format file");
             eprintln!("stderr: {}", String::from_utf8_lossy(&output.stderr));
         }
-
         Ok(())
     }
 }
