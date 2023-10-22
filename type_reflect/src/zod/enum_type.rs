@@ -1,4 +1,4 @@
-use type_reflect_core::{syn_err, EnumCase, EnumType, Inflectable, Inflection};
+use type_reflect_core::{EnumCase, EnumType, Inflectable, Inflection};
 
 use crate::EnumReflectionType;
 
@@ -129,7 +129,7 @@ export enum {name} {{
         case: &EnumCase,
         case_key: &String,
         content_key: &Option<String>,
-        inflection: Inflection,
+        _inflection: Inflection,
     ) -> String {
         let schema_name = union_type_name(case, Self::name());
         let id = Self::case_id(case);
@@ -137,7 +137,7 @@ export enum {name} {{
         let additional_fields = match &case.type_ {
             type_reflect_core::EnumCaseType::Simple => String::new(),
             type_reflect_core::EnumCaseType::Tuple(inner) => {
-                let content_key = match (content_key) {
+                let content_key = match content_key {
                     Some(content_key) => content_key,
                     None => {
                         //TODO: make this a localized Syn error

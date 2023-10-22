@@ -2,7 +2,7 @@ use std::ffi::OsStr;
 
 pub use super::struct_type::*;
 pub use super::type_description::Type;
-pub use super::*;
+use super::*;
 
 mod struct_type;
 use struct_type::*;
@@ -30,7 +30,7 @@ fn to_zod_type(t: &Type) -> String {
         Type::Option(t) => format!("{}.optional()", to_zod_type(t)),
         Type::Array(t) => format!("z.array({})", to_zod_type(t)),
         Type::Map { key, value } => format!("z.map({}, {})", to_zod_type(key), to_zod_type(value)),
-        _ => todo!(),
+        // _ => todo!(),
     }
 }
 
@@ -78,7 +78,7 @@ export type {name} = z.infer<typeof {name}Schema>;
         emit_alias_type::<T>()
     }
 
-    fn finalize<P>(path: P) -> Result<(), std::io::Error>
+    fn finalize<P>(_path: P) -> Result<(), std::io::Error>
     where
         P: AsRef<OsStr>,
     {

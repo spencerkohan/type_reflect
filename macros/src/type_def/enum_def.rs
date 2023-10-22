@@ -1,6 +1,6 @@
 use crate::attribute_utils::*;
 use crate::type_def::InflectionTokenProvider;
-use crate::utils::*;
+// use crate::utils::*;
 use type_reflect_core::EnumType;
 use type_reflect_core::Inflection;
 
@@ -8,8 +8,10 @@ use super::{syn_type_utils::*, type_utils::EnumCaseBridge, RustTypeEmitter};
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use syn::{
-    parse::{Parse, ParseStream},
-    Attribute, ItemEnum, Result,
+    // parse::{Parse, ParseStream},
+    Attribute,
+    ItemEnum,
+    Result,
 };
 use type_reflect_core::*;
 

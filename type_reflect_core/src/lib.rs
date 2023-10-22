@@ -14,6 +14,7 @@ macro_rules! syn_err {
 }
 
 #[macro_export]
+#[allow(unreachable_code)]
 macro_rules! impl_parse {
     ($i:ident ($input:ident, $out:ident) { $($k:pat => $e:expr),* $(,)? }) => {
         impl std::convert::TryFrom<&syn::Attribute> for $i {
@@ -27,12 +28,13 @@ macro_rules! impl_parse {
                 let mut $out = $i::default();
                 loop {
                     let key: Ident = $input.call(syn::ext::IdentExt::parse_any)?;
+
                     match &*key.to_string() {
                         $($k => $e,)*
-                        #[allow(unreachable_patterns)]
                         _ => syn_err!($input.span(); "unexpected attribute")
-                    }
+                    };
 
+                    #[allow(unreachable_code)]
                     match $input.is_empty() {
                         true => break,
                         false => {

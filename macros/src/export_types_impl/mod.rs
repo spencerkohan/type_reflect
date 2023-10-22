@@ -9,9 +9,10 @@ use syn::*;
 
 #[derive(Debug, Clone)]
 struct ItemsList {
+    #[allow(unused)]
     ident: Ident,
-    colon_token: Token![:],
-    brackets: Bracket,
+    // colon_token: Token![:],
+    // brackets: Bracket,
     idents: Punctuated<Ident, Token![,]>,
 }
 
@@ -24,14 +25,14 @@ impl ItemsList {
 impl Parse for ItemsList {
     fn parse(input: ParseStream) -> Result<Self> {
         let ident = input.parse()?;
-        let colon_token = input.parse()?;
+        let _colon_token: Token![:] = input.parse()?;
         let content;
-        let brackets = bracketed!(content in input);
+        let _brackets: Bracket = bracketed!(content in input);
         let idents = content.parse_terminated(Ident::parse)?;
         Ok(Self {
             ident,
-            colon_token,
-            brackets,
+            // colon_token,
+            // brackets,
             idents,
         })
     }
@@ -39,23 +40,24 @@ impl Parse for ItemsList {
 
 #[derive(Debug, Clone)]
 struct DestinationList {
+    #[allow(unused)]
     ident: Ident,
-    colon_token: Token![:],
-    brackets: Bracket,
+    // colon_token: Token![:],
+    // brackets: Bracket,
     destinations: Punctuated<ExprCall, Token![,]>,
 }
 
 impl Parse for DestinationList {
     fn parse(input: ParseStream) -> Result<Self> {
         let ident = input.parse()?;
-        let colon_token = input.parse()?;
+        let _colon_token: Token![:] = input.parse()?;
         let content;
-        let brackets = bracketed!(content in input);
+        let _brackets: Bracket = bracketed!(content in input);
         let destinations = content.parse_terminated(ExprCall::parse)?;
         Ok(Self {
             ident,
-            colon_token,
-            brackets,
+            // colon_token,
+            // brackets,
             destinations,
         })
     }
@@ -81,18 +83,18 @@ impl DestinationList {
 #[derive(Debug, Clone)]
 struct Input {
     items: ItemsList,
-    comma_token: Token![,],
+    // comma_token: Token![,],
     destinations: DestinationList,
 }
 
 impl Parse for Input {
     fn parse(input: ParseStream) -> Result<Self> {
         let items = input.parse()?;
-        let comma_token = input.parse()?;
+        let _comma_token: Token![,] = input.parse()?;
         let destinations = input.parse()?;
         Ok(Self {
             items,
-            comma_token,
+            // comma_token,
             destinations,
         })
     }
@@ -138,7 +140,7 @@ pub fn export_types_impl(input: proc_macro::TokenStream) -> Result<TokenStream> 
         })()
     };
 
-    // println!("Emitting: {}", result);
+    println!("Emitting: {}", result);
     // Ok(input)
     Ok(result)
 }

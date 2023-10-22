@@ -1,9 +1,10 @@
+#![allow(incomplete_features)]
 #![feature(specialization)]
 #![macro_use]
 // #![deny(unused)]
 
 use proc_macro2::TokenStream;
-use quote::quote;
+// use quote::quote;
 use syn::{spanned::Spanned, Item, Result};
 
 mod type_def;
@@ -48,8 +49,8 @@ fn entry(input: proc_macro::TokenStream) -> Result<TokenStream> {
         }
     };
 
-    // println!("Type Def Parsed: {:#?}", type_def);
-    // println!("Type Def Emits: \n{}", type_def.emit());
+    println!("Type Def Parsed: {:#?}", type_def);
+    println!("Type Def Emits: \n{}", type_def.emit());
 
     Ok(type_def.emit())
 

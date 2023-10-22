@@ -1,8 +1,9 @@
+#![allow(incomplete_features)]
 #![feature(specialization)]
 extern crate type_reflect_macros;
 pub use core::convert::AsRef;
 use std::ffi::OsStr;
-use std::fs;
+
 use std::fs::File;
 pub use std::io::Write;
 pub use std::path::Path;

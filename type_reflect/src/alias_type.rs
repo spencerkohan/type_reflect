@@ -1,4 +1,4 @@
-use type_reflect_core::{type_description::Type, Inflection};
+use type_reflect_core::type_description::Type;
 
 pub trait AliasType {
     fn name() -> &'static str;
