@@ -119,7 +119,7 @@ fn emit_destination(dest: &Destination, types: &Vec<&Ident>) -> TokenStream {
 }
 
 pub fn export_types_impl(input: proc_macro::TokenStream) -> Result<TokenStream> {
-    println!("EXPORT TYPES input: {:#?}", input);
+    // println!("EXPORT TYPES input: {:#?}", input);
     let input = syn::parse::<Input>(input)?;
     // println!("parse result: {:#?}", input);
 
@@ -138,7 +138,7 @@ pub fn export_types_impl(input: proc_macro::TokenStream) -> Result<TokenStream> 
         })()
     };
 
-    println!("Emitting: {}", result);
+    // println!("Emitting: {}", result);
     // Ok(input)
     Ok(result)
 }

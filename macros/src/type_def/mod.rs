@@ -31,10 +31,10 @@ impl TypeDef {
         Ok(TypeDef::Alias(TypeAliasDef::new(item)?))
     }
     pub fn enum_def(item: &ItemEnum) -> Result<Self> {
-        println!("ATTRIBUTES:");
-        for attr in &item.attrs {
-            println!("    {:?}", attr);
-        }
+        // println!("ATTRIBUTES:");
+        // for attr in &item.attrs {
+        //     println!("    {:?}", attr);
+        // }
         Ok(TypeDef::Enum(EnumDef::new(item)?))
     }
 

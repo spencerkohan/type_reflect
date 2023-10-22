@@ -36,10 +36,10 @@ fn extract_cases(item: &ItemEnum) -> Result<Vec<EnumCase>> {
                     Inflection::None
                 }
                 Ok(rename_all) => {
-                    println!(
-                        "Extracted inflection: {:?} from attributes: {:#?}",
-                        rename_all, &case.attrs
-                    );
+                    // println!(
+                    //     "Extracted inflection: {:?} from attributes: {:#?}",
+                    //     rename_all, &case.attrs
+                    // );
                     rename_all.rename_all
                 }
             };
