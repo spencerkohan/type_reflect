@@ -33,11 +33,17 @@ pub trait Emittable {
 }
 
 pub trait TypeEmitter {
-    fn init_destination_file<P>(path: P) -> Result<File, std::io::Error>
+    fn init_destination_file<P: std::fmt::Debug + Clone>(path: P) -> Result<File, std::io::Error>
     where
         P: AsRef<Path>,
     {
-        let mut file = File::create(path)?;
+        let mut file = match File::create(path.clone()) {
+            Ok(file) => file,
+            Err(err) => {
+                eprintln!("Error creating file: {:?}", path);
+                return Err(err);
+            }
+        };
         file.write_all(Self::dependencies().as_bytes())?;
         Ok(file)
     }
