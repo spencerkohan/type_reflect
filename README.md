@@ -10,7 +10,7 @@ Other solutions exist to solve similar problems, for instance the excellent [ts-
 
 So for example, if I have this type:
 
-```
+```rust
 struct Foo {
     name: String,
     id: u32,
@@ -20,7 +20,7 @@ struct Foo {
 
 This crate provides a way to automatically generate a Zod schema like so:
 
-```
+```ts
 export const FooSchema = z.object({
     name: z.string(),
     id: z.number(),
@@ -31,6 +31,8 @@ export type Foo = z.infer<typeof FooSchema>;
 ```
 
 Toward that goal, this crate implements a procedural macro, which grants runtime type reflection to Rust types.
+
+---
 
 # Goals
 
@@ -48,6 +50,8 @@ Non-goals:
     - Basically anything which can't be easily serialzied into JSON
 - This crate is not currently optimized for performance, it's optimized for productivity
 
+---
+
 # Important Details:
 
 ## Serde Attributes
@@ -62,7 +66,7 @@ This attribute is commonly used to convert between case conventions, like `snake
 
 So for example, a rust `snake_case` representation can be converted to `camelCase` in the Zod output by using this attribute:
 
-```
+```rust
 #[derive(Reflect, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct Foo {
@@ -77,7 +81,7 @@ would result in the `Zod` export using the key names `key1` and `key2`.
 
 For enum types with associated data, the `tag` attribute is requires.  So for instance this declaration:
 
-```
+```rust
 #[derive(Reflect, Serialize, Deserialize)]
 enum MyEnum {
     VariantA { x: u32 }
@@ -85,9 +89,9 @@ enum MyEnum {
 }
 ```
 
-will throw an error.  The reason for this is that by default, serde uses externally tagged JSON representation of enums.  I.e. the abovev code would serialize to:
+will throw an error.  The reason for this is that by default, serde uses externally tagged JSON representation of enums.  I.e. the above code would serialize to:
 
-```
+```json
 { "VariantA": { "x": 42 }}
 { "VariantB": { "text": "foo" }}
 ```
@@ -98,7 +102,7 @@ This type of enum representation is disallowed by `type_reflect` because it is l
 
 ## Simple Struct Definition:
 
-```
+```rust
 #[derive(Reflect)]
 struct MyStruct {
     foo: i32,
@@ -122,7 +126,7 @@ export_types!(
 
 Where `export_types` desugars to:
 
-```
+```rust
 let export_dir1 = "/export/dir/1"
 remove_file(export_dir1)
 
@@ -142,16 +146,19 @@ How an enum is transformed depends on the type of enum.
 
 So for examle this enum:
 
-```
+```rust
+
 enum Foo {
     Bar,
     Baz
 }
+
 ```
 
 will emit the following:
 
-```
+```ts
+
 export enum SimpleEnumsExample {
     Foo = "Foo",
     Bar = "Bar,
@@ -169,7 +176,7 @@ Enums with associated data are transformed by default to unions, with the `_case
 
 So for instance this enum:
 
-```
+```rust
 #[derive(Debug, Reflect, Serialize, Deserialize)]
 #[serde(tag = "_case", content = "data")]
 enum Status {
@@ -187,14 +194,13 @@ enum Status {
 
 will be emitted as:
 
-```
+```ts
 
 export enum StatusCase {
     Initial = "Initial",
     InProgress = "InProgress",
     Complete = "Complete",
 }
-
 
 export const StatusCaseInitialSchema = z.object({
     _case: z.literal(StatusCase.Initial),
