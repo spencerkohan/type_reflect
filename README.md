@@ -102,7 +102,7 @@ This type of enum representation is disallowed by `type_reflect` because it is l
 
 # Example Usage:
 
-A working example can be found at `type_reflect/examples/declare_and_export`.
+A working example can be found at [`type_reflect/examples/declare_and_export.rs`](type_reflect/examples/declare_and_export.rs).
 
 It can be run with the command: `cargo run -p type_reflect --example declare_and_export`
 
