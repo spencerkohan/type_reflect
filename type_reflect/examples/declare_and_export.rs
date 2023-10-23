@@ -67,7 +67,14 @@ fn main() {
         ],
         destinations: [
             Zod("./type_reflect/example_output/declare_and_export/zod.ts"),
-            Rust("./type_reflect/example_output/declare_and_export/rust.rs", prefix: r#"// We add an extra comment here"#),
+            // With a prefix arg, it's possible to add additional arbitrary
+            // content to the output file.  So for instance this might be used
+            // to add extra import statements for dependencies required by the
+            // outputed type
+            Rust(
+                "./type_reflect/example_output/declare_and_export/rust.rs",
+                prefix: r#"// We add an extra comment here"#
+            ),
         ]
     }
     .unwrap();
