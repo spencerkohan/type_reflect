@@ -22,6 +22,9 @@ pub use enum_type::*;
 pub mod alias_type;
 pub use alias_type::*;
 
+pub mod type_script;
+pub use type_script::TypeScript;
+
 pub use serde::{Deserialize, Serialize};
 pub use serde_json;
 

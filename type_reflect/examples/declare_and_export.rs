@@ -66,6 +66,7 @@ fn main() {
             Status,
         ],
         destinations: [
+            TypeScript("./type_reflect/example_output/declare_and_export/type_script.ts"),
             Zod("./type_reflect/example_output/declare_and_export/zod.ts"),
             // With a prefix arg, it's possible to add additional arbitrary
             // content to the output file.  So for instance this might be used
