@@ -52,8 +52,6 @@ where
 
     // Generate case type
 
-    // let members = enum_cases(&T::cases());
-
     format!(
         r#"
 {cases_enum}

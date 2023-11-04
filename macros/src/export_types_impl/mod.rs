@@ -1,5 +1,3 @@
-use std::ops::Deref;
-
 use proc_macro2::*;
 use quote::*;
 use syn::parse::{Parse, ParseStream};
@@ -73,7 +71,7 @@ impl Parse for DestinationList {
 #[derive(Debug, Clone)]
 enum DestinationArg {
     Dest(Expr),
-    Prefix(Prefix),
+    Named(NamedArg),
 }
 
 impl Parse for DestinationArg {
@@ -85,8 +83,8 @@ impl Parse for DestinationArg {
             let _ident: Ident = forked.parse()?;
             if forked.parse::<Token![:]>().is_ok() && !forked.lookahead1().peek(Ident) {
                 // We are fairly certain it's a KeyValuePair now
-                let prefix = input.parse::<Prefix>()?;
-                return Ok(DestinationArg::Prefix(prefix));
+                let prefix = input.parse::<NamedArg>()?;
+                return Ok(DestinationArg::Named(prefix));
             }
         }
         let expr: Expr = input.parse()?;
@@ -98,6 +96,7 @@ impl Parse for DestinationArg {
 struct Destination {
     export_type: Expr,
     destinations: Vec<Expr>,
+    named_args: Vec<NamedArg>,
     prefix: Option<Expr>,
 }
 
@@ -125,53 +124,66 @@ impl Parse for Destination {
             }
         }
 
-        let mut prefixes: Vec<Prefix> = vec![];
+        let mut named_args: Vec<NamedArg> = vec![];
 
         let destinations: Vec<Expr> = args
             .into_iter()
             .filter_map(|arg| match arg {
                 DestinationArg::Dest(expr) => Some(expr),
-                DestinationArg::Prefix(pref) => {
-                    prefixes.push(pref);
+                DestinationArg::Named(arg) => {
+                    named_args.push(arg);
                     None
                 }
             })
             .collect();
 
-        if prefixes.len() > 1 {
-            let pref = &prefixes[1];
-            return Err(syn::Error::new(
-                pref.ident.span(),
-                r#"Only a single "prefix" argument is allowed in a destination declaration"#,
-            ));
-        }
-
-        let prefix: Option<Expr> = prefixes.first().map(|pref| pref.expr.clone());
+        let mut prefix: Option<Expr> = None;
+        let named_args = named_args
+            .into_iter()
+            .filter(|arg| {
+                match arg.name().as_str() {
+                    "prefix" => {
+                        prefix = Some(arg.expr.clone());
+                        return false;
+                    }
+                    _ => {}
+                };
+                true
+            })
+            .collect();
 
         Ok(Self {
             export_type,
             destinations,
+            named_args,
             prefix,
         })
     }
 }
 
 #[derive(Debug, Clone)]
-struct Prefix {
+struct NamedArg {
     ident: Ident,
     expr: Expr,
 }
 
-impl Parse for Prefix {
+impl NamedArg {
+    fn name(&self) -> String {
+        self.ident.to_string()
+    }
+}
+
+impl ToTokens for NamedArg {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
+        let ident = &self.ident;
+        let expr = &self.expr;
+        tokens.extend(quote! { #ident: #expr })
+    }
+}
+
+impl Parse for NamedArg {
     fn parse(input: ParseStream) -> Result<Self> {
         let ident: Ident = input.parse()?;
-
-        if ident.to_string().as_str() != "prefix" {
-            return Err(syn::Error::new(
-                ident.span(),
-                r#"Expected the argument name "prefix" when parsing a prefix"#,
-            ));
-        }
 
         let _colon_token: Token![:] = input.parse()?;
         let expr = input.parse()?;
@@ -208,18 +220,25 @@ fn emit_destination(dest: &Destination, types: &Vec<&Ident>) -> TokenStream {
         None => quote! { "" },
     };
 
+    let emitter_args = &dest.named_args;
+    let emitter_args = quote! { #(#emitter_args,)* };
+
     let mut result = quote! {};
     for dest in &dest.destinations {
         result.extend(quote! {
-            let mut file = #emitter::init_destination_file(#dest, #prefix)?;
+            let mut emitter = #emitter {
+                #emitter_args
+                ..Default::default()
+            };
+            let mut file = emitter.init_destination_file(#dest, #prefix)?;
         });
         for type_ in types {
             result.extend(quote! {
-                file.write_all(#emitter::emit::<#type_>().as_bytes())?;
+                file.write_all(emitter.emit::<#type_>().as_bytes())?;
             });
         }
         result.extend(quote! {
-            #emitter::finalize(#dest)?;
+            emitter.finalize(#dest)?;
         });
     }
     result

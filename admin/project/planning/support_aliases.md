@@ -12,3 +12,7 @@ Should output like so:
 
     export const FooScema = z.string();
     export type Foo = z.infer<typeof FooScema>
+
+## Challenge
+
+In order to support this, I need to be able to run Reflect outside the context of a derive macro.  Derive macros apparently don't work on type declarations in Rust.

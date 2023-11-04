@@ -29,8 +29,8 @@ impl TypeAliasDef {
 
         quote! {
             impl Emittable for #ident {
-                fn emit_with<E: TypeEmitter>() -> String {
-                    E::emit_alias::<Self>()
+                fn emit_with<E: TypeEmitter>(emitter: &mut E) -> String {
+                    emitter.emit_alias::<Self>()
                 }
             }
 

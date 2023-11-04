@@ -13,6 +13,7 @@ use enum_type::*;
 mod alias_type;
 use alias_type::*;
 
+#[derive(Default)]
 pub struct Zod {}
 
 pub trait TypeExporter {
@@ -34,11 +35,11 @@ fn to_zod_type(t: &Type) -> String {
 }
 
 impl TypeEmitter for Zod {
-    fn dependencies() -> String {
+    fn dependencies(&mut self) -> String {
         "import { z } from 'zod';\n".to_string()
     }
 
-    fn emit_struct<T>() -> String
+    fn emit_struct<T>(&mut self) -> String
     where
         T: StructType,
     {
@@ -59,21 +60,21 @@ export type {name} = z.infer<typeof {name}Schema>;
         )
     }
 
-    fn emit_enum<T>() -> String
+    fn emit_enum<T>(&mut self) -> String
     where
         T: EnumReflectionType,
     {
         emit_enum_type::<T>()
     }
 
-    fn emit_alias<T>() -> String
+    fn emit_alias<T>(&mut self) -> String
     where
         T: AliasType,
     {
         emit_alias_type::<T>()
     }
 
-    fn finalize<P>(_path: P) -> Result<(), std::io::Error>
+    fn finalize<P>(&mut self, _path: P) -> Result<(), std::io::Error>
     where
         P: AsRef<OsStr>,
     {

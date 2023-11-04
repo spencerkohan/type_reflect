@@ -2,3 +2,4 @@
 /Cargo.lock
 node_modules/
 type_reflect/example_output
+type_reflect/examples/declare_and_export/output/*

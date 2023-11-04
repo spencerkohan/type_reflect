@@ -98,6 +98,28 @@ will throw an error.  The reason for this is that by default, serde uses externa
 
 This type of enum representation is disallowed by `type_reflect` because it is less convenient to bridge to typescript union types, which are the best analog for ADT's in typescript.
 
+## Emitters Must Implement `Default`
+
+Due to the way emitters are instantiated by `export_types!`, it's requried for emitters to implement the `Default` trait if they are declared as a destination in the macro.
+
+So for example this destination:
+
+```
+MyEmitter(...)
+```
+
+desugars to this:
+
+```
+let mut MyEmitter {
+    ..Default::default()
+}
+```
+
+This is required to support passing named parameters to an emitter with defaults.
+
+`Default` was not made a requirement of the trait, in order to support creating an emitter instance outside the context of the macro.
+
 ---
 
 # Example Usage:
@@ -125,8 +147,8 @@ export_types!(
         MyOtherType,
     ]
     exports: [
-        Rust("/export/dir/1", "/export/dir/2"),
-        Zod("/export/dir/3"),
+        Zod("/export/dir/1"),
+        Rust("/export/dir/2", "/export/dir/3"),
         MyCustomExport("/export/dir/4")
     ]
 )
@@ -135,15 +157,127 @@ export_types!(
 Where `export_types` desugars to:
 
 ```rust
-let export_dir1 = "/export/dir/1"
-remove_file(export_dir1)
-
-export_dir1.write_all(MyStruct::export<Zod>())
-export_dir1.write_all(MyOtherType::export<Zod>())
+let mut emitter = Zod {
+    ..Default::default()
+};
+let mut file = emitter
+    .init_destination_file(
+        "/export/dir/1",
+        "",
+    )?;
+file.write_all(emitter.emit::<MyStruct>().as_bytes())?;
+file.write_all(emitter.emit::<MyOtherType>().as_bytes())?;
+emitter.finalize("/export/dir/1")?;
 ...
 ```
 
 Here all directories are relative to the current working director from which the binary is executed.
+
+## Custom Prefix
+
+It's also possible to support a custom prefix for output files.
+
+This may be useful, for instance, if we want to have an exported type depend on a type defined directly in the destination project.
+
+For instance, let's say we have a type defined and exported like so:
+
+```
+#[define(Reflect, Serialize, Deserialize)]
+struct Foo {
+    bar: Bar
+}
+...
+export_types!(
+    types: [
+        Foo,
+    ]
+    exports: [
+        TypeScript("./export/foo.ts"),
+    ]
+)
+```
+
+By default, this will result in the following `.export/foo.ts` being generated:
+
+```ts
+export type Foo {
+  bar: Bar
+}
+```
+
+Of course this is not valid typescript, because the type `bar` here is undefined.
+
+So we could add a prefix to import `Bar` from a different location:
+
+```rs
+export_types!(
+    types: [
+        Foo,
+    ]
+    exports: [
+        TypeScript(
+            "./export/foo.ts",
+            prefix: "import { Bar } from './bar.ts'",
+        ),
+    ]
+)
+```
+
+This will desugar like so:
+
+```rs
+let mut emitter = TypeScript {
+    ..Default::default()
+};
+let mut file = emitter
+    .init_destination_file(
+        "/export/dir/1",
+        "import { Bar } from './bar.ts'",
+    )?;
+```
+
+And will generate the following typescript:
+
+```ts
+import { Bar } from './bar.ts'
+
+export type Foo = {
+  bar: Bar;
+};
+```
+
+By default, the prefix will be added to the output file *before* the `emitter.dependencies()`, but this can be customized within the `TypeEmitter` implementation.
+
+## Custom TypeEmitter Arguments
+
+Through the `export_types` macro, it's also possible to forward initialization arguments to a type emitter.
+
+So for instance, the `TypeScript` emitter supports a `tab_size` argument to define the output tab size.
+
+So if the argument were specified like so in the `export_types` function:
+
+```rust
+    ...
+    exports: [
+        TypeScript(
+            "/export/dir/1",
+            tab_size: 4,
+        ),
+    ]
+    ...
+```
+
+This would be desugared like so:
+
+```rust
+let mut emitter = TypeScript {
+    tab_size: 4,
+    ..Default::default()
+};
+```
+
+The `prefix` argument is not forwarded for emitter initialization, since it's passed to the call for `init_destination_file`.
+
 
 ## Enum Transformations
 
@@ -177,6 +311,8 @@ export const SimpleEnumsExampleSchema = z.enum([
 ])
 
 ```
+
+
 
 
 Enums with associated data are transformed by default to unions, with the `_case` field used to differntiate the cases.

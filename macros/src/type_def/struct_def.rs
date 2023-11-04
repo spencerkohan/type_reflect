@@ -55,8 +55,8 @@ impl StructDef {
         quote! {
 
             impl Emittable for #ident {
-                fn emit_with<E: TypeEmitter>() -> String {
-                    E::emit_struct::<Self>()
+                fn emit_with<E: TypeEmitter>(emitter: &mut E) -> String {
+                    emitter.emit_struct::<Self>()
                 }
             }
 

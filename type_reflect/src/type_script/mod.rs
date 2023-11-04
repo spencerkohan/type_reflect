@@ -4,16 +4,24 @@ pub use super::struct_type::*;
 pub use super::type_description::Type;
 use super::*;
 
-mod struct_type;
+pub mod struct_type;
 use struct_type::*;
 
-mod enum_type;
-use enum_type::*;
+pub mod enum_type;
+pub use enum_type::*;
 
 mod alias_type;
-use alias_type::*;
+pub use alias_type::*;
 
-pub struct TypeScript {}
+pub struct TypeScript {
+    pub tab_size: u32,
+}
+
+impl Default for TypeScript {
+    fn default() -> Self {
+        Self { tab_size: 2 }
+    }
+}
 
 pub trait TypeExporter {
     fn export<T>() -> String;
@@ -34,11 +42,11 @@ fn to_ts_type(t: &Type) -> String {
 }
 
 impl TypeEmitter for TypeScript {
-    fn dependencies() -> String {
+    fn dependencies(&mut self) -> String {
         "".to_string()
     }
 
-    fn emit_struct<T>() -> String
+    fn emit_struct<T>(&mut self) -> String
     where
         T: StructType,
     {
@@ -58,21 +66,21 @@ export type {name} = {{
         )
     }
 
-    fn emit_enum<T>() -> String
+    fn emit_enum<T>(&mut self) -> String
     where
         T: EnumReflectionType,
     {
         emit_enum_type::<T>()
     }
 
-    fn emit_alias<T>() -> String
+    fn emit_alias<T>(&mut self) -> String
     where
         T: AliasType,
     {
         emit_alias_type::<T>()
     }
 
-    fn finalize<P>(_path: P) -> Result<(), std::io::Error>
+    fn finalize<P>(&mut self, _path: P) -> Result<(), std::io::Error>
     where
         P: AsRef<OsStr>,
     {

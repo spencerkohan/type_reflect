@@ -49,11 +49,21 @@ enum SimpleEnumsExample {
     Foo,
 }
 
+type AliasedEnum = SimpleEnumsExample;
+
 // And here we have an example of a type which depends
 // on a declared type, rather than primitive types
 #[derive(Debug, Reflect, Serialize, Deserialize)]
 struct DependantTypeExample {
     foo: SimpleEnumsExample,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Bar {}
+
+#[derive(Debug, Reflect, Serialize, Deserialize)]
+struct Foo {
+    bar: Bar,
 }
 
 fn main() {
@@ -66,15 +76,33 @@ fn main() {
             Status,
         ],
         destinations: [
-            TypeScript("./type_reflect/example_output/declare_and_export/type_script.ts"),
-            Zod("./type_reflect/example_output/declare_and_export/zod.ts"),
+            TypeScript(
+                "./type_reflect/examples/declare_and_export/output/type_script.ts"
+                tab_size: 2,
+            ),
+            Zod("./type_reflect/examples/declare_and_export/output/zod.ts"),
             // With a prefix arg, it's possible to add additional arbitrary
             // content to the output file.  So for instance this might be used
             // to add extra import statements for dependencies required by the
             // outputed type
             Rust(
-                "./type_reflect/example_output/declare_and_export/rust.rs",
+                "./type_reflect/examples/declare_and_export/output/rust.rs",
                 prefix: r#"// We add an extra comment here"#
+            ),
+        ]
+    }
+    .unwrap();
+
+    export_types! {
+        types: [
+            Foo,
+        ],
+        destinations: [
+            TypeScript(
+                "./type_reflect/examples/declare_and_export/output/type_2.ts"
+                prefix: "import { Bar } from './bar.ts'",
+                tab_size: 2,
+
             ),
         ]
     }

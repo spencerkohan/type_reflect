@@ -159,8 +159,8 @@ impl EnumDef {
         quote! {
 
             impl Emittable for #ident {
-                fn emit_with<E: TypeEmitter>() -> String {
-                    E::emit_enum::<Self>()
+                fn emit_with<E: TypeEmitter>(emitter: &mut E) -> String {
+                    emitter.emit_enum::<Self>()
                 }
             }
 

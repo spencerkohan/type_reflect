@@ -4,37 +4,38 @@ pub use super::*;
 use std::ffi::OsStr;
 use std::process::Command;
 
+#[derive(Default)]
 pub struct Rust {}
 
 const DERIVES: &str = "#[derive(Debug, Clone, Serialize, Deserialize)]";
 
 impl TypeEmitter for Rust {
-    fn dependencies() -> String {
+    fn dependencies(&mut self) -> String {
         "use serde::{Deserialize, Serialize};\nuse serde_json;\n".to_string()
     }
 
-    fn emit_struct<T>() -> String
+    fn emit_struct<T>(&mut self) -> String
     where
         T: StructType,
     {
         format!("\n{}\n{}\n", DERIVES, T::rust())
     }
 
-    fn emit_enum<T>() -> String
+    fn emit_enum<T>(&mut self) -> String
     where
         T: EnumReflectionType,
     {
         format!("\n{}\n{}\n", DERIVES, T::rust())
     }
 
-    fn emit_alias<T>() -> String
+    fn emit_alias<T>(&mut self) -> String
     where
         T: AliasType,
     {
         format!("\n{}\n{}\n", DERIVES, T::rust())
     }
 
-    fn finalize<P>(path: P) -> Result<(), std::io::Error>
+    fn finalize<P>(&mut self, path: P) -> Result<(), std::io::Error>
     where
         P: AsRef<OsStr>,
     {
