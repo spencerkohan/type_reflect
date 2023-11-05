@@ -93,7 +93,10 @@ fn main() {
                 "./type_reflect/examples/declare_and_export/output/multi.ts",
                 emitters: [
                     TypeScript(),
-                    Zod(),
+                    TSFormat(
+                        tab_size: 2,
+                        line_width: 20,
+                    ),
                 ]
             ),
         ]

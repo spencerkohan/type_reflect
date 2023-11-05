@@ -27,6 +27,9 @@ pub use type_script::TypeScript;
 
 pub mod ts_validation;
 
+pub mod ts_format;
+pub use ts_format::TSFormat;
+
 pub use serde::{Deserialize, Serialize};
 pub use serde_json;
 

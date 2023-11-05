@@ -95,7 +95,7 @@ impl Parse for NamedArg {
         let ident: Ident = input.parse()?;
 
         let _colon_token: Token![:] = input.parse()?;
-        let expr = input.parse()?;
+        let expr: Expr = input.parse()?;
 
         Ok(Self { ident, expr })
     }
@@ -105,6 +105,19 @@ impl Parse for NamedArg {
 pub enum DestinationArg {
     Dest(Expr),
     Named(NamedArg),
+}
+
+pub fn peak_arg_name(input: &syn::parse::ParseStream) -> Option<Ident> {
+    let lookahead = input.lookahead1();
+    if lookahead.peek(Ident) {
+        let forked = input.fork();
+        let ident: Ident = forked.parse().unwrap();
+        if forked.parse::<Token![:]>().is_ok() && !forked.lookahead1().peek(Ident) {
+            // We are fairly certain it's a KeyValuePair now
+            return Some(ident);
+        }
+    }
+    None
 }
 
 impl Parse for DestinationArg {

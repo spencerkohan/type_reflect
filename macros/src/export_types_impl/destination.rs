@@ -4,7 +4,7 @@ use syn::parse::{Parse, ParseStream};
 use syn::token::Paren;
 use syn::*;
 
-use super::{DestinationArg, NamedArg};
+use super::{peak_arg_name, DestinationArg, NamedArg};
 
 #[derive(Debug, Clone)]
 pub enum Destination {
@@ -109,6 +109,11 @@ impl Parse for EmitterDecl {
 
         let type_name: Expr = syn::parse2(export_type_tokens)?;
 
+        eprintln!(
+            "Parsing emitter decl: {}",
+            type_name.clone().into_token_stream()
+        );
+
         let content;
         let _parens: Paren = parenthesized!(content in input);
 
@@ -166,56 +171,73 @@ impl Parse for UnnamedDestination {
         let content;
         let _parens: Paren = parenthesized!(content in input);
 
-        let mut args: Vec<DestinationArg> = vec![];
+        // let mut args: Vec<DestinationArg> = vec![];
+
+        let mut destinations: Vec<Expr> = vec![];
+        let mut prefix: Option<Expr> = None;
+        let mut emitters: EmitterDeclList = EmitterDeclList { emitters: vec![] };
 
         while !content.is_empty() {
-            let arg: DestinationArg = content.parse()?;
-            args.push(arg);
+            match peak_arg_name(&&content) {
+                Some(name) => match name.to_string().as_str() {
+                    "prefix" => {
+                        prefix = Some(content.parse()?);
+                    }
+                    "emitters" => {
+                        let _: Ident = content.parse()?;
+                        let _: Token![:] = content.parse()?;
+                        emitters = content.parse()?;
+                    }
+                    _ => {
+                        // TODO: this should produce an error
+                    }
+                },
+                None => {
+                    let dest: Expr = content.parse()?;
+                    destinations.push(dest);
+                }
+            }
             if content.peek(Token![,]) {
                 let _comma: Token![,] = content.parse()?;
             }
         }
 
-        let mut named_args: Vec<NamedArg> = vec![];
-        let mut emitter_tokens: TokenStream = quote! {};
+        // let destinations: Vec<Expr> = args
+        //     .into_iter()
+        //     .filter_map(|arg| match arg {
+        //         DestinationArg::Dest(expr) => Some(expr),
+        //         DestinationArg::Named(arg) => {
+        //             named_args.push(arg);
+        //             None
+        //         }
+        //     })
+        //     .collect();
 
-        let destinations: Vec<Expr> = args
-            .into_iter()
-            .filter_map(|arg| match arg {
-                DestinationArg::Dest(expr) => Some(expr),
-                DestinationArg::Named(arg) => {
-                    named_args.push(arg);
-                    None
-                }
-            })
-            .collect();
+        // // TODO: validate that named args is empty
+        // let _named_args: Vec<NamedArg> = named_args
+        //     .into_iter()
+        //     .filter(|arg| {
+        //         match arg.name().as_str() {
+        //             "prefix" => {
+        //                 prefix = Some(arg.expr.clone());
+        //                 return false;
+        //             }
+        //             "emitters" => {
+        //                 emitter_tokens = arg.expr.clone().into_token_stream();
+        //                 return false;
+        //             }
+        //             _ => {}
+        //         };
+        //         true
+        //     })
+        //     .collect();
 
-        let mut prefix: Option<Expr> = None;
-        // TODO: validate that named args is empty
-        let _named_args: Vec<NamedArg> = named_args
-            .into_iter()
-            .filter(|arg| {
-                match arg.name().as_str() {
-                    "prefix" => {
-                        prefix = Some(arg.expr.clone());
-                        return false;
-                    }
-                    "emitters" => {
-                        emitter_tokens = arg.expr.clone().into_token_stream();
-                        return false;
-                    }
-                    _ => {}
-                };
-                true
-            })
-            .collect();
-
-        let emitters = parse_emitters(emitter_tokens)?;
+        // let emitters = parse_emitters(emitter_tokens)?;
 
         Ok(Self {
             destinations,
             prefix,
-            emitters,
+            emitters: emitters.emitters,
         })
     }
 }
