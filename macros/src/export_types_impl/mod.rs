@@ -2,7 +2,7 @@ use proc_macro2::*;
 use quote::*;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::*;
-use syn::token::{Bracket, Paren};
+use syn::token::Bracket;
 use syn::*;
 mod destination;
 use destination::*;

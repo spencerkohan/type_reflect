@@ -149,11 +149,6 @@ impl Parse for EmitterDeclList {
     }
 }
 
-fn parse_emitters(input: TokenStream) -> Result<Vec<EmitterDecl>> {
-    let emitter_decls: EmitterDeclList = syn::parse2::<EmitterDeclList>(input)?;
-    Ok(emitter_decls.emitters)
-}
-
 #[derive(Debug, Clone)]
 pub struct UnnamedDestination {
     pub destinations: Vec<Expr>,
