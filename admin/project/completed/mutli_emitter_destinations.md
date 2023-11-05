@@ -67,3 +67,4 @@ emitter.finalize("/export/dir/1")?;
 - [x] Define Un-named emitter variant
     - [x] Define parsing behavior
     - [x] Define code generation
+- [ ] Add documentation

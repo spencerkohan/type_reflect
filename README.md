@@ -278,6 +278,30 @@ let mut emitter = TypeScript {
 
 The `prefix` argument is not forwarded for emitter initialization, since it's passed to the call for `init_destination_file`.
 
+## Multi-emitter Destinations
+
+It's also possible to define destinations in `export_types` with multiple emitters.  This might be useful, for instance, if you want to use mutluple type emitters to output to the same file.  For instance:
+
+```rs
+export_types! {
+    types: [
+        Foo,
+        Bar,
+        Baz,
+    ],
+    destinations: [
+        (
+            "./ouptu_file.ts",
+            emitters: [
+                TypeScript(),
+                TSValidation(),
+            ]
+        ),
+    ]
+}
+```
+
+This would first emit the types `Foo`, `Bar` and `Baz` using the `TypeScript` emitter, and then using the `TSValidation` emitter.
 
 ## Enum Transformations
 

@@ -91,7 +91,6 @@ impl TypeEmitter for TypeScript {
 
         let result =
             dprint_plugin_typescript::format_text(Path::new(&path), text.as_str(), &config);
-        eprintln!("Result: {:?}", result);
 
         match result {
             Ok(Some(contents)) => {

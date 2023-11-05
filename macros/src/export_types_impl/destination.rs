@@ -15,14 +15,10 @@ pub enum Destination {
 impl Parse for Destination {
     fn parse(input: ParseStream) -> Result<Self> {
         if input.peek(syn::token::Paren) {
-            eprintln!("Found unnamed destination");
             let dest = input.parse()?;
-            eprintln!("Parsed unnamed destination");
             return Ok(Destination::Unnamed(dest));
         }
-        eprintln!("Found named destination");
         let dest = input.parse()?;
-        eprintln!("Parsed named destination");
         return Ok(Destination::Named(dest));
     }
 }
