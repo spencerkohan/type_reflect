@@ -109,11 +109,6 @@ impl Parse for EmitterDecl {
 
         let type_name: Expr = syn::parse2(export_type_tokens)?;
 
-        eprintln!(
-            "Parsing emitter decl: {}",
-            type_name.clone().into_token_stream()
-        );
-
         let content;
         let _parens: Paren = parenthesized!(content in input);
 
