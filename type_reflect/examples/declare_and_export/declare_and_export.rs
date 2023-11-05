@@ -89,6 +89,13 @@ fn main() {
                 "./type_reflect/examples/declare_and_export/output/rust.rs",
                 prefix: r#"// We add an extra comment here"#
             ),
+            (
+                "./type_reflect/examples/declare_and_export/output/multi.ts",
+                emitters: [
+                    TypeScript(),
+                    Zod(),
+                ]
+            ),
         ]
     }
     .unwrap();

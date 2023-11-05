@@ -35,7 +35,7 @@ fn to_zod_type(t: &Type) -> String {
 }
 
 impl TypeEmitter for Zod {
-    fn dependencies(&mut self) -> String {
+    fn prefix(&mut self) -> String {
         "import { z } from 'zod';\n".to_string()
     }
 

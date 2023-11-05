@@ -11,6 +11,7 @@ type_reflect_macros = { path = "../macros" }
 type_reflect_core = { path = "../type_reflect_core" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+dprint-plugin-typescript = "0.88.3"
 
 [[example]]
 name = "declare_and_export"

@@ -1,5 +1,6 @@
-use type_reflect_core::{EnumCase, EnumType, Inflectable, Inflection};
+use type_reflect_core::{EnumCase, EnumType, Inflection};
 
+use crate::type_script::struct_type;
 use crate::EnumReflectionType;
 
 use super::to_ts_type;
@@ -147,18 +148,7 @@ export enum {name} {{
                 }
             }
             type_reflect_core::EnumCaseType::Struct(inner) => {
-                let struct_items: Vec<String> = inner
-                    .into_iter()
-                    .map(|item| {
-                        format!(
-                            "{}: {},",
-                            item.name.inflect(case.inflection),
-                            to_ts_type(&item.type_)
-                        )
-                    })
-                    .collect();
-
-                let struct_items: String = struct_items.join("\n        ");
+                let struct_items = struct_type::struct_members(inner, case.inflection);
 
                 match content_key {
                     Some(content_key) => format!(
@@ -180,7 +170,6 @@ export type {case_type_name} = {{
 }};
             "#,
             case_type_name = case_type_name,
-            // name = format!("{}Case{}", Self::name(), case.name),
             case_key = case_key,
             id = id,
             additional_fields = additional_fields

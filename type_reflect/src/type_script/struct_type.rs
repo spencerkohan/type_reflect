@@ -14,3 +14,17 @@ pub fn struct_members(members: &Vec<StructMember>, inflection: Inflection) -> St
         .collect();
     members.join("\n  ")
 }
+
+pub fn struct_impl(name: &str, members: &Vec<StructMember>, inflection: Inflection) -> String {
+    let members = struct_members(members, inflection);
+    return format!(
+        r#"
+
+export type {name} = {{
+    {members}
+}};
+        "#,
+        name = name,
+        members = members
+    );
+}

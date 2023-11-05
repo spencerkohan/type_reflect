@@ -5,6 +5,9 @@ pub use super::type_description::Type;
 use super::*;
 
 pub mod struct_type;
+use dprint_plugin_typescript::configuration::{
+    ConfigurationBuilder, NextControlFlowPosition, QuoteStyle,
+};
 use struct_type::*;
 
 pub mod enum_type;
@@ -27,7 +30,7 @@ pub trait TypeExporter {
     fn export<T>() -> String;
 }
 
-fn to_ts_type(t: &Type) -> String {
+pub fn to_ts_type(t: &Type) -> String {
     match t {
         Type::Named(t) => format!("{}", t),
         Type::String => "string".to_string(),
@@ -42,7 +45,7 @@ fn to_ts_type(t: &Type) -> String {
 }
 
 impl TypeEmitter for TypeScript {
-    fn dependencies(&mut self) -> String {
+    fn prefix(&mut self) -> String {
         "".to_string()
     }
 
@@ -50,20 +53,8 @@ impl TypeEmitter for TypeScript {
     where
         T: StructType,
     {
-        let members = struct_members(&T::members(), T::inflection());
         let name = T::name();
-
-        format!(
-            r#"
-
-export type {name} = {{
-  {members}
-}};
-
-"#,
-            members = members,
-            name = name
-        )
+        struct_impl(&name, &T::members(), T::inflection())
     }
 
     fn emit_enum<T>(&mut self) -> String
@@ -80,10 +71,36 @@ export type {name} = {{
         emit_alias_type::<T>()
     }
 
-    fn finalize<P>(&mut self, _path: P) -> Result<(), std::io::Error>
+    fn finalize<P>(&mut self, path: P) -> Result<(), std::io::Error>
     where
         P: AsRef<OsStr>,
     {
+        // build the configuration once
+        let config = ConfigurationBuilder::new()
+            .indent_width(self.tab_size as u8)
+            .line_width(80)
+            .prefer_hanging(true)
+            .prefer_single_line(false)
+            .quote_style(QuoteStyle::PreferSingle)
+            .next_control_flow_position(NextControlFlowPosition::SameLine)
+            .build();
+
+        let file_path = Path::new(&path);
+
+        let text: String = std::fs::read_to_string(Path::new(&path))?;
+
+        let result =
+            dprint_plugin_typescript::format_text(Path::new(&path), text.as_str(), &config);
+        eprintln!("Result: {:?}", result);
+
+        match result {
+            Ok(Some(contents)) => {
+                std::fs::write(file_path, contents)?;
+            }
+            Err(_) => {}
+            _ => {}
+        };
+
         Ok(())
     }
 }

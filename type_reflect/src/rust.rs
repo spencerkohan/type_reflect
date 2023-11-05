@@ -10,7 +10,7 @@ pub struct Rust {}
 const DERIVES: &str = "#[derive(Debug, Clone, Serialize, Deserialize)]";
 
 impl TypeEmitter for Rust {
-    fn dependencies(&mut self) -> String {
+    fn prefix(&mut self) -> String {
         "use serde::{Deserialize, Serialize};\nuse serde_json;\n".to_string()
     }
 

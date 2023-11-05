@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
 
-
 export const SDParametersSchema = z.object({
     prompt: z.string(),
     negativePrompt: z.string().optional(),

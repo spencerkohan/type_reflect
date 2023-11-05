@@ -4,6 +4,8 @@ use syn::parse::{Parse, ParseStream};
 use syn::punctuated::*;
 use syn::token::{Bracket, Paren};
 use syn::*;
+mod destination;
+use destination::*;
 
 #[derive(Debug, Clone)]
 struct ItemsList {
@@ -69,106 +71,13 @@ impl Parse for DestinationList {
 }
 
 #[derive(Debug, Clone)]
-enum DestinationArg {
-    Dest(Expr),
-    Named(NamedArg),
-}
-
-impl Parse for DestinationArg {
-    fn parse(input: syn::parse::ParseStream) -> Result<Self> {
-        let lookahead = input.lookahead1();
-
-        if lookahead.peek(Ident) {
-            let forked = input.fork();
-            let _ident: Ident = forked.parse()?;
-            if forked.parse::<Token![:]>().is_ok() && !forked.lookahead1().peek(Ident) {
-                // We are fairly certain it's a KeyValuePair now
-                let prefix = input.parse::<NamedArg>()?;
-                return Ok(DestinationArg::Named(prefix));
-            }
-        }
-        let expr: Expr = input.parse()?;
-        Ok(DestinationArg::Dest(expr))
-    }
-}
-
-#[derive(Debug, Clone)]
-struct Destination {
-    export_type: Expr,
-    destinations: Vec<Expr>,
-    named_args: Vec<NamedArg>,
-    prefix: Option<Expr>,
-}
-
-impl Parse for Destination {
-    fn parse(input: ParseStream) -> Result<Self> {
-        let mut export_type_tokens: TokenStream = quote! {};
-
-        while !input.peek(syn::token::Paren) && !input.is_empty() {
-            let next: TokenTree = input.parse()?;
-            export_type_tokens.append(next);
-        }
-
-        let export_type: Expr = syn::parse2(export_type_tokens)?;
-
-        let content;
-        let _parens: Paren = parenthesized!(content in input);
-
-        let mut args: Vec<DestinationArg> = vec![];
-
-        while !content.is_empty() {
-            let arg: DestinationArg = content.parse()?;
-            args.push(arg);
-            if content.peek(Token![,]) {
-                let _comma: Token![,] = content.parse()?;
-            }
-        }
-
-        let mut named_args: Vec<NamedArg> = vec![];
-
-        let destinations: Vec<Expr> = args
-            .into_iter()
-            .filter_map(|arg| match arg {
-                DestinationArg::Dest(expr) => Some(expr),
-                DestinationArg::Named(arg) => {
-                    named_args.push(arg);
-                    None
-                }
-            })
-            .collect();
-
-        let mut prefix: Option<Expr> = None;
-        let named_args = named_args
-            .into_iter()
-            .filter(|arg| {
-                match arg.name().as_str() {
-                    "prefix" => {
-                        prefix = Some(arg.expr.clone());
-                        return false;
-                    }
-                    _ => {}
-                };
-                true
-            })
-            .collect();
-
-        Ok(Self {
-            export_type,
-            destinations,
-            named_args,
-            prefix,
-        })
-    }
-}
-
-#[derive(Debug, Clone)]
-struct NamedArg {
+pub struct NamedArg {
     ident: Ident,
     expr: Expr,
 }
 
 impl NamedArg {
-    fn name(&self) -> String {
+    pub fn name(&self) -> String {
         self.ident.to_string()
     }
 }
@@ -193,6 +102,30 @@ impl Parse for NamedArg {
 }
 
 #[derive(Debug, Clone)]
+pub enum DestinationArg {
+    Dest(Expr),
+    Named(NamedArg),
+}
+
+impl Parse for DestinationArg {
+    fn parse(input: syn::parse::ParseStream) -> Result<Self> {
+        let lookahead = input.lookahead1();
+
+        if lookahead.peek(Ident) {
+            let forked = input.fork();
+            let _ident: Ident = forked.parse()?;
+            if forked.parse::<Token![:]>().is_ok() && !forked.lookahead1().peek(Ident) {
+                // We are fairly certain it's a KeyValuePair now
+                let prefix = input.parse::<NamedArg>()?;
+                return Ok(DestinationArg::Named(prefix));
+            }
+        }
+        let expr: Expr = input.parse()?;
+        Ok(DestinationArg::Dest(expr))
+    }
+}
+
+#[derive(Debug, Clone)]
 struct Input {
     items: ItemsList,
     destinations: DestinationList,
@@ -208,40 +141,6 @@ impl Parse for Input {
             destinations,
         })
     }
-}
-
-fn emit_destination(dest: &Destination, types: &Vec<&Ident>) -> TokenStream {
-    let emitter = &dest.export_type;
-
-    let prefix = match &dest.prefix {
-        Some(expr) => {
-            quote! { #expr }
-        }
-        None => quote! { "" },
-    };
-
-    let emitter_args = &dest.named_args;
-    let emitter_args = quote! { #(#emitter_args,)* };
-
-    let mut result = quote! {};
-    for dest in &dest.destinations {
-        result.extend(quote! {
-            let mut emitter = #emitter {
-                #emitter_args
-                ..Default::default()
-            };
-            let mut file = emitter.init_destination_file(#dest, #prefix)?;
-        });
-        for type_ in types {
-            result.extend(quote! {
-                file.write_all(emitter.emit::<#type_>().as_bytes())?;
-            });
-        }
-        result.extend(quote! {
-            emitter.finalize(#dest)?;
-        });
-    }
-    result
 }
 
 pub fn export_types_impl(input: proc_macro::TokenStream) -> Result<TokenStream> {
