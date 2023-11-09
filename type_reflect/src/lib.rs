@@ -26,6 +26,7 @@ pub mod type_script;
 pub use type_script::TypeScript;
 
 pub mod ts_validation;
+pub use ts_validation::TSValidation;
 
 pub mod ts_format;
 pub use ts_format::TSFormat;
@@ -68,6 +69,22 @@ where
     };
     file.write_all(prefix.as_ref())?;
     Ok(file)
+}
+
+pub fn write_postfix<P: std::fmt::Debug + Clone, Post>(
+    path: P,
+    postfix: Post,
+) -> Result<(), std::io::Error>
+where
+    P: AsRef<Path>,
+    Post: AsRef<[u8]>,
+{
+    let mut file = std::fs::OpenOptions::new()
+        .write(true)
+        .append(true)
+        .open(path)?;
+    file.write_all(postfix.as_ref())?;
+    Ok(())
 }
 
 /// The `TypeEmitter` trait defines how an `Emittable` can be used

@@ -29,6 +29,7 @@ pub struct NamedDestination {
     pub destinations: Vec<Expr>,
     pub named_args: Vec<NamedArg>,
     pub prefix: Option<Expr>,
+    pub postfix: Option<Expr>,
 }
 
 impl Parse for NamedDestination {
@@ -69,12 +70,17 @@ impl Parse for NamedDestination {
             .collect();
 
         let mut prefix: Option<Expr> = None;
+        let mut postfix: Option<Expr> = None;
         let named_args = named_args
             .into_iter()
             .filter(|arg| {
                 match arg.name().as_str() {
                     "prefix" => {
                         prefix = Some(arg.expr.clone());
+                        return false;
+                    }
+                    "postfix" => {
+                        postfix = Some(arg.expr.clone());
                         return false;
                     }
                     _ => {}
@@ -88,6 +94,7 @@ impl Parse for NamedDestination {
             destinations,
             named_args,
             prefix,
+            postfix,
         })
     }
 }
@@ -153,6 +160,7 @@ impl Parse for EmitterDeclList {
 pub struct UnnamedDestination {
     pub destinations: Vec<Expr>,
     pub prefix: Option<Expr>,
+    pub postfix: Option<Expr>,
     pub emitters: Vec<EmitterDecl>,
 }
 
@@ -165,20 +173,28 @@ impl Parse for UnnamedDestination {
 
         let mut destinations: Vec<Expr> = vec![];
         let mut prefix: Option<Expr> = None;
+        let mut postfix: Option<Expr> = None;
         let mut emitters: EmitterDeclList = EmitterDeclList { emitters: vec![] };
 
         while !content.is_empty() {
             match peak_arg_name(&&content) {
                 Some(name) => match name.to_string().as_str() {
                     "prefix" => {
+                        let _: Ident = content.parse()?;
+                        let _: Token![:] = content.parse()?;
                         prefix = Some(content.parse()?);
+                    }
+                    "postfix" => {
+                        let _: Ident = content.parse()?;
+                        let _: Token![:] = content.parse()?;
+                        postfix = Some(content.parse()?);
                     }
                     "emitters" => {
                         let _: Ident = content.parse()?;
                         let _: Token![:] = content.parse()?;
                         emitters = content.parse()?;
                     }
-                    _ => {
+                    _other => {
                         // TODO: this should produce an error
                     }
                 },
@@ -192,41 +208,10 @@ impl Parse for UnnamedDestination {
             }
         }
 
-        // let destinations: Vec<Expr> = args
-        //     .into_iter()
-        //     .filter_map(|arg| match arg {
-        //         DestinationArg::Dest(expr) => Some(expr),
-        //         DestinationArg::Named(arg) => {
-        //             named_args.push(arg);
-        //             None
-        //         }
-        //     })
-        //     .collect();
-
-        // // TODO: validate that named args is empty
-        // let _named_args: Vec<NamedArg> = named_args
-        //     .into_iter()
-        //     .filter(|arg| {
-        //         match arg.name().as_str() {
-        //             "prefix" => {
-        //                 prefix = Some(arg.expr.clone());
-        //                 return false;
-        //             }
-        //             "emitters" => {
-        //                 emitter_tokens = arg.expr.clone().into_token_stream();
-        //                 return false;
-        //             }
-        //             _ => {}
-        //         };
-        //         true
-        //     })
-        //     .collect();
-
-        // let emitters = parse_emitters(emitter_tokens)?;
-
         Ok(Self {
             destinations,
             prefix,
+            postfix,
             emitters: emitters.emitters,
         })
     }
@@ -249,6 +234,8 @@ pub fn emit_named_destination(dest: &NamedDestination, types: &Vec<&Ident>) -> T
         None => quote! { "" },
     };
 
+    let postfix = &dest.postfix;
+
     let emitter_args = &dest.named_args;
     let emitter_args = quote! { #(#emitter_args,)* };
 
@@ -270,6 +257,12 @@ pub fn emit_named_destination(dest: &NamedDestination, types: &Vec<&Ident>) -> T
         result.extend(quote! {
             emitter.finalize(#dest)?;
         });
+        match postfix {
+            Some(expr) => result.extend(quote! {
+                type_reflect::write_postfix(#dest, #expr)?;
+            }),
+            None => {}
+        };
     }
     result
 }
@@ -308,6 +301,8 @@ pub fn emit_unnamed_destination(dest: &UnnamedDestination, types: &Vec<&Ident>) 
         None => quote! { "" },
     };
 
+    let postfix = &dest.postfix;
+
     let emitters = &dest.emitters;
 
     let mut result = quote! {};
@@ -316,8 +311,20 @@ pub fn emit_unnamed_destination(dest: &UnnamedDestination, types: &Vec<&Ident>) 
             let mut file = type_reflect::init_destination_file(#dest, #prefix)?;
         });
         for emitter in emitters {
+            result.extend(quote! {
+                let mut file = std::fs::OpenOptions::new()
+                    .write(true)
+                    .append(true)
+                    .open(#dest)?;
+            });
             result.extend(emit_single_emitter(emitter, types, dest));
         }
+        match postfix {
+            Some(expr) => result.extend(quote! {
+                type_reflect::write_postfix(#dest, #expr)?;
+            }),
+            None => {}
+        };
     }
     result
 }

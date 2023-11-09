@@ -67,12 +67,83 @@ namespace Foo {
   }
 }
 
+```
+
+### Array Validation
+
+For an array, we need to validate that every member of the array conforms to the desired type
+
+```ts
+
+type ArrType = {
+    records: Array<Foo>
+}
+
+namespace ArrType {
+  function validate(input: any) -> Result<ArrType> {
+    if(!input.records) {
+      return {ok: false, error: `Error vaildaing ArrType: expected ArrType.records to be defined`}
+    } else {
+      if(!Array.isArray(input.records)) {
+        return {ok: false, error: `Error vaildaing ArrType: expected ArrType.records to be an Array`}
+      }
+      for (let value in input.records) {
+        let res = Foo.validate(input.bar);
+        if(!res.ok) {
+          return {ok: false, error: `Error vaildaing ArrType: ${res.error}`}
+        }
+      }
+    }
+  }
+}
 
 ```
+
+### Redesign
+
+After giving this some thought, I think it's better that the validator should throw errors rather than using monads.
+
+This is more idiomatic Typescript, and may even be more performant.
+
+So each type generated should generate:
+
+```ts
+namespace MyType {
+  // A validator which throws
+  export function tryValidate(): MyType { ... }
+
+  // A parser which throws
+  export function tryParse(input: string): MyType { ... }
+
+  // A validator which returns a result
+  export function validate(): Result<MyType> { ... }
+
+  // A parser which returns a result
+  export function parse(input: string): Result<MyType> { ... }
+}
+```
+
+### Error Types
+
+For the thrown errors, we have to cover the follwing:
+
+1. Missing members:
+    - "Error validating MyType.member: expected [string] found [undefined]"
+
+2. Type mismatch:
+    - "Error validating MyType.member: expected [string] found [number]
+
 
 ## TODO:
 
 - [ ] Implement generation for struct types
+    - [x] Named type keys
+    - [x] string keys
+    - [x] number keys
+    - [x] bool keys
+    - [x] option keys
+    - [ ] Array keys
+    - [ ] Map keys
 - [ ] Implement generation for enum types
     - [ ] Enum variants
     - [ ] Enum union type

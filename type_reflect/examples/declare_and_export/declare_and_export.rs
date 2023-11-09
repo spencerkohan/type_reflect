@@ -5,6 +5,12 @@ use serde::{Deserialize, Serialize};
 use type_reflect::*;
 use type_reflect::{export_types, Reflect};
 
+#[derive(Debug, Reflect, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct Foos {
+    x: f32,
+}
+
 // Here we declare a simple struct type with Reflect
 // the serde(rename_all) attribute will rename the keys to
 // camel case, both for the JSON representation, and for
@@ -18,6 +24,8 @@ struct SDParameters {
     step_count: u32,
     seed: u64,
     images: u32,
+    foo1: Foos,
+    foo2: Option<Foos>,
     results: Vec<String>,
     headers: HashMap<String, String>,
 }
@@ -49,7 +57,7 @@ enum SimpleEnumsExample {
     Foo,
 }
 
-type AliasedEnum = SimpleEnumsExample;
+// type AliasedEnum = SimpleEnumsExample;
 
 // And here we have an example of a type which depends
 // on a declared type, rather than primitive types
@@ -71,31 +79,33 @@ fn main() {
     // types to both a Zod target, and a Rust target
     export_types! {
         types: [
+            Foos,
             SDParameters,
-            SimpleEnumsExample,
-            Status,
+            // SimpleEnumsExample,
+            // Status,
         ],
         destinations: [
-            TypeScript(
-                "./type_reflect/examples/declare_and_export/output/type_script.ts"
-                tab_size: 2,
-            ),
-            Zod("./type_reflect/examples/declare_and_export/output/zod.ts"),
-            // With a prefix arg, it's possible to add additional arbitrary
-            // content to the output file.  So for instance this might be used
-            // to add extra import statements for dependencies required by the
-            // outputed type
-            Rust(
-                "./type_reflect/examples/declare_and_export/output/rust.rs",
-                prefix: r#"// We add an extra comment here"#
-            ),
+            // TypeScript(
+            //     "./type_reflect/examples/declare_and_export/output/type_script.ts"
+            //     tab_size: 2,
+            // ),
+            // Zod("./type_reflect/examples/declare_and_export/output/zod.ts"),
+            // // With a prefix arg, it's possible to add additional arbitrary
+            // // content to the output file.  So for instance this might be used
+            // // to add extra import statements for dependencies required by the
+            // // outputed type
+            // Rust(
+            //     "./type_reflect/examples/declare_and_export/output/rust.rs",
+            //     prefix: r#"// We add an extra comment here"#
+            // ),
             (
                 "./type_reflect/examples/declare_and_export/output/multi.ts",
                 emitters: [
                     TypeScript(),
+                    TSValidation(),
                     TSFormat(
                         tab_size: 2,
-                        line_width: 20,
+                        line_width: 80,
                     ),
                 ]
             ),

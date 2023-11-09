@@ -111,8 +111,15 @@ pub fn peak_arg_name(input: &syn::parse::ParseStream) -> Option<Ident> {
     let lookahead = input.lookahead1();
     if lookahead.peek(Ident) {
         let forked = input.fork();
-        let ident: Ident = forked.parse().unwrap();
-        if forked.parse::<Token![:]>().is_ok() && !forked.lookahead1().peek(Ident) {
+        let ident: Ident = match forked.parse::<Ident>() {
+            Ok(ident) => ident,
+            Err(err) => {
+                eprintln!("Failed to get ident");
+                panic!("{}", err);
+            }
+        };
+        if forked.parse::<Token![:]>().is_ok() && !forked.lookahead1().peek(Token![:]) {
+            // !forked.lookahead1().peek(Ident) {
             // We are fairly certain it's a KeyValuePair now
             return Some(ident);
         }

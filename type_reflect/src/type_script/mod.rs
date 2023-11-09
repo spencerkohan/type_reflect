@@ -40,7 +40,9 @@ pub fn to_ts_type(t: &Type) -> String {
         Type::Boolean => "boolean".to_string(),
         Type::Option(t) => format!("{}", to_ts_type(t)),
         Type::Array(t) => format!("Array<{}>", to_ts_type(t)),
-        Type::Map { key, value } => format!("Map<{}, {}>", to_ts_type(key), to_ts_type(value)),
+        Type::Map { key, value } => {
+            format!("{{[key: {}]: {}}}", to_ts_type(key), to_ts_type(value))
+        }
     }
 }
 
@@ -96,7 +98,9 @@ impl TypeEmitter for TypeScript {
             Ok(Some(contents)) => {
                 std::fs::write(file_path, contents)?;
             }
-            Err(_) => {}
+            Err(e) => {
+                eprintln!("Error formatting typescript: {}", e);
+            }
             _ => {}
         };
 
