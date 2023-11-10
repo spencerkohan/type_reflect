@@ -1,5 +1,3 @@
-use crate::type_script::to_ts_type;
-
 use type_reflect_core::{Inflectable, Inflection, StructMember};
 
 use super::validation::type_validation;

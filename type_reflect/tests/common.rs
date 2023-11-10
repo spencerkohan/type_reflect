@@ -1,5 +1,28 @@
 pub const OUTPUT_DIR: &'static str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/output");
 
+pub const TESTING_PREFIX: &'static str = r#"
+
+function assertThrows(fn: ()=>void, message: string) {
+  try {
+    fn();
+  } catch (e) {
+    console.log(`error thrown: ${e}`);
+    return;
+  }
+  throw new Error(message);
+}
+
+function assertDoesNotThrow<T>(fn: ()=>T, message: string) {
+  try {
+    return fn();
+  } catch (e) {
+    console.error(message);
+    throw e;
+  }
+}
+
+"#;
+
 use std::{fs, path::PathBuf};
 
 use anyhow::{bail, Result};
@@ -40,6 +63,7 @@ impl OutputLocation {
     }
 
     pub fn run_ts(&self) -> Result<()> {
+        println!("");
         run_command(format!("tsc {}", self.ts_path().to_str().unwrap()).as_str())?;
         run_command(format!("node {}", self.js_path().to_str().unwrap()).as_str())?;
         Ok(())
@@ -53,8 +77,18 @@ fn remove_file(path: PathBuf) {
     }
 }
 
-pub fn init_path(name: &str) -> OutputLocation {
+pub fn init_path(scope: &str, name: &str) -> OutputLocation {
     let mut base_path: PathBuf = PathBuf::from(OUTPUT_DIR);
+    base_path.push(scope);
+    if !base_path.exists() {
+        match fs::create_dir(&base_path) {
+            Ok(_) => {},
+            Err(e) => {
+                eprintln!("Error creating directory [{:?}]: {}", &base_path, e);
+            }
+        }
+    };
+
     base_path.push(name);
     let output = OutputLocation { path: base_path };
     output.clean();
