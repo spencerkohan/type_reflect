@@ -41,7 +41,11 @@ pub fn to_ts_type(t: &Type) -> String {
         Type::Option(t) => format!("{}", to_ts_type(t)),
         Type::Array(t) => format!("Array<{}>", to_ts_type(t)),
         Type::Map { key, value } => {
-            format!("{{[key: {}]: {}}}", to_ts_type(key), to_ts_type(value))
+            format!(
+                "{{[key: {k}]: {v}}}",
+                k = to_ts_type(key),
+                v = to_ts_type(value)
+            )
         }
     }
 }

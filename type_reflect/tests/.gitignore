@@ -1,1 +1,2 @@
-output/*
+output/src/*
+output/node_modules/

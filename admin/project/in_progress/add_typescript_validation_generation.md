@@ -134,16 +134,30 @@ For the thrown errors, we have to cover the follwing:
     - "Error validating MyType.member: expected [string] found [number]
 
 
+
+
 ## TODO:
 
-- [ ] Implement generation for struct types
+- [x] Implement generation for struct types
     - [x] Named type keys
     - [x] string keys
     - [x] number keys
     - [x] bool keys
     - [x] option keys
-    - [ ] Array keys
-    - [ ] Map keys
-- [ ] Implement generation for enum types
-    - [ ] Enum variants
-    - [ ] Enum union type
+    - [x] Array keys
+    - [x] Map keys
+- [x] Implement generation for enum types
+    - [x] Simple enums
+    - [x] Enum variants
+    - [x] Enum union type
+
+- [ ] Add tests
+    - [x] Simple value
+        - [x] validation
+        - [x] parsing
+    - [x] Optional member
+    - [x] Nested types
+    - [ ] Arrays
+        - [x] Type with array
+        - [ ] Array of types
+    - [x] Map member

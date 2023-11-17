@@ -5,6 +5,9 @@ use crate::{AliasType, EnumReflectionType, StructType, TypeEmitter};
 mod struct_type;
 use struct_type::struct_impl;
 
+mod enum_type;
+use enum_type::emit_enum_type;
+
 mod validation;
 
 #[derive(Default)]
@@ -35,7 +38,7 @@ impl TypeEmitter for TSValidation {
     where
         T: EnumReflectionType,
     {
-        "".to_string()
+        emit_enum_type::<T>()
     }
 
     fn emit_alias<T>(&mut self) -> String
@@ -51,4 +54,38 @@ impl TypeEmitter for TSValidation {
     {
         Ok(())
     }
+}
+
+pub fn validation_namespace(name: &str, validation_impl: &str) -> String {
+    format!(
+        r#"
+
+export namespace {name} {{
+    export function tryValidate(input: any): {name} {{
+        {validation_impl}
+    }}
+
+    export function tryParse(input: string): {name} {{
+        let json = JSON.parse(input);
+        return tryValidate(json);
+    }}
+
+    export function validate(input: any): Result<{name}> {{
+        try {{
+            return {{ok: true, value: tryValidate(input)}};
+        }} catch (e: any) {{
+            return {{ok: false, error: e as Error}};
+        }}
+    }}
+
+    export function parse(input: string): Result<{name}> {{
+        let json = JSON.parse(input);
+        return validate(json);
+    }}
+
+}}
+        "#,
+        name = name,
+        validation_impl = validation_impl
+    )
 }

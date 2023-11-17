@@ -48,7 +48,7 @@ pub trait SynTypeBridge {
                     "Option" if generics.len() == 1 => Ok(Type::Option(generics[0].clone().into())),
                     "Vec" if generics.len() == 1 => Ok(Type::Array(generics[0].clone().into())),
                     "HashMap" if generics.len() == 2 => Ok(Type::Map {
-                        key: generics[1].clone().into(),
+                        key: generics[0].clone().into(),
                         value: generics[1].clone().into(),
                     }),
                     _ if generics.len() == 0 => Ok(simple_type(leading)),

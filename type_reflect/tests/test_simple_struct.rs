@@ -11,24 +11,16 @@ pub struct Foo {
     pub x: f32,
 }
 
-#[test]
-fn test_validate_valid() -> Result<()> {
-    let output = init_path("test_simple_struct", "test_validate_valid");
+pub const SCOPE: &'static str = "test_simple_struct";
 
-    let post = r#"
-assertDoesNotThrow(()=>{
-    Foo.tryValidate({ x: 7 });
-},
-`{ x: 7 } should be a valid value of Foo`
-);
-    "#;
+#[test]
+fn test_validation() -> Result<()> {
+    let output = init_path(SCOPE, "test_validation");
 
     export_types!(
         types: [ Foo ],
         destinations: [(
             output.ts_path(),
-            prefix: TESTING_PREFIX,
-            postfix: post,
             emitters: [
                 TypeScript(),
                 TSValidation(),
@@ -39,27 +31,76 @@ assertDoesNotThrow(()=>{
             ],
         )]
     )?;
+
+    output.write_jest(
+        "Foo",
+        r#"
+
+describe('Simple Struct Validation', ()=>{
+  it("validates an object: `{x: 7}` matching the type `Foo` without throwing", ()=>{
+    expect(() => {
+        Foo.tryValidate({x: 7})
+    }).not.toThrow();
+  });
+
+  it("validates an object: `{x: -7}` matching the type `Foo` without throwing", ()=>{
+    expect(() => {
+        Foo.tryValidate({x: -7})
+    }).not.toThrow();
+  });
+
+  it("validates an object: `{x: 0}` matching the type `Foo` without throwing", ()=>{
+    expect(() => {
+        Foo.tryValidate({x: 0})
+    }).not.toThrow();
+  });
+
+  it("throws an error validating an object: `{x: '7'}` not matching the type `Foo`", ()=>{
+    expect(() => {
+        Foo.tryValidate({x: '7'})
+    }).toThrow();
+  });
+
+  it("throws an error validating an object: `{y: 7}` not matching the type `Foo`", ()=>{
+    expect(() => {
+        Foo.tryValidate({y: 7})
+    }).toThrow();
+  });
+
+  it("throws an error validating a string: `foo` not matching the type `Foo`", ()=>{
+    expect(() => {
+        Foo.tryValidate('foo')
+    }).toThrow();
+  });
+
+  it("throws an error validating a number: 7 not matching the type `Foo`", ()=>{
+    expect(() => {
+        Foo.tryValidate(7)
+    }).toThrow();
+  });
+
+  it("throws an error validating a boolean: false not matching the type `Foo`", ()=>{
+    expect(() => {
+        Foo.tryValidate(false)
+    }).toThrow();
+  });
+})
+    "#,
+    )?;
+
     output.run_ts()
 }
 
 #[test]
-fn test_validate_invalid() -> Result<()> {
-    let output = init_path("test_simple_struct", "test_validate_invalid");
-
-    let post = r#"
-assertThrows(()=>{
-    Foo.tryValidate({ x: { a: 1 } });
-},
-`{ x: { a: 1 } } should be an invalid value of Foo`
-);
-    "#;
+fn test_parsing() -> Result<()> {
+    let output = init_path(SCOPE, "test_parsing");
 
     export_types!(
         types: [ Foo ],
         destinations: [(
             output.ts_path(),
-            prefix: TESTING_PREFIX,
-            postfix: post,
+            // prefix: TESTING_PREFIX,
+            // postfix: post,
             emitters: [
                 TypeScript(),
                 TSValidation(),
@@ -70,68 +111,54 @@ assertThrows(()=>{
             ],
         )]
     )?;
-    output.run_ts()
-}
 
+    output.write_jest(
+        "Foo",
+        r#"
 
-#[test]
-fn test_parse_valid() -> Result<()> {
-    let output = init_path("test_simple_struct", "test_parse_valid");
-
-    let post = r#"
-assertDoesNotThrow(()=>{
-    Foo.tryParse(`{ "x": 42 }`);
-},
-`'{ "x": 42 }' should be a valid value of Foo`
-);
-    "#;
-
-    export_types!(
-        types: [ Foo ],
-        destinations: [(
-            output.ts_path(),
-            prefix: TESTING_PREFIX,
-            postfix: post,
-            emitters: [
-                TypeScript(),
-                TSValidation(),
-                TSFormat(
-                    tab_size: 2,
-                    line_width: 80,
-                ),
-            ],
-        )]
+describe('Simple Struct Parsing', ()=>{
+  it('parses json: `{"x": 7}` matching the type `Foo` without throwing', ()=>{
+    expect(() => {
+        const foo = Foo.tryParse(`{"x": 7}`);
+        expect(foo.x).toBe(7);
+    }).not.toThrow();
+  });
+  it('parses json: `{"x": -7}` matching the type `Foo` without throwing', ()=>{
+    expect(() => {
+        const foo = Foo.tryParse(`{"x": -7}`);
+        expect(foo.x).toBe(-7);
+    }).not.toThrow();
+  });
+  it('parses json: `{"x": 0}` matching the type `Foo` without throwing', ()=>{
+    expect(() => {
+        const foo = Foo.tryParse(`{"x": 0}`);
+        expect(foo.x).toBe(0);
+    }).not.toThrow();
+  });
+  it('parses json: `{"x": 3.14159}` matching the type `Foo` without throwing', ()=>{
+    expect(() => {
+        const foo = Foo.tryParse(`{"x": 3.14159}`);
+        expect(foo.x).toBe(3.14159);
+    }).not.toThrow();
+  });
+  it('throws an error parsing a string: `{"y": 7}` not matching the type `Foo`', ()=>{
+    expect(() => {
+        Foo.tryParse(`{"y": 7}`)
+    }).toThrow();
+  });
+  it('throws an error parsing a string: `qewcm9823d` not matching the type `Foo`', ()=>{
+    expect(() => {
+        Foo.tryParse(`qewcm9823d`)
+    }).toThrow();
+  });
+  it('throws an error parsing an invalid json string: `{x: 7}` not matching the type `Foo`', ()=>{
+    expect(() => {
+        Foo.tryParse(`{x: 7}`)
+    }).toThrow();
+  });
+})
+    "#,
     )?;
-    output.run_ts()
-}
 
-#[test]
-fn test_parse_invalid() -> Result<()> {
-    let output = init_path("test_simple_struct", "test_parse_invalid");
-
-    let post = r#"
-assertThrows(()=>{
-    Foo.tryParse(`{ "x": "42" }`);
-},
-`'{ "x": "42" }' should be an invalid value of Foo`
-);
-    "#;
-
-    export_types!(
-        types: [ Foo ],
-        destinations: [(
-            output.ts_path(),
-            prefix: TESTING_PREFIX,
-            postfix: post,
-            emitters: [
-                TypeScript(),
-                TSValidation(),
-                TSFormat(
-                    tab_size: 2,
-                    line_width: 80,
-                ),
-            ],
-        )]
-    )?;
     output.run_ts()
 }

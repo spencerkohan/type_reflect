@@ -29,17 +29,17 @@ use anyhow::{bail, Result};
 use std::process::Command;
 pub struct OutputLocation {
     path: PathBuf,
+    filename: String,
 }
 
-fn run_command(command: &str) -> Result<()> {
-
+fn run_command(dir: &str, command: &str) -> Result<()> {
     println!("Running command:\n\t{}", command);
 
     let mut parts = command.split_whitespace();
     let command = parts.next().expect("no command given");
     let args = parts.collect::<Vec<&str>>();
 
-    let mut child = Command::new(command).args(&args).spawn()?; // Spawn the command as a child process
+    let mut child = Command::new(command).args(&args).current_dir(dir).spawn()?; // Spawn the command as a child process
 
     let status = child.wait()?; // Wait for the command to complete
 
@@ -54,18 +54,33 @@ impl OutputLocation {
     pub fn ts_path(&self) -> PathBuf {
         self.path.with_extension("ts")
     }
-    fn js_path(&self) -> PathBuf {
-        self.path.with_extension("js")
+    fn jest_path(&self) -> PathBuf {
+        self.path.with_extension("test.ts")
     }
     fn clean(&self) {
         remove_file(self.ts_path());
-        remove_file(self.js_path());
+        remove_file(self.jest_path());
     }
 
     pub fn run_ts(&self) -> Result<()> {
         println!("");
-        run_command(format!("tsc {}", self.ts_path().to_str().unwrap()).as_str())?;
-        run_command(format!("node {}", self.js_path().to_str().unwrap()).as_str())?;
+        run_command(
+            OUTPUT_DIR,
+            format!("yarn jest {}", self.jest_path().to_str().unwrap()).as_str(),
+        )?;
+        Ok(())
+    }
+
+    pub fn write_jest(&self, imports: &str, content: &str) -> Result<()> {
+        fs::write(
+            self.jest_path(),
+            format!(
+                "import {{ {imports} }} from './{file}'\n\n{content}",
+                content = content,
+                imports = imports,
+                file = self.filename
+            ),
+        )?;
         Ok(())
     }
 }
@@ -79,10 +94,11 @@ fn remove_file(path: PathBuf) {
 
 pub fn init_path(scope: &str, name: &str) -> OutputLocation {
     let mut base_path: PathBuf = PathBuf::from(OUTPUT_DIR);
+    base_path.push("src");
     base_path.push(scope);
     if !base_path.exists() {
         match fs::create_dir(&base_path) {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(e) => {
                 eprintln!("Error creating directory [{:?}]: {}", &base_path, e);
             }
@@ -90,7 +106,10 @@ pub fn init_path(scope: &str, name: &str) -> OutputLocation {
     };
 
     base_path.push(name);
-    let output = OutputLocation { path: base_path };
+    let output = OutputLocation {
+        path: base_path,
+        filename: name.to_string(),
+    };
     output.clean();
     output
 }
