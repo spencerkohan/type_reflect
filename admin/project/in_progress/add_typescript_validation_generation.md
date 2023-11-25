@@ -134,7 +134,9 @@ For the thrown errors, we have to cover the follwing:
     - "Error validating MyType.member: expected [string] found [number]
 
 
+### Array of Types
 
+Each validator should also have the option to parse or validate an array of that type, for convenience
 
 ## TODO:
 

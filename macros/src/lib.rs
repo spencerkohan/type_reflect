@@ -15,8 +15,8 @@ mod export_types_impl;
 use export_types_impl::*;
 use type_reflect_core::syn_err;
 
-mod ts_str;
-use ts_str::ts_str_impl;
+// mod ts_str;
+// use ts_str::ts_str_impl;
 
 #[macro_use]
 mod utils;
@@ -69,24 +69,22 @@ pub fn export_types(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     .into()
 }
 
-/**
-ts_str is a utility macro for emitting typescript strings from rust code
+// /**
+// ts_str is a utility macro for emitting typescript strings from rust code
 
-usage:
+// usage:
 
+// let ts = ts_str!{
+// const x = 7;
+// };
+// assert_eq!(ts, "const x = 7;".to_string());
 
-let ts = ts_str!{
-const x = 7;
-};
-assert_eq!(ts, "const x = 7;".to_string());
-
-
-**/
-#[proc_macro]
-pub fn ts_str(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    match ts_str_impl(input.into()) {
-        Err(err) => err.to_compile_error(),
-        Ok(result) => result,
-    }
-    .into()
-}
+// **/
+// #[proc_macro]
+// pub fn ts_str(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+//     match ts_str_impl(input.into()) {
+//         Err(err) => err.to_compile_error(),
+//         Ok(result) => result,
+//     }
+//     .into()
+// }

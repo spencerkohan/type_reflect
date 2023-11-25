@@ -1,13 +1,8 @@
-use type_reflect_core::{inflection, EnumCase, Inflectable, Inflection, StructMember, Type};
-use type_reflect_macros::ts_str;
+use ts_quote::ts_str;
+use type_reflect_core::{EnumCase, Inflection, StructMember, Type};
 
-use crate::{
-    ts_validation::{
-        struct_type::struct_member_validations,
-        validation::{tuple_validation, type_validation},
-        validation_namespace,
-    },
-    EnumReflectionType,
+use crate::ts_validation::{
+    struct_type::struct_member_validations, validation::tuple_validation, validation_namespace,
 };
 
 pub fn emit_complex_enum_case_type(

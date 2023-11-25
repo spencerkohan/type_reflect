@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "macros",
+    "ts_quote",
     "type_reflect_core",
     "type_reflect",
 ]

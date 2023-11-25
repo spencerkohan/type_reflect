@@ -1,6 +1,6 @@
 use crate::ts_validation::validation::type_validation;
+use ts_quote::ts_str;
 use type_reflect_core::Type;
-use type_reflect_macros::ts_str;
 
 pub fn tuple_validation(var_name: &str, member_types: &Vec<Type>) -> String {
     if member_types.len() == 1 {

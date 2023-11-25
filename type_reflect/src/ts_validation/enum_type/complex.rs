@@ -3,7 +3,7 @@ use type_reflect_core::EnumCase;
 use crate::{ts_validation::validation_namespace, EnumReflectionType};
 
 use super::case_type::emit_complex_enum_case_type;
-use type_reflect_macros::ts_str;
+use ts_quote::ts_str;
 
 pub fn emit_complex_enum_type<T>(case_key: &String, content_key: &Option<String>) -> String
 where
