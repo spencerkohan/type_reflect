@@ -6,6 +6,8 @@ edition = "2021"
 description = "Extensible runtime reflection through a Derive macro"
 license = "Apache-2.0"
 
+repository = "https://github.com/spencerkohan/type_reflect"
+
 [dependencies]
 type_reflect_macros = "0.1.0"
 ts_quote = "0.1.0"
