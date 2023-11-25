@@ -1,12 +1,15 @@
 [package]
-name = "ts_quote"
+name = "ts_quote_macros"
 version = "0.1.0"
 edition = "2021"
+
+
+[lib]
+proc-macro = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ts_quote_macros = { path = "../ts_quote_macros" }
-deno_ast = "0.31.6"
-dprint-plugin-typescript = "0.88.3"
-anyhow = "1.0.75"
+proc-macro2 = "1.0.69"
+quote = "1"
+syn = { version = "1", features = ["full", "extra-traits"] }

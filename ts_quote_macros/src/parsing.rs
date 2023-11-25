@@ -1,9 +1,7 @@
-use std::fmt::format;
 use std::iter::Peekable;
 
 use proc_macro2::*;
 use quote::*;
-use syn::Result;
 use syn::{parse_str, Lit};
 
 use std::collections::HashSet;
@@ -31,21 +29,6 @@ pub struct ParseContext {
     ident_substituions: HashSet<Ident>,
     expr_substituions: Vec<ExprSubstitution>,
 }
-
-// pub fn ts_str_impl(input: TokenStream) -> Result<TokenStream> {
-//     let mut parse_context = ParseContext::new("0".to_string(), input);
-//     parse_context.parse();
-
-//     // let raw_string = format!(r##"r#"{}"#"##, parse_context.string_val);
-//     let raw_string = &parse_context.string_val;
-//     let substitution_mappings = parse_context.substitution_mappings();
-
-//     println!("Raw string: {}", raw_string);
-
-//     Ok(quote! {
-//         format!(#raw_string, #substitution_mappings)
-//     })
-// }
 
 impl ParseContext {
     /// Initialize the parser, with a given ID

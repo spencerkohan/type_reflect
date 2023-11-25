@@ -107,7 +107,7 @@ fn test_validation() -> Result<()> {
             });
         }
         .as_str(),
-    );
+    )?;
 
     output.run_ts()
 }

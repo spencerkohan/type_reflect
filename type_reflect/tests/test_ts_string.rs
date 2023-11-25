@@ -3,12 +3,10 @@ mod common;
 use anyhow::Result;
 use common::*;
 
-use serde::{Deserialize, Serialize};
+use ts_quote::ts_string;
 use type_reflect::*;
 
 pub const SCOPE: &'static str = "test_ts_string";
-
-struct Foo {}
 
 #[test]
 fn test_ts_str() -> Result<()> {

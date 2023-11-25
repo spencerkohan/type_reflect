@@ -5,6 +5,8 @@ Currently I have ts_str in a general macros crate for supporting type_reflect.  
 ## TODO:
 
 - [x] Move `ts_str!` to the new crate
-- [ ] Rename `ts_str!` to `ts_string!` and test
-- [ ] Implement `ts_str!`
+- [x] Rename `ts_str!` to `ts_string!` and test
 - [ ] Implement `ts_quote!`
+    - [x] Implement TS type
+    - [ ] Implement `ts_quote` macro
+    - [ ] Document
