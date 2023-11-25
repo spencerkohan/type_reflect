@@ -1,4 +1,4 @@
-use ts_quote::ts_str;
+use ts_quote::ts_string;
 use type_reflect_core::{EnumCase, Inflection, StructMember, Type};
 
 use crate::ts_validation::{
@@ -24,7 +24,7 @@ pub fn emit_complex_enum_case_type(
         }
     };
 
-    let validation_impl = ts_str! {
+    let validation_impl = ts_string! {
         if (!isRecord(input)) {
             throw new Error(#"`Error parsing #case_type_name: expected: Record, found: ${typeof input}`");
         }

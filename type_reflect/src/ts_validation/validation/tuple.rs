@@ -1,5 +1,5 @@
 use crate::ts_validation::validation::type_validation;
-use ts_quote::ts_str;
+use ts_quote::ts_string;
 use type_reflect_core::Type;
 
 pub fn tuple_validation(var_name: &str, member_types: &Vec<Type>) -> String {
@@ -12,7 +12,7 @@ pub fn tuple_validation(var_name: &str, member_types: &Vec<Type>) -> String {
         .enumerate()
         .map(|(i, member)| {
             type_validation(
-                ts_str! {
+                ts_string! {
                     #var_name[#i]
                 }
                 .as_str(),
@@ -21,7 +21,7 @@ pub fn tuple_validation(var_name: &str, member_types: &Vec<Type>) -> String {
         })
         .collect();
 
-    ts_str! {
+    ts_string! {
         if (!Array.isArray(#var_name)) {
             throw new Error(#"`Error parsing #var_name: expected: Array, found: ${ typeof #var_name }`");
         }

@@ -45,7 +45,7 @@ fn test_validation() -> Result<()> {
 
     output.write_jest(
         "Shape, Rectangle, ShapeCase",
-        ts_str! {
+        ts_string! {
             describe("ADT Validation", ()=>{
                 it("Validates a Null variant: {_case: ShapeCase.Null}", ()=>{
                     expect(() => {
@@ -110,42 +110,4 @@ fn test_validation() -> Result<()> {
     );
 
     output.run_ts()
-
-    //     output.write_jest(
-    //         "Pet",
-    //         r#"
-
-    // describe('Simple Enum Validation', ()=>{
-
-    //   it("validates an object: `Dog`", ()=>{
-    //     expect(() => {
-    //         Pet.tryValidate(`Dog`)
-    //     }).not.toThrow();
-    //   });
-
-    //   it("validates an object: `Cat`", ()=>{
-    //     expect(() => {
-    //         Pet.tryValidate(`Cat`)
-    //     }).not.toThrow();
-    //   });
-
-    //   it("throws an error validating an number: `7`", ()=>{
-    //     expect(() => {
-    //         Pet.tryValidate(7)
-    //     }).toThrow();
-    //   });
-
-    //   it("throws an error validating an object: `{tag: 'Dog'}`", ()=>{
-    //     expect(() => {
-    //         Pet.tryValidate({tag: 'Dog'})
-    //     }).toThrow();
-    //   });
-
-    // })
-    //     "#,
-    //     )?;
-
-    // output.run_ts()
-
-    // Ok(())
 }

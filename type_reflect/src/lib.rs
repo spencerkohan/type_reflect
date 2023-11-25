@@ -8,7 +8,7 @@ use std::fs::File;
 pub use std::io::Write;
 pub use std::path::Path;
 
-pub use ts_quote::ts_str;
+pub use ts_quote::ts_string;
 pub use type_reflect_macros::export_types;
 pub use type_reflect_macros::Reflect;
 pub mod struct_type;

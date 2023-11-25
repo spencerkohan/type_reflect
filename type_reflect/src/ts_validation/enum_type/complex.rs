@@ -3,7 +3,7 @@ use type_reflect_core::EnumCase;
 use crate::{ts_validation::validation_namespace, EnumReflectionType};
 
 use super::case_type::emit_complex_enum_case_type;
-use ts_quote::ts_str;
+use ts_quote::ts_string;
 
 pub fn emit_complex_enum_type<T>(case_key: &String, content_key: &Option<String>) -> String
 where
@@ -21,12 +21,12 @@ where
 
     let name = T::name();
 
-    let namespace = validation_namespace(T::name(), ts_str! {
+    let namespace = validation_namespace(T::name(), ts_string! {
         #case_validations
         throw new Error(#"`Error validating #name: value ${JSON.stringify(input)} does not match any variant`");
     }.as_str());
 
-    ts_str! {
+    ts_string! {
         #case_type_validators
         #namespace
     }
@@ -35,7 +35,7 @@ where
 fn validate_case(type_name: &str, case: &EnumCase) -> String {
     let case_type = format!("{}Case{}", type_name, case.name);
 
-    ts_str! {
+    ts_string! {
         try {
             return #case_type.tryValidate(input);
         } catch {}

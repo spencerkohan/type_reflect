@@ -6,15 +6,15 @@ use common::*;
 use serde::{Deserialize, Serialize};
 use type_reflect::*;
 
-pub const SCOPE: &'static str = "test_ts_str";
+pub const SCOPE: &'static str = "test_ts_string";
 
 struct Foo {}
 
 #[test]
 fn test_ts_str() -> Result<()> {
-    let output = init_path(SCOPE, "test_ts_str");
+    let output = init_path(SCOPE, "test_ts_string");
 
-    let prefix = ts_str! {
+    let prefix = ts_string! {
         const x = 4;
     };
 
@@ -39,7 +39,7 @@ fn test_ts_str() -> Result<()> {
 fn test_with_str() -> Result<()> {
     let output = init_path(SCOPE, "test_with_str");
 
-    let prefix = ts_str! {
+    let prefix = ts_string! {
         const x = "Foo";
     };
 
@@ -64,7 +64,7 @@ fn test_with_str() -> Result<()> {
 fn test_groups() -> Result<()> {
     let output = init_path(SCOPE, "test_groups");
 
-    let prefix = ts_str! {
+    let prefix = ts_string! {
         const double = (x: number): number => {
             return x * 2;
         }
@@ -95,7 +95,7 @@ fn test_ident_substitution() -> Result<()> {
     let foo = 3;
     let bar = 4;
 
-    let prefix = ts_str! {
+    let prefix = ts_string! {
         const val = #hola + #{foo + bar};
         const lemon = #"`egg salad sandwich ${val}`";
         const peas = #"`egg salad sandwich ${val} == #foo`";

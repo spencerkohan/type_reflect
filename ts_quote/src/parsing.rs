@@ -23,7 +23,7 @@ impl ToTokens for ExprSubstitution {
     }
 }
 
-struct ParseContext {
+pub struct ParseContext {
     id: String,
     subgroup_index: u32,
     token_iter: Peekable<token_stream::IntoIter>,
@@ -32,23 +32,25 @@ struct ParseContext {
     expr_substituions: Vec<ExprSubstitution>,
 }
 
-pub fn ts_str_impl(input: TokenStream) -> Result<TokenStream> {
-    let mut parse_context = ParseContext::new("0".to_string(), input);
-    parse_context.parse();
+// pub fn ts_str_impl(input: TokenStream) -> Result<TokenStream> {
+//     let mut parse_context = ParseContext::new("0".to_string(), input);
+//     parse_context.parse();
 
-    // let raw_string = format!(r##"r#"{}"#"##, parse_context.string_val);
-    let raw_string = &parse_context.string_val;
-    let substitution_mappings = parse_context.substitution_mappings();
+//     // let raw_string = format!(r##"r#"{}"#"##, parse_context.string_val);
+//     let raw_string = &parse_context.string_val;
+//     let substitution_mappings = parse_context.substitution_mappings();
 
-    println!("Raw string: {}", raw_string);
+//     println!("Raw string: {}", raw_string);
 
-    Ok(quote! {
-        format!(#raw_string, #substitution_mappings)
-    })
-}
+//     Ok(quote! {
+//         format!(#raw_string, #substitution_mappings)
+//     })
+// }
 
 impl ParseContext {
-    fn new(id: String, tokens: TokenStream) -> Self {
+    /// Initialize the parser, with a given ID
+    /// and the input token stream
+    pub fn new(id: String, tokens: TokenStream) -> Self {
         Self {
             id,
             subgroup_index: 0,
@@ -59,7 +61,17 @@ impl ParseContext {
         }
     }
 
-    fn substitution_mappings(&self) -> TokenStream {
+    /// Parse the input tokens until finished
+    pub fn parse(&mut self) {
+        while self.consume_next() {}
+    }
+
+    /// Return the format string for this parser
+    pub fn format_string(&self) -> &String {
+        &self.string_val
+    }
+
+    pub fn substitution_mappings(&self) -> TokenStream {
         let subsitutions = &self.expr_substituions;
         quote! {
             #(#subsitutions,)*
@@ -78,10 +90,6 @@ impl ParseContext {
     fn merge_args(&mut self, other: ParseContext) {
         self.ident_substituions.extend(other.ident_substituions);
         self.expr_substituions.extend(other.expr_substituions);
-    }
-
-    fn parse(&mut self) {
-        while self.consume_next() {}
     }
 
     fn push_back_str(&mut self, s: &str) {
