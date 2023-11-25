@@ -1,5 +1,8 @@
 # TS Quote
 
+[![Crates.io](https://img.shields.io/crates/v/ts_quote.svg)](https://crates.io/crates/ts_quote)
+[![Documentation](https://docs.rs/ts_quote/badge.svg)](https://docs.rs/ts_quote)
+
 This crate provides a few quasi-quote macros for generating TypeScript from inside Rust.
 
 It is built upon the [`Deno`](https://deno.com) project, and is interoperable with Deno's TypeScript representation.
