@@ -3,8 +3,8 @@ name = "type_reflect_core"
 version = "0.1.0"
 authors = ["Spencer Kohan <spencerkohan@gmail.com>"]
 edition = "2021"
-description = "derive macro for type_reflect"
-license = "MIT"
+description = "Utility functions for type_reflect"
+license = "Apache-2.0"
 
 [dependencies]
 proc-macro2 = "1.0.69"

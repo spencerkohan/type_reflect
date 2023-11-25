@@ -1,7 +1,10 @@
 [package]
 name = "ts_quote"
 version = "0.1.0"
+authors = ["Spencer Kohan <spencerkohan@gmail.com>"]
 edition = "2021"
+description = "Procedural macros for quasi-quoting TypeScript from Rust"
+license = "Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
