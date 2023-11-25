@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ts_quote_macros = { path = "../ts_quote_macros" }
+ts_quote_macros = "0.1.0"
 deno_ast = "0.31.6"
 dprint-plugin-typescript = "0.88.3"
 anyhow = "1.0.75"

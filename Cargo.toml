@@ -1,9 +1,17 @@
 [workspace]
 members = [
-    "macros",
+    "ts_quote_macros",
     "ts_quote",
+    "type_reflect_macros",
     "type_reflect_core",
     "type_reflect",
 ]
 
 resolver = "2"
+
+[patch.crates-io]
+ts_quote_macros = { path = "ts_quote_macros" }
+ts_quote = { path = "ts_quote" }
+type_reflect_core = { path = "type_reflect_core" }
+type_reflect_macros = { path = "type_reflect_macros" }
+type_reflect = { path = "type_reflect" }

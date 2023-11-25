@@ -1,0 +1,5 @@
+(cd ts_quote_macros && cargo publish)
+(cd ts_quote && cargo publish)
+(cd type_reflect_core && cargo publish)
+(cd type_reflect_macros && cargo publish)
+(cd type_reflect && cargo publish)
