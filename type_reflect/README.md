@@ -3,7 +3,7 @@
 [![Crates.io](https://img.shields.io/crates/v/type_reflect.svg)](https://crates.io/crates/type_reflect)
 [![Documentation](https://docs.rs/type_reflect/badge.svg)](https://docs.rs/type_reflect)
 
-*This crate is part of a larger workspace, see the [monorepo README](../) for more details*
+*This crate is part of a larger workspace, see the [monorepo README](https://github.com/spencerkohan/type_reflect) for more details*
 
 ***This project is currently fairly rough around the edges.  It's already usable in it's current state, but for instance the rust docs are WIP.  You may also expect to run into bugs and limitations, since so far it has only been tested on my own use-cases.  If you run into something, please report it so I can make this a better tool***
 

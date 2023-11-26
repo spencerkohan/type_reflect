@@ -3,7 +3,7 @@
 [![Crates.io](https://img.shields.io/crates/v/ts_quote.svg)](https://crates.io/crates/ts_quote)
 [![Documentation](https://docs.rs/ts_quote/badge.svg)](https://docs.rs/ts_quote)
 
-*This crate is part of a larger workspace, see the [monorepo README](../) for more details*
+*This crate is part of a larger workspace, see the [monorepo README](https://github.com/spencerkohan/type_reflect) for more details*
 
 This crate provides a few quasi-quote macros for generating TypeScript from inside Rust.
 

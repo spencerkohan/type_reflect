@@ -4,4 +4,4 @@
 
 Procedural macro implementations for `type_reflect`.  This crate is for internal use, and the macros are re-exported by the `type_reflect` crate.
 
-*This crate is part of a larger workspace, see the [monorepo README](../) for more details*
+*This crate is part of a larger workspace, see the [monorepo README](https://github.com/spencerkohan/type_reflect) for more details*

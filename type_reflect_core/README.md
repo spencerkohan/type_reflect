@@ -4,4 +4,4 @@
 
 A crate for shared components used by both `type_reflect` and `type_reflect_macros`.
 
-*This crate is part of a larger workspace, see the [monorepo README](../) for more details*
+*This crate is part of a larger workspace, see the [monorepo README](https://github.com/spencerkohan/type_reflect) for more details*
