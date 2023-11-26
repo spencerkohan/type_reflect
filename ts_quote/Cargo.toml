@@ -7,6 +7,7 @@ description = "Procedural macros for quasi-quoting TypeScript from Rust"
 license = "Apache-2.0"
 
 repository = "https://github.com/spencerkohan/type_reflect/tree/main/ts_quote"
+documentation = "https://docs.rs/ts_quote"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
