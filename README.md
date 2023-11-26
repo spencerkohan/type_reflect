@@ -12,7 +12,7 @@ It provides some utilities out of the box for exporting Rust types to TypeScript
 
 | Crate    | Description | Links    |
 |----------|-------------|----------|
-| `type_reflect` | The main `type_reflect` crate for public consumption | [![Github](https://img.shields.io/badge/github-source-blue?logo=github)](/tree/main/type_reflect) [![Crates.io](https://img.shields.io/crates/v/type_reflect.svg)](https://crates.io/crates/type_reflect) [![Documentation](https://docs.rs/type_reflect/badge.svg)](https://docs.rs/type_reflect) |
+| `type_reflect` | The main `type_reflect` crate for public consumption | [![Github](https://img.shields.io/badge/github-source-blue?logo=github)](./tree/main/type_reflect) [![Crates.io](https://img.shields.io/crates/v/type_reflect.svg)](https://crates.io/crates/type_reflect) [![Documentation](https://docs.rs/type_reflect/badge.svg)](https://docs.rs/type_reflect) |
 
 ## 2. 🖊️ TS Quote
 
@@ -22,4 +22,4 @@ It provides some utilities out of the box for exporting Rust types to TypeScript
 
 | Crate    | Description | Links    |
 |----------|-------------|----------|
-| `ts_quote` | The main `ts_quote` crate for public consumption | [![Github](https://img.shields.io/badge/github-source-blue?logo=github)](/tree/main/ts_quote) [![Crates.io](https://img.shields.io/crates/v/ts_quote.svg)](https://crates.io/crates/ts_quote) [![Documentation](https://docs.rs/ts_quote/badge.svg)](https://docs.rs/ts_quote) |
+| `ts_quote` | The main `ts_quote` crate for public consumption | [![Github](https://img.shields.io/badge/github-source-blue?logo=github)](./tree/main/ts_quote) [![Crates.io](https://img.shields.io/crates/v/ts_quote.svg)](https://crates.io/crates/ts_quote) [![Documentation](https://docs.rs/ts_quote/badge.svg)](https://docs.rs/ts_quote) |
