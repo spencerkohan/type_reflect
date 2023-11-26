@@ -52,19 +52,19 @@ describe('Struct with Array of Primitives Validation', ()=>{
 
   it('validates an object: `{ records: {a: 42, b: 7, dog: 3, cat: 21} }` which conforms to MapOfPrimitive', ()=>{
     expect(() => {
-        MapOfPrimitive.tryValidate({ records: {a: 42, b: 7, dog: 3, cat: 21} });
+        MapOfPrimitive.validate({ records: {a: 42, b: 7, dog: 3, cat: 21} });
     }).not.toThrow();
   });
 
   it('validates an empty array: `{ records: {} }` which conforms to MapOfPrimitive', ()=>{
     expect(() => {
-        MapOfPrimitive.tryValidate({ records: {} });
+        MapOfPrimitive.validate({ records: {} });
     }).not.toThrow();
   });
 
   it('throws an error validating an object: `{a: 42, b: 7, dog: "3", cat: 21}` which has one value not conforming to the type', ()=>{
     expect(() => {
-        MapOfPrimitive.tryValidate({a: 42, b: 7, dog: "3", cat: 21})
+        MapOfPrimitive.validate({a: 42, b: 7, dog: "3", cat: 21})
     }).toThrow();
   });
 
@@ -102,19 +102,19 @@ describe('Struct with Map of Types Validation', ()=>{
 
   it('validates an object: `{ records: {a: { val: true }, b: {val: false } } }` which conforms to MapOfType', ()=>{
     expect(() => {
-        MapOfType.tryValidate({ records: {a: { val: true }, b: {val: false } } });
+        MapOfType.validate({ records: {a: { val: true }, b: {val: false } } });
     }).not.toThrow();
   });
 
   it('validates an empty object: `{ records: {} }` which conforms to MapOfType', ()=>{
     expect(() => {
-        MapOfType.tryValidate({ records: {} });
+        MapOfType.validate({ records: {} });
     }).not.toThrow();
   });
 
   it('throws an error validating an object: `{ records: {a: { val: true }, b: {val: false }, c: 32 } }` which has one value not conforming to the type', ()=>{
     expect(() => {
-        MapOfType.tryValidate({ records: {a: { val: true }, b: {val: false }, c: 32 } })
+        MapOfType.validate({ records: {a: { val: true }, b: {val: false }, c: 32 } })
     }).toThrow();
   });
 

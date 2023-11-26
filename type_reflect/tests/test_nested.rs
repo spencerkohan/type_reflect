@@ -45,25 +45,25 @@ describe('Struct with Nested Type Validation', ()=>{
 
   it('validates an object: `{ bar: { val: true } }` which conforms to the nested types', ()=>{
     expect(() => {
-        Foo.tryValidate({ bar: { val: true } });
+        Foo.validate({ bar: { val: true } });
     }).not.toThrow();
   });
 
   it('throws an error validating an object: `{ bar: { val: "hola" } }` not conforming to the nested type', ()=>{
     expect(() => {
-        Foo.tryValidate({ bar: { val: "hola" } })
+        Foo.validate({ bar: { val: "hola" } })
     }).toThrow();
   });
 
   it('throws an error validating an object: `{ bar: true }` not conforming to the nested type', ()=>{
     expect(() => {
-        Foo.tryValidate({ bar: true })
+        Foo.validate({ bar: true })
     }).toThrow();
   });
 
   it('throws an error validating an object: `{ baz: { val: true } }` not conforming to the outer type', ()=>{
     expect(() => {
-        Foo.tryValidate({ baz: { val: true } })
+        Foo.validate({ baz: { val: true } })
     }).toThrow();
   });
 

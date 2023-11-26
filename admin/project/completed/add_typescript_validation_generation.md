@@ -153,7 +153,7 @@ Each validator should also have the option to parse or validate an array of that
     - [x] Enum variants
     - [x] Enum union type
 
-- [ ] Add tests
+- [x] Add tests
     - [x] Simple value
         - [x] validation
         - [x] parsing
@@ -161,5 +161,5 @@ Each validator should also have the option to parse or validate an array of that
     - [x] Nested types
     - [ ] Arrays
         - [x] Type with array
-        - [ ] Array of types
+        - [x] Array of types
     - [x] Map member

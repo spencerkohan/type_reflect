@@ -41,19 +41,19 @@ describe('Struct with Optional Member Validation', ()=>{
 
   it("validates an object: `{x: 7, y: 42}` with both the requred and optional members", ()=>{
     expect(() => {
-        Foo.tryValidate({x: 7, y: 42})
+        Foo.validate({x: 7, y: 42})
     }).not.toThrow();
   });
 
   it("validates an object: `{x: 7}` matching the type `Foo` without the optional member `y`", ()=>{
     expect(() => {
-        Foo.tryValidate({x: 7})
+        Foo.validate({x: 7})
     }).not.toThrow();
   });
 
   it("throws an error validating an object: `{y: 42}` missing the required member `x`", ()=>{
     expect(() => {
-        Foo.tryValidate({y: 42})
+        Foo.validate({y: 42})
     }).toThrow();
   });
 

@@ -36,40 +36,4 @@ pub fn struct_impl(name: &str, members: &Vec<StructMember>, inflection: Inflecti
     );
 
     validation_namespace(name, validation_impl.as_str())
-
-    //     return format!(
-    //         r#"
-
-    // export namespace {name} {{
-    //     export function tryValidate(input: any): {name} {{
-    //         if (!isRecord(input)) {{
-    //             throw new Error(`Error parsing {name}: expected: Record, found: ${{typeof input}}`);
-    //         }}
-    //         {validaitions}
-    //         return input as {name};
-    //     }}
-
-    //     export function tryParse(input: string): {name} {{
-    //         let json = JSON.parse(input);
-    //         return tryValidate(json);
-    //     }}
-
-    //     export function validate(input: any): Result<{name}> {{
-    //         try {{
-    //             return {{ok: true, value: tryValidate(input)}};
-    //         }} catch (e: any) {{
-    //             return {{ok: false, error: e as Error}};
-    //         }}
-    //     }}
-
-    //     export function parse(input: string): Result<{name}> {{
-    //         let json = JSON.parse(input);
-    //         return validate(json);
-    //     }}
-
-    // }}
-    //         "#,
-    //         name = name,
-    //         validaitions = validaitions
-    //     );
 }

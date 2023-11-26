@@ -37,7 +37,7 @@ fn validate_case(type_name: &str, case: &EnumCase) -> String {
 
     ts_string! {
         try {
-            return #case_type.tryValidate(input);
+            return #case_type.validate(input);
         } catch {}
     }
 }

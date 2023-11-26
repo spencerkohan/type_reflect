@@ -50,19 +50,19 @@ describe('Struct with Array of Primitives Validation', ()=>{
 
   it('validates an object: `{ records: [42, 7, 3, 21] }` which conforms to ArrayOfPrimitive', ()=>{
     expect(() => {
-        ArrayOfPrimitive.tryValidate({ records: [42, 7, 3, 21] });
+        ArrayOfPrimitive.validate({ records: [42, 7, 3, 21] });
     }).not.toThrow();
   });
 
   it('validates an empty array: `{ records: [] }` which conforms to ArrayOfPrimitive', ()=>{
     expect(() => {
-        ArrayOfPrimitive.tryValidate({ records: [] });
+        ArrayOfPrimitive.validate({ records: [] });
     }).not.toThrow();
   });
 
   it('throws an error validating an object: `{ records: [42, 7, "3", 21] }` which has one value not conforming to the type', ()=>{
     expect(() => {
-        ArrayOfPrimitive.tryValidate({ records: [42, 7, "3", 21] })
+        ArrayOfPrimitive.validate({ records: [42, 7, "3", 21] })
     }).toThrow();
   });
 
@@ -100,19 +100,19 @@ describe('Struct with Array of Types Validation', ()=>{
 
   it('validates an object: `{ records: [{ val: true }, {val: false }] }` which conforms to ArrayOfType', ()=>{
     expect(() => {
-        ArrayOfType.tryValidate({ records: [{ val: true }, {val: false }] });
+        ArrayOfType.validate({ records: [{ val: true }, {val: false }] });
     }).not.toThrow();
   });
 
   it('validates an empty array: `{ records: [] }` which conforms to ArrayOfType', ()=>{
     expect(() => {
-        ArrayOfType.tryValidate({ records: [] });
+        ArrayOfType.validate({ records: [] });
     }).not.toThrow();
   });
 
   it('throws an error validating an object: `{ records: [{ val: true }, {val: false }, [3]] }` which has one value not conforming to the type', ()=>{
     expect(() => {
-        ArrayOfType.tryValidate({ records: [{ val: true }, {val: false }, [3]] })
+        ArrayOfType.validate({ records: [{ val: true }, {val: false }, [3]] })
     }).toThrow();
   });
 

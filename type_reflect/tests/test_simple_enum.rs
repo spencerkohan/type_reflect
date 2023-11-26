@@ -41,25 +41,25 @@ describe('Simple Enum Validation', ()=>{
 
   it("validates an object: `Dog`", ()=>{
     expect(() => {
-        Pet.tryValidate(`Dog`)
+        Pet.validate(`Dog`)
     }).not.toThrow();
   });
 
   it("validates an object: `Cat`", ()=>{
     expect(() => {
-        Pet.tryValidate(`Cat`)
+        Pet.validate(`Cat`)
     }).not.toThrow();
   });
 
   it("throws an error validating an number: `7`", ()=>{
     expect(() => {
-        Pet.tryValidate(7)
+        Pet.validate(7)
     }).toThrow();
   });
 
   it("throws an error validating an object: `{tag: 'Dog'}`", ()=>{
     expect(() => {
-        Pet.tryValidate({tag: 'Dog'})
+        Pet.validate({tag: 'Dog'})
     }).toThrow();
   });
 

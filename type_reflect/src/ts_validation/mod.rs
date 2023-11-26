@@ -7,6 +7,7 @@ use struct_type::struct_impl;
 
 mod enum_type;
 use enum_type::emit_enum_type;
+use ts_quote::ts_string;
 
 mod validation;
 
@@ -57,35 +58,60 @@ impl TypeEmitter for TSValidation {
 }
 
 pub fn validation_namespace(name: &str, validation_impl: &str) -> String {
-    format!(
-        r#"
+    ts_string! {
+        export namespace #name {
+            export function validate(input: any): #name {
+                #validation_impl
+            }
 
-export namespace {name} {{
-    export function tryValidate(input: any): {name} {{
-        {validation_impl}
-    }}
+            export function parse(input: string): #name {
+                let json = JSON.parse(input);
+                return validate(json);
+            }
 
-    export function tryParse(input: string): {name} {{
-        let json = JSON.parse(input);
-        return tryValidate(json);
-    }}
+            export function tryValidate(input: any): #name | undefined {
+                try {
+                    return validate(input);
+                } catch {
+                    return undefined;
+                }
+            }
 
-    export function validate(input: any): Result<{name}> {{
-        try {{
-            return {{ok: true, value: tryValidate(input)}};
-        }} catch (e: any) {{
-            return {{ok: false, error: e as Error}};
-        }}
-    }}
+            export function tryParse(input: string): #name | undefined {
+                let json = JSON.parse(input);
+                return tryValidate(json);
+            }
 
-    export function parse(input: string): Result<{name}> {{
-        let json = JSON.parse(input);
-        return validate(json);
-    }}
+            export function validateArray(input: any): Array<#name> {
+                if (!Array.isArray(input)) {
+                    throw new Error(#"`Error validating Array<#name>: expected: Array, found: ${ typeof input }`");
+                }
+                for (const item of input) {
+                    validate(item);
+                }
+                return input as Array<#name>;
+            }
 
-}}
-        "#,
-        name = name,
-        validation_impl = validation_impl
-    )
+            export function parseArray(input: string): Array<#name> {
+                let json = JSON.parse(input);
+                return validateArray(json);
+            }
+
+            export function tryValidateArray(input: any): Array<#name> | undefined {
+                try {
+                    return validateArray(input);
+                } catch (e: any) {
+                    return undefined;
+                }
+            }
+
+            export function tryParseArray(input: any): Array<#name> | undefined {
+                try {
+                    return parseArray(input);
+                } catch (e: any) {
+                    return undefined;
+                }
+            }
+        }
+    }
 }

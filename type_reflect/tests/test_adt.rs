@@ -49,14 +49,14 @@ fn test_validation() -> Result<()> {
             describe("ADT Validation", ()=>{
                 it("Validates a Null variant: {_case: ShapeCase.Null}", ()=>{
                     expect(() => {
-                        Shape.tryValidate({
+                        Shape.validate({
                             _case: ShapeCase.Null
                         })
                     }).not.toThrow();
                 });
                 it("Validates a Circle variant: {_case: ShapeCase.Circle, data: { radius: 1.7} }", ()=>{
                     expect(() => {
-                        Shape.tryValidate({
+                        Shape.validate({
                             _case: ShapeCase.Circle,
                             data: {
                                 radius: 1.7
@@ -66,7 +66,7 @@ fn test_validation() -> Result<()> {
                 });
                 it("Validates a Rectangle variant: {_case: ShapeCase.Rectangle, data: { width: 1, height: 2} }", ()=>{
                     expect(() => {
-                        Shape.tryValidate({
+                        Shape.validate({
                             _case: ShapeCase.Rectangle,
                             data: {
                                 width: 1,
@@ -77,7 +77,7 @@ fn test_validation() -> Result<()> {
                 });
                 it("Validates a ScaledRectangle variant: {_case: ShapeCase.ScaledRectangle, data: [{ width: 1, height: 2}, 0.5] }", ()=>{
                     expect(() => {
-                        Shape.tryValidate({
+                        Shape.validate({
                             _case: ShapeCase.ScaledRectangle,
                             data: [
                                 {
@@ -91,7 +91,7 @@ fn test_validation() -> Result<()> {
                 });
                 it("Doesn't Validate an incorrect ScaledRectangle variant: {_case: ShapeCase.Circle, data: [{ width: 1, height: 2}, 0.5] }", ()=>{
                     expect(() => {
-                        Shape.tryValidate({
+                        Shape.validate({
                             _case: ShapeCase.Circle,
                             data: [
                                 {
