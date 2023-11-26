@@ -9,13 +9,13 @@ This crate provides a few quasi-quote macros for generating TypeScript from insi
 
 It is built upon the [`Deno`](https://deno.com) project, and is interoperable with Deno's TypeScript representation.
 
-The API is and usage are heavily inspired by the [`quote` crate](https://crates.io/crates/quote).
+The interface is heavily inspired by the popular [`quote` crate](https://crates.io/crates/quote) crate for Rust code generation.
 
 ## Example usage:
 
 Generate a Typescript string using `ts_string!`:
 
-```
+```rust
 let ts: String = ts_string! { const foo: number = 42; }
 // the value of ts is "const foo: number = 42;"
 ```
@@ -26,7 +26,7 @@ It's also possible to embed runtime values from Rust.
 
 This should feel familiar to anyone who has used `quote` to generate Rust code:
 
-```
+```rust
 let name = "foo";
 let value: u32 = 7;
 
@@ -44,7 +44,7 @@ Sometimes it's not posible to represent TypeScript syntax as a valid Rust TokenS
 
 For instance, if we try to use `ts_string` like so it will fail:
 
-```
+```rust
 let ts: String = ts_string! { const text = 'some text here'; }
 let ts: String = ts_string! { const text = `some other text here`; }
 ```
@@ -55,7 +55,7 @@ To solve this problem, thie macros in this crate allow us to insert string liter
 
 So for instance we can escape the examples above like so:
 
-```
+```rust
 let ts: String = ts_string! { const text = #"'some text here'"; }
 println!("{}", ts);
 let ts: String = ts_string! { const text = #"`some other text here`:"; }
@@ -64,7 +64,7 @@ println!("{}", ts);
 
 This will print:
 
-```
+```ts
 const text = 'some text here';
 const text = `some other text here`;
 ```
@@ -82,7 +82,7 @@ println!("{}", ts); // prints: const text = 'some text here';
 
 For interoperability with Deno, this library also provides the `to_quote!` macro.  This allows for creation of a `deno_ast::ParsedSource` object:
 
-```
+```rust
 let ts: Result<ParsedSource, deno_ast::Diagnostic> = ts_quote! { const foo = truel; };
 ```
 
@@ -90,7 +90,7 @@ This crate also provides the `TSSource` convenience trait, which is implemented 
 
 This trait provides a method for formatting:
 
-```
+```rust
 let ts: ParsedSource = ts_quote! { const foo = truel; };
 let source: anyhow::Result<Option<String>> = ts.formatted(None);
 ```
@@ -101,7 +101,7 @@ If None is provided, a common sense default will be used for formatting.
 
 Here's an example using a custom config:
 
-```
+```rust
 let ts: ParsedSource = ts_quote! { const foo = truel; };
 let config = ConfigurationBuilder::new()
     .indent_width(4)
@@ -116,7 +116,7 @@ let source: anyhow::Result<Option<String>> = ts.formatted(Some(config));
 
 The above example desugars to the following:
 
-```
+```rust
 let ts: ParsedSource = ParsedSource::from_source( "const foo = truel;".to_string() );
 let config = ConfigurationBuilder::new()
     .indent_width(4)
