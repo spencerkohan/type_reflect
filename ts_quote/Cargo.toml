@@ -1,6 +1,6 @@
 [package]
 name = "ts_quote"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Spencer Kohan <spencerkohan@gmail.com>"]
 edition = "2021"
 description = "Procedural macros for quasi-quoting TypeScript from Rust"
@@ -12,7 +12,7 @@ documentation = "https://docs.rs/ts_quote"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ts_quote_macros = "0.1.0"
+ts_quote_macros = "0.1.1"
 deno_ast = "0.31.6"
 dprint-plugin-typescript = "0.88.3"
 anyhow = "1.0.75"

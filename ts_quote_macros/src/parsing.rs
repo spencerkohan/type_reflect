@@ -203,8 +203,7 @@ impl ParseContext {
             return;
         };
         // Consume the string literal
-        let consumed = self.next();
-        println!("Consumed string literal: {:?}", consumed);
+        let _consumed = self.next();
         let literal = lit_str.value();
 
         let mut components: Vec<&str> = literal.split('#').collect();
@@ -248,12 +247,10 @@ impl ParseContext {
         };
 
         let lit = lit.replace("{", "{{").replace("}", "}}");
-        println!("pushing back hased literal: {}", lit);
         self.push_back_str(lit.as_str());
     }
 
     fn consume_hashed_ident_group(&mut self, lit: String) -> String {
-        println!("consume_hashed_ident_group");
         for (index, char) in lit.chars().enumerate() {
             if is_ident_character(char) {
                 continue;
@@ -265,9 +262,9 @@ impl ParseContext {
             };
             let ident = match parse_str::<Ident>(first) {
                 Ok(ident) => ident,
-                Err(err) => {
+                Err(_err) => {
                     // TODO: should this error propogate?
-                    eprintln!("Error parsing Ident: {:?}", err);
+                    // eprintln!("Error parsing Ident: {:?}", err);
                     self.push_back_str("#");
                     return lit;
                 }
@@ -288,7 +285,6 @@ impl ParseContext {
     }
 
     fn consume_hashed_literal_group(&mut self, delimiter: Delimiter, lit: String) -> String {
-        println!("consume_hashed_literal_group");
         let mut depth: u32 = 0;
         for (index, char) in lit.chars().enumerate() {
             match delimiter.matches(char) {
@@ -305,9 +301,9 @@ impl ParseContext {
 
                 let group = match parse_str::<Group>(first) {
                     Ok(group) => group,
-                    Err(err) => {
+                    Err(_err) => {
                         // TODO: should this error propogate?
-                        eprintln!("Error parsing group: {:?}", err);
+                        // eprintln!("Error parsing group: {:?}", err);
                         self.push_back_str("#");
                         return lit;
                     }

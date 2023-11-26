@@ -1,11 +1,13 @@
 [package]
 name = "ts_quote_macros"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Spencer Kohan <spencerkohan@gmail.com>"]
 edition = "2021"
 description = "Proc macro implementations for ts_quote"
 license = "Apache-2.0"
 
+repository = "https://github.com/spencerkohan/type_reflect/tree/main/ts_quote_macros"
+documentation = "https://docs.rs/ts_quote_macros"
 
 [lib]
 proc-macro = true

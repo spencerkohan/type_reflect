@@ -1,5 +1,6 @@
 pub const OUTPUT_DIR: &'static str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/output");
 
+#[allow(unused)]
 pub const TESTING_PREFIX: &'static str = r#"
 
 function assertThrows(fn: ()=>void, message: string) {
@@ -27,11 +28,14 @@ use std::{fs, path::PathBuf};
 
 use anyhow::{bail, Result};
 use std::process::Command;
+
+#[allow(unused)]
 pub struct OutputLocation {
     path: PathBuf,
     filename: String,
 }
 
+#[allow(unused)]
 fn run_command(dir: &str, command: &str) -> Result<()> {
     println!("Running command:\n\t{}", command);
 
@@ -50,6 +54,7 @@ fn run_command(dir: &str, command: &str) -> Result<()> {
     Ok(())
 }
 
+#[allow(unused)]
 impl OutputLocation {
     pub fn ts_path(&self) -> PathBuf {
         self.path.with_extension("ts")

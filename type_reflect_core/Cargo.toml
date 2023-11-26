@@ -1,10 +1,13 @@
 [package]
 name = "type_reflect_core"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Spencer Kohan <spencerkohan@gmail.com>"]
 edition = "2021"
 description = "Utility functions for type_reflect"
 license = "Apache-2.0"
+
+repository = "https://github.com/spencerkohan/type_reflect/tree/main/type_reflect_core"
+documentation = "https://docs.rs/type_reflect_core"
 
 [dependencies]
 proc-macro2 = "1.0.69"
