@@ -2,8 +2,8 @@
 
 This is the monorepo for `type_reflect` and `ts_quote`.  It contains two main projects:
 
-- [`type_reflect`](#1-type-reflect): Runtime reflection for Rust types, to facilitate easy bridging between Rust types and other languages
-- [`ts_quote`](#1-ts-quote): Utilities for generating TypeScript code from Rust
+- [`type_reflect`](#1--type-reflect): Runtime reflection for Rust types, to facilitate easy bridging between Rust types and other languages
+- [`ts_quote`](#2-%EF%B8%8F-ts-quote): Utilities for generating TypeScript code from Rust
 
 ## 1. 🪩 Type Reflect
 
