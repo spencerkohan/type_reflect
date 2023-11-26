@@ -11,7 +11,7 @@ It is built upon the [`Deno`](https://deno.com) project, and is interoperable wi
 
 The interface is heavily inspired by the popular [`quote` crate](https://crates.io/crates/quote) crate for Rust code generation.
 
-## Example usage:
+### Example Usage:
 
 Generate a Typescript string using `ts_string!`:
 

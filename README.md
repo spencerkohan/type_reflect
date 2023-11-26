@@ -11,6 +11,58 @@ This is the monorepo for `type_reflect` and `ts_quote`.  It contains two main pr
 
 It provides some utilities out of the box for exporting Rust types to TypeScript, both as raw TS types and Zod schemas, and is designed to be extensible, so the user can implement custom type exporters to meet thier own specific use-case.
 
+<details> <summary><code>📝 Example usage</code></summary>
+
+Give types runtime reflection using the `Reflect` derive macro:
+
+```rust
+#[derive(Reflect)]
+struct Message {
+    index: u32,
+    text: Option<String>,
+}
+```
+
+Export types using the `export_types!` macro:
+
+```rust
+export_types!(
+    types: [
+        Message
+    ]
+    exports: [
+        Zod("/path/to/zod_export.ts"),
+        TypeScript("/path/to/ts_export.ts", tab_width: 2),
+    ]
+)
+```
+
+Invoking this macro will generate the following `ts_export.ts` file:
+
+```ts
+export type Message = {
+index: number;
+text?: string;
+};
+```
+
+and the following `zod_export.ts`:
+
+```ts
+import { z } from 'zod';
+
+export const MessageSchema = z.object({
+    index: z.number(),
+    text: z.string().optional(),
+});
+
+export type Message = z.infer<typeof MessageSchema>;
+```
+
+*For more examples check the [type_reflect crate README](type_reflect)*
+
+</details>
+
 ### 📦 Type Reflect Crates:
 
 | Crate    | Description | Links    |
@@ -24,6 +76,40 @@ It provides some utilities out of the box for exporting Rust types to TypeScript
 `ts_quote` provides procedural macros and utilities for generating TypeScript code in Rust.
 
 Usage is similar to the popular [`quote` crate](https://crates.io/crates/quote) for Rust code generation.
+
+<details> <summary><code>📝 Example usage</code></summary>
+
+Create a TypeScript string using the `ts_string!` macro:
+
+```rust
+let ts: String = ts_string!{ const foo: number = 1; };
+```
+
+Embed Rust runtime values in the output by prefixing with `#`:
+
+```rust
+let var_name = "foo";
+let value = 1;
+
+let ts: String = ts_string!{ const #var_name: number = #value; };
+// the value of ts is "const foo: number = 1;"
+```
+
+Output pretty-printed TypeScript:
+
+```rust
+let ts_func: TS = ts_quote! {
+    const add = (x: number, y: number) => {
+        return x + y;
+    };
+}?;
+
+let pretty: String = ts_func.formatted(None)?.unwrap();
+```
+
+*For more examples check the [ts_quote crate README](ts_quote)*
+
+</details>
 
 ### 📦 TS Quote Crates:
 
