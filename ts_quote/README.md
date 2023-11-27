@@ -111,7 +111,7 @@ let config = ConfigurationBuilder::new()
     .quote_style(QuoteStyle::PreferDouble)
     .next_control_flow_position(NextControlFlowPosition::SameLine)
     .build();
-let source: anyhow::Result<Option<String>> = ts.formatted(Some(config));
+let source: anyhow::Result<String> = ts.formatted(Some(config));
 ```
 
 The above example desugars to the following:
@@ -126,5 +126,5 @@ let config = ConfigurationBuilder::new()
     .quote_style(QuoteStyle::PreferDouble)
     .next_control_flow_position(NextControlFlowPosition::SameLine)
     .build();
-let source: anyhow::Result<Option<String>> = ts.formatted(Some(config));
+let source: anyhow::Result<String> = ts.formatted(Some(config));
 ```
