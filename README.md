@@ -104,7 +104,7 @@ let ts_func: TS = ts_quote! {
     };
 }?;
 
-let pretty: String = ts_func.formatted(None)?.unwrap();
+let pretty: String = ts_func.formatted(None)?;
 ```
 
 *For more examples check the [ts_quote crate README](ts_quote)*
