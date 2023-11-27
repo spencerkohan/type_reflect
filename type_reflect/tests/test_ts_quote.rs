@@ -24,7 +24,7 @@ fn test_ident_substitution() -> Result<()> {
         const soup = #"`egg salad sandwich ${val} == #{foo - bar} something something`";
     }?;
 
-    let prefix = ts.formatted(None)?.unwrap();
+    let prefix = ts.formatted(None)?;
 
     export_types!(
         types: [],

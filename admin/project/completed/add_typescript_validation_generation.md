@@ -159,7 +159,7 @@ Each validator should also have the option to parse or validate an array of that
         - [x] parsing
     - [x] Optional member
     - [x] Nested types
-    - [ ] Arrays
+    - [x] Arrays
         - [x] Type with array
         - [x] Array of types
     - [x] Map member

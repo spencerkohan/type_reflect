@@ -44,7 +44,7 @@ pub trait TSSource: Sized {
 
     Returns a ParsedSource, or an error diagnostic if source is not valid TypeScript
     **/
-    fn formatted(&self, config: Option<&Configuration>) -> anyhow::Result<Option<String>>;
+    fn formatted(&self, config: Option<&Configuration>) -> anyhow::Result<String>;
 }
 
 impl TSSource for TS {
@@ -59,9 +59,9 @@ impl TSSource for TS {
         })
     }
 
-    fn formatted(&self, config: Option<&Configuration>) -> anyhow::Result<Option<String>> {
+    fn formatted(&self, config: Option<&Configuration>) -> anyhow::Result<String> {
         match config {
-            Some(config) => format_parsed_source(self, config),
+            Some(config) => Ok(format_parsed_source(self, config)?.unwrap_or(String::new())),
             None => {
                 let config = ConfigurationBuilder::new()
                     .indent_width(2)
@@ -72,7 +72,7 @@ impl TSSource for TS {
                     .next_control_flow_position(NextControlFlowPosition::SameLine)
                     .build();
 
-                format_parsed_source(self, &config)
+                Ok(format_parsed_source(self, &config)?.unwrap_or(String::new()))
             }
         }
     }
@@ -85,7 +85,7 @@ mod tests {
     fn test_format_source_from_string() -> anyhow::Result<()> {
         let ts: TS = TS::from_source("let a = 1; let b = 2;".to_string())?;
 
-        let output = ts.formatted(None)?.unwrap();
+        let output = ts.formatted(None)?;
 
         println!("output:");
         println!("{}", output);
