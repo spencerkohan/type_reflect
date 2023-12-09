@@ -17,9 +17,6 @@ pub struct TSValidation {}
 impl TypeEmitter for TSValidation {
     fn prefix(&mut self) -> String {
         r#"
-            export type Result<T> = {ok: true, value: T}
-                | {ok: false, error: Error };
-
             function isRecord(value: any): value is Record<string, any> {
                 return typeof value === 'object' && value !== null && !Array.isArray(value);
             }

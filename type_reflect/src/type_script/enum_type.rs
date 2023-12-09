@@ -1,6 +1,6 @@
 use type_reflect_core::{EnumCase, EnumType, Inflection};
 
-use crate::type_script::struct_type;
+use crate::type_script::{struct_type, type_fields};
 use crate::EnumReflectionType;
 
 use super::to_ts_type;
@@ -148,7 +148,7 @@ export enum {name} {{
                 }
             }
             type_reflect_core::TypeFieldsDefinition::Named(inner) => {
-                let struct_items = struct_type::named_fields(inner, case.inflection);
+                let struct_items = type_fields::named_fields(inner, case.inflection);
 
                 match content_key {
                     Some(content_key) => format!(

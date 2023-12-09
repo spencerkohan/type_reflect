@@ -5,7 +5,7 @@ use type_reflect_core::{Inflectable, Inflection, NamedField, TypeFieldsDefinitio
 pub fn struct_member(member: &NamedField, inflection: Inflection) -> String {
     let name = &member.name.inflect(inflection);
     let value = to_zod_type(&member.type_);
-    ts_string! { {name}: {value}, }
+    ts_string! { #name: #value, }
 
     // format!("    {name}: {value},\n", name = name, value = value)
 }

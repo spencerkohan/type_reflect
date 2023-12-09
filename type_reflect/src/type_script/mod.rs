@@ -13,6 +13,9 @@ use struct_type::*;
 pub mod enum_type;
 pub use enum_type::*;
 
+pub mod type_fields;
+pub use type_fields::*;
+
 mod alias_type;
 pub use alias_type::*;
 

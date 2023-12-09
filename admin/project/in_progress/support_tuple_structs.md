@@ -64,3 +64,4 @@ We can rename this to `TypeFieldsDefinition`
     - [x] Modify trait definition
     - [x] Modify proc macro
     - [x] Modify generator implementations
+- [ ] Implement test for tuple structs
