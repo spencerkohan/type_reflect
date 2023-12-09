@@ -1,5 +1,5 @@
 use syn::{Field, GenericArgument, PathArguments, Result, Type as SynType, TypePath};
-use type_reflect_core::{syn_err, NamedField, Type};
+use type_reflect_core::{syn_err, NamedField, Type, TypeFieldsDefinition};
 
 fn leading_segment(path: &TypePath) -> String {
     path.path.segments[0].ident.to_string()
@@ -90,9 +90,28 @@ fn get_field_type(field: &Field) -> Result<Type> {
     Ok(type_)
 }
 
+pub trait FieldsBridge {
+    fn fields(&self) -> &syn::Fields;
+    fn to_fields(&self) -> Result<TypeFieldsDefinition> {
+        match &self.fields() {
+            syn::Fields::Named(named) => Ok(TypeFieldsDefinition::Named(named.to_named_fields()?)),
+            syn::Fields::Unnamed(unnamed) => {
+                Ok(TypeFieldsDefinition::Tuple(unnamed.to_tuple_members()?))
+            }
+            syn::Fields::Unit => Ok(TypeFieldsDefinition::Unit),
+        }
+    }
+}
+
+impl FieldsBridge for syn::Fields {
+    fn fields(&self) -> &syn::Fields {
+        self
+    }
+}
+
 pub trait FieldsNamedBridge {
     fn fields_named(&self) -> &syn::FieldsNamed;
-    fn to_struct_members(&self) -> Result<Vec<NamedField>> {
+    fn to_named_fields(&self) -> Result<Vec<NamedField>> {
         (&self.fields_named().named)
             .into_iter()
             .map(|field: &Field| get_struct_member(&field))

@@ -37,12 +37,12 @@ impl TypeBridge for Type {
     }
 }
 
-pub trait EnumCaseBridge {
-    fn case(&self) -> &TypeFieldDefinition;
-    fn emit_case(&self) -> TokenStream {
-        match &self.case() {
-            TypeFieldDefinition::Unit => quote! { TypeFieldDefinition::Unit },
-            TypeFieldDefinition::Tuple(inner) => {
+pub trait TypeFieldsDefinitionBridge {
+    fn def(&self) -> &TypeFieldsDefinition;
+    fn emit_def(&self) -> TokenStream {
+        match &self.def() {
+            TypeFieldsDefinition::Unit => quote! { TypeFieldsDefinition::Unit },
+            TypeFieldsDefinition::Tuple(inner) => {
                 let mut types = quote! {};
 
                 for type_ in inner {
@@ -50,9 +50,9 @@ pub trait EnumCaseBridge {
                     types.extend(quote! {#t, });
                 }
 
-                quote! { TypeFieldDefinition::Tuple(vec![#types]) }
+                quote! { TypeFieldsDefinition::Tuple(vec![#types]) }
             }
-            TypeFieldDefinition::Named(inner) => {
+            TypeFieldsDefinition::Named(inner) => {
                 let mut mermbers = quote! {};
 
                 for member in inner {
@@ -60,14 +60,14 @@ pub trait EnumCaseBridge {
                     mermbers.extend(quote! {#m, });
                 }
 
-                quote! { TypeFieldDefinition::Named(vec![#mermbers]) }
+                quote! { TypeFieldsDefinition::Named(vec![#mermbers]) }
             }
         }
     }
 }
 
-impl EnumCaseBridge for TypeFieldDefinition {
-    fn case(&self) -> &TypeFieldDefinition {
+impl TypeFieldsDefinitionBridge for TypeFieldsDefinition {
+    fn def(&self) -> &TypeFieldsDefinition {
         self
     }
 }

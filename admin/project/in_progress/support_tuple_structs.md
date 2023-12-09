@@ -51,15 +51,16 @@ trait StructType {
 
 I think the right approach here is to re-use the `EnumCaseType` here to represent all cases of type fields.
 
-We can rename this to `TypeFieldDefinition`
+We can rename this to `TypeFieldsDefinition`
 
 ## TODO:
 
-- [x] Rename `EnumCaseType` to `TypeFieldDefinition`
-- [x] Rename `TypeFieldDefinition::Simple` to `TypeFieldDefinition::Unit`
-- [x] Rename `TypeFieldDefinition::Struct` to `TypeFieldDefinition::Named`
+- [x] Rename `EnumCaseType` to `TypeFieldsDefinition`
+- [x] Rename `TypeFieldsDefinition::Simple` to `TypeFieldsDefinition::Unit`
+- [x] Rename `TypeFieldsDefinition::Struct` to `TypeFieldsDefinition::Named`
 - [x] Rename `StructMember` to `NamedField`
 - [x] Rename `StructType.members` to `StructType.fields`
-- [ ] Modify `StructType.fields` to return `TypeFieldDefinition`
-    - [ ] Modify trait definition
-    - [ ] Modify proc macro
+- [x] Modify `StructType.fields` to return `TypeFieldsDefinition`
+    - [x] Modify trait definition
+    - [x] Modify proc macro
+    - [x] Modify generator implementations

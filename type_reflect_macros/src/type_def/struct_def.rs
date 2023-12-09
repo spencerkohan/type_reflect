@@ -6,6 +6,7 @@ use crate::attribute_utils::RenameAllAttr;
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use syn::{ItemStruct, Result};
+use type_reflect_core::TypeFieldsDefinition;
 use type_reflect_core::{type_description::NamedField, Inflection};
 
 #[derive(Clone, Debug)]
@@ -13,16 +14,16 @@ pub struct StructDef {
     tokens: TokenStream,
     inflection: Inflection,
     ident: Ident,
-    members: Vec<NamedField>,
+    fields: TypeFieldsDefinition,
 }
 
-fn extract_members(item: &ItemStruct) -> Result<Vec<NamedField>> {
-    match &(item.fields) {
-        syn::Fields::Named(fields) => (&fields).to_struct_members(),
-        syn::Fields::Unnamed(fieldsUnnamed) => todo!(),
-        syn::Fields::Unit => todo!(),
-    }
-}
+// fn extract_members(item: &ItemStruct) -> Result<TypeFieldsDefinition> {
+//     match &(item.fields) {
+//         syn::Fields::Named(fields) => (&fields).to_named_fields(),
+//         syn::Fields::Unnamed(fieldsUnnamed) => todo!(),
+//         syn::Fields::Unit => todo!(),
+//     }
+// }
 
 impl StructDef {
     pub fn new(item: &ItemStruct) -> Result<Self> {
@@ -31,24 +32,26 @@ impl StructDef {
             tokens: quote! { #item },
             inflection: rename_attr.rename_all,
             ident: item.ident.clone(),
-            members: extract_members(&item)?,
+            fields: (&item.fields).to_fields()?,
         })
     }
 
-    pub fn emit_members(&self) -> TokenStream {
-        let members: Vec<TokenStream> = (&self.members)
-            .into_iter()
-            .map(|member| member.emit_member())
-            .collect();
-        quote! {
-            #(#members),*
-        }
+    pub fn emit_fields(&self) -> TokenStream {
+        // let members: Vec<TokenStream> = (&self.fields)
+        //     .into_iter()
+        //     .map(|member| member.emit_member())
+        //     .collect();
+        // quote! {
+        //     #(#members),*
+        // }
+
+        return (&self.fields).emit_def();
     }
 
     pub fn emit(&self) -> TokenStream {
         let ident = &self.ident();
         let name_literal = format!("{}", ident);
-        let members = &self.emit_members();
+        let members = &self.emit_fields();
         let rust = format!("{}", self.tokens());
         let inflection = &self.inflection.to_tokens();
         quote! {
@@ -66,10 +69,8 @@ impl StructDef {
                 fn inflection() -> Inflection {
                     #inflection
                 }
-                fn fields() -> Vec<NamedField> {
-                    vec![
-                        #members
-                    ]
+                fn fields() -> TypeFieldsDefinition {
+                    #members
                 }
                 fn rust() -> String {
                     #rust.to_string()

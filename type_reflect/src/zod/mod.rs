@@ -43,7 +43,7 @@ impl TypeEmitter for Zod {
     where
         T: StructType,
     {
-        let members = struct_members(&T::fields(), T::inflection());
+        let members = struct_fields(&T::fields(), T::inflection());
         let name = T::name();
 
         format!(

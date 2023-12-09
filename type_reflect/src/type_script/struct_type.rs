@@ -1,5 +1,5 @@
 use super::to_ts_type;
-use type_reflect_core::{Inflectable, Inflection, NamedField};
+use type_reflect_core::{Inflectable, Inflection, NamedField, TypeFieldsDefinition};
 
 pub fn struct_member(member: &NamedField, inflection: Inflection) -> String {
     let name = &member.name.inflect(inflection);
@@ -15,7 +15,7 @@ pub fn struct_member(member: &NamedField, inflection: Inflection) -> String {
     }
 }
 
-pub fn struct_members(members: &Vec<NamedField>, inflection: Inflection) -> String {
+pub fn named_fields(members: &Vec<NamedField>, inflection: Inflection) -> String {
     let members: Vec<String> = members
         .into_iter()
         .map(|member| struct_member(member, inflection))
@@ -23,16 +23,20 @@ pub fn struct_members(members: &Vec<NamedField>, inflection: Inflection) -> Stri
     members.join("\n  ")
 }
 
-pub fn struct_impl(name: &str, members: &Vec<NamedField>, inflection: Inflection) -> String {
-    let members = struct_members(members, inflection);
+pub fn struct_impl(name: &str, fields: &TypeFieldsDefinition, inflection: Inflection) -> String {
+    let fields = match fields {
+        TypeFieldsDefinition::Unit => todo!(),
+        TypeFieldsDefinition::Tuple(_) => todo!(),
+        TypeFieldsDefinition::Named(named) => named_fields(named, inflection),
+    };
     return format!(
         r#"
 
 export type {name} = {{
-    {members}
+    {fields}
 }};
         "#,
         name = name,
-        members = members
+        fields = fields
     );
 }

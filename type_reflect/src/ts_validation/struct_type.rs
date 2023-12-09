@@ -1,8 +1,9 @@
-use type_reflect_core::{Inflectable, Inflection, NamedField};
+use type_reflect_core::{Inflectable, Inflection, NamedField, TypeFieldsDefinition};
 
 use super::{validation::type_validation, validation_namespace};
+use ts_quote::*;
 
-pub fn struct_member_validations(
+pub fn named_field_validations(
     member_prefix: &str,
     members: &Vec<NamedField>,
     inflection: Inflection,
@@ -12,16 +13,38 @@ pub fn struct_member_validations(
         .map(|member| {
             let member_name = member.name.inflect(inflection);
             type_validation(
-                format!("{}.{}", member_prefix, member_name).as_str(),
+                ts_string! {
+                    #{member_prefix}.#{member_name}
+                }
+                .as_str(),
                 &member.type_,
             )
+
+            // type_validation(
+            //     format!("{}.{}", member_prefix, member_name).as_str(),
+            //     &member.type_,
+            // )
         })
         .collect();
     members.join("\n  ")
 }
 
-pub fn struct_impl(name: &str, members: &Vec<NamedField>, inflection: Inflection) -> String {
-    let validations = struct_member_validations("input", members, inflection);
+pub fn struct_field_validations(
+    member_prefix: &str,
+    fields: &TypeFieldsDefinition,
+    inflection: Inflection,
+) -> String {
+    match fields {
+        TypeFieldsDefinition::Unit => todo!(),
+        TypeFieldsDefinition::Tuple(_) => todo!(),
+        TypeFieldsDefinition::Named(named) => {
+            named_field_validations(member_prefix, named, inflection)
+        }
+    }
+}
+
+pub fn struct_impl(name: &str, fields: &TypeFieldsDefinition, inflection: Inflection) -> String {
+    let validations = struct_field_validations("input", fields, inflection);
 
     let validation_impl = format!(
         r#"

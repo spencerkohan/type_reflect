@@ -22,7 +22,7 @@ pub struct NamedField {
 #[derive(Clone, Debug)]
 pub struct EnumCase {
     pub name: String,
-    pub type_: TypeFieldDefinition,
+    pub type_: TypeFieldsDefinition,
     pub inflection: Inflection,
 }
 
@@ -32,7 +32,7 @@ The TypeFieldDefinition represents the set of fields for a type
 This is used both in the context of a struct definition, and for enum variants
 */
 #[derive(Clone, Debug)]
-pub enum TypeFieldDefinition {
+pub enum TypeFieldsDefinition {
     /**
     The Unit field definition describes a type which does not contain data
     */

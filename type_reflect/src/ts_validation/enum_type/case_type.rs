@@ -2,7 +2,7 @@ use ts_quote::ts_string;
 use type_reflect_core::{EnumCase, Inflection, NamedField, Type};
 
 use crate::ts_validation::{
-    struct_type::struct_member_validations, validation::tuple_validation, validation_namespace,
+    struct_type::named_field_validations, validation::tuple_validation, validation_namespace,
 };
 
 pub fn emit_complex_enum_case_type(
@@ -15,11 +15,11 @@ pub fn emit_complex_enum_case_type(
     let case_type_name: String = format!("{}Case{}", enum_name, case.name);
 
     let validator = match case.type_ {
-        type_reflect_core::TypeFieldDefinition::Unit => emit_simple_case_type_validator(),
-        type_reflect_core::TypeFieldDefinition::Tuple(members) => {
+        type_reflect_core::TypeFieldsDefinition::Unit => emit_simple_case_type_validator(),
+        type_reflect_core::TypeFieldsDefinition::Tuple(members) => {
             emit_tuple_case_type_validator(content_key, &members)
         }
-        type_reflect_core::TypeFieldDefinition::Named(members) => {
+        type_reflect_core::TypeFieldsDefinition::Named(members) => {
             emit_struct_case_type_validator(content_key, &members, case.inflection)
         }
     };
@@ -51,7 +51,7 @@ fn emit_struct_case_type_validator(
         None => "input".to_string(),
         Some(key) => format!("input.{}", key),
     };
-    struct_member_validations(member_prefix.as_str(), members, inflection)
+    named_field_validations(member_prefix.as_str(), members, inflection)
 }
 
 fn emit_tuple_case_type_validator(content_key: &Option<String>, members: &Vec<Type>) -> String {

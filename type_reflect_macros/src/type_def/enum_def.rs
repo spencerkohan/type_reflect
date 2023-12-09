@@ -4,7 +4,7 @@ use crate::type_def::InflectionTokenProvider;
 use type_reflect_core::EnumType;
 use type_reflect_core::Inflection;
 
-use super::{syn_type_utils::*, type_utils::EnumCaseBridge, RustTypeEmitter};
+use super::{syn_type_utils::*, type_utils::TypeFieldsDefinitionBridge, RustTypeEmitter};
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use syn::{
@@ -45,23 +45,11 @@ fn extract_cases(item: &ItemEnum) -> Result<Vec<EnumCase>> {
                     rename_all.rename_all
                 }
             };
-            match &case.fields {
-                syn::Fields::Named(fileds) => Ok(EnumCase {
-                    name,
-                    type_: TypeFieldDefinition::Named(fileds.to_struct_members()?),
-                    inflection,
-                }),
-                syn::Fields::Unnamed(fields) => Ok(EnumCase {
-                    name,
-                    type_: TypeFieldDefinition::Tuple(fields.to_tuple_members()?),
-                    inflection,
-                }),
-                syn::Fields::Unit => Ok(EnumCase {
-                    name,
-                    type_: TypeFieldDefinition::Unit,
-                    inflection,
-                }),
-            }
+            Ok(EnumCase {
+                name,
+                type_: (&case.fields).to_fields()?,
+                inflection,
+            })
         })
         .collect()
 }
@@ -75,7 +63,7 @@ impl EnumDef {
 
         let enum_type = match (&cases).into_iter().fold(false, |input, case| {
             input
-                || if let TypeFieldDefinition::Unit = case.type_ {
+                || if let TypeFieldsDefinition::Unit = case.type_ {
                     false
                 } else {
                     true
@@ -117,7 +105,7 @@ impl EnumDef {
             .into_iter()
             .map(|case| {
                 let name = &case.name;
-                let type_ = case.type_.emit_case();
+                let type_ = case.type_.emit_def();
                 let rename_all = &case.inflection.to_tokens();
                 quote! {
                     EnumCase {
@@ -146,7 +134,10 @@ impl EnumDef {
                 content_key,
             } => match content_key {
                 Some(content_key) => quote! {
-                    EnumType::Complex { case_key: #case_key.to_string(), content_key: Some(#content_key.to_string()) }
+                    EnumType::Complex {
+                        case_key: #case_key.to_string(),
+                        content_key: Some(#content_key.to_string())
+                    }
                 },
                 None => quote! {
                     EnumType::Complex { case_key: #case_key.to_string(), content_key: None }

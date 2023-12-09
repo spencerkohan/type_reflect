@@ -117,8 +117,8 @@ export enum {name} {{
         let id = Self::case_id(case);
 
         let additional_fields = match &case.type_ {
-            type_reflect_core::TypeFieldDefinition::Unit => String::new(),
-            type_reflect_core::TypeFieldDefinition::Tuple(inner) => {
+            type_reflect_core::TypeFieldsDefinition::Unit => String::new(),
+            type_reflect_core::TypeFieldsDefinition::Tuple(inner) => {
                 let content_key = match content_key {
                     Some(content_key) => content_key,
                     None => {
@@ -147,8 +147,8 @@ export enum {name} {{
                     )
                 }
             }
-            type_reflect_core::TypeFieldDefinition::Named(inner) => {
-                let struct_items = struct_type::struct_members(inner, case.inflection);
+            type_reflect_core::TypeFieldsDefinition::Named(inner) => {
+                let struct_items = struct_type::named_fields(inner, case.inflection);
 
                 match content_key {
                     Some(content_key) => format!(
