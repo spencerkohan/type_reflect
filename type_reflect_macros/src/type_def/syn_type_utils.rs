@@ -1,5 +1,5 @@
 use syn::{Field, GenericArgument, PathArguments, Result, Type as SynType, TypePath};
-use type_reflect_core::{syn_err, StructMember, Type};
+use type_reflect_core::{syn_err, NamedField, Type};
 
 fn leading_segment(path: &TypePath) -> String {
     path.path.segments[0].ident.to_string()
@@ -66,7 +66,7 @@ impl SynTypeBridge for syn::Type {
     }
 }
 
-fn get_struct_member(field: &Field) -> Result<StructMember> {
+fn get_struct_member(field: &Field) -> Result<NamedField> {
     // println!("Getting struct member from field: {:#?}", field);
     let name = match &field.ident {
         None => panic!("Struct fields must be named: {:#?}", field),
@@ -75,7 +75,7 @@ fn get_struct_member(field: &Field) -> Result<StructMember> {
 
     let type_ = field.ty.to_type()?;
 
-    Ok(StructMember { name, type_ })
+    Ok(NamedField { name, type_ })
 }
 
 fn get_field_type(field: &Field) -> Result<Type> {
@@ -92,7 +92,7 @@ fn get_field_type(field: &Field) -> Result<Type> {
 
 pub trait FieldsNamedBridge {
     fn fields_named(&self) -> &syn::FieldsNamed;
-    fn to_struct_members(&self) -> Result<Vec<StructMember>> {
+    fn to_struct_members(&self) -> Result<Vec<NamedField>> {
         (&self.fields_named().named)
             .into_iter()
             .map(|field: &Field| get_struct_member(&field))

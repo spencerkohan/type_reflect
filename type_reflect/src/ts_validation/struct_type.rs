@@ -1,10 +1,10 @@
-use type_reflect_core::{Inflectable, Inflection, StructMember};
+use type_reflect_core::{Inflectable, Inflection, NamedField};
 
 use super::{validation::type_validation, validation_namespace};
 
 pub fn struct_member_validations(
     member_prefix: &str,
-    members: &Vec<StructMember>,
+    members: &Vec<NamedField>,
     inflection: Inflection,
 ) -> String {
     let members: Vec<String> = members
@@ -20,7 +20,7 @@ pub fn struct_member_validations(
     members.join("\n  ")
 }
 
-pub fn struct_impl(name: &str, members: &Vec<StructMember>, inflection: Inflection) -> String {
+pub fn struct_impl(name: &str, members: &Vec<NamedField>, inflection: Inflection) -> String {
     let validations = struct_member_validations("input", members, inflection);
 
     let validation_impl = format!(

@@ -38,11 +38,11 @@ impl TypeBridge for Type {
 }
 
 pub trait EnumCaseBridge {
-    fn case(&self) -> &EnumCaseType;
+    fn case(&self) -> &TypeFieldDefinition;
     fn emit_case(&self) -> TokenStream {
         match &self.case() {
-            EnumCaseType::Simple => quote! { EnumCaseType::Simple },
-            EnumCaseType::Tuple(inner) => {
+            TypeFieldDefinition::Unit => quote! { TypeFieldDefinition::Unit },
+            TypeFieldDefinition::Tuple(inner) => {
                 let mut types = quote! {};
 
                 for type_ in inner {
@@ -50,9 +50,9 @@ pub trait EnumCaseBridge {
                     types.extend(quote! {#t, });
                 }
 
-                quote! { EnumCaseType::Tuple(vec![#types]) }
+                quote! { TypeFieldDefinition::Tuple(vec![#types]) }
             }
-            EnumCaseType::Struct(inner) => {
+            TypeFieldDefinition::Named(inner) => {
                 let mut mermbers = quote! {};
 
                 for member in inner {
@@ -60,26 +60,26 @@ pub trait EnumCaseBridge {
                     mermbers.extend(quote! {#m, });
                 }
 
-                quote! { EnumCaseType::Struct(vec![#mermbers]) }
+                quote! { TypeFieldDefinition::Named(vec![#mermbers]) }
             }
         }
     }
 }
 
-impl EnumCaseBridge for EnumCaseType {
-    fn case(&self) -> &EnumCaseType {
+impl EnumCaseBridge for TypeFieldDefinition {
+    fn case(&self) -> &TypeFieldDefinition {
         self
     }
 }
 
-pub trait StructMemberBridge {
-    fn member(&self) -> &StructMember;
+pub trait NamedFieldBridge {
+    fn member(&self) -> &NamedField;
     fn emit_member(&self) -> TokenStream {
         let member = &self.member();
         let name = &member.name;
         let type_ = member.type_.emit_type();
         quote! {
-            StructMember {
+            NamedField {
                 name: #name.to_string(),
                 type_: #type_,
             }
@@ -87,8 +87,8 @@ pub trait StructMemberBridge {
     }
 }
 
-impl StructMemberBridge for StructMember {
-    fn member(&self) -> &StructMember {
+impl NamedFieldBridge for NamedField {
+    fn member(&self) -> &NamedField {
         self
     }
 }

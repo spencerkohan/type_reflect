@@ -6,20 +6,20 @@ use crate::attribute_utils::RenameAllAttr;
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use syn::{ItemStruct, Result};
-use type_reflect_core::{type_description::StructMember, Inflection};
+use type_reflect_core::{type_description::NamedField, Inflection};
 
 #[derive(Clone, Debug)]
 pub struct StructDef {
     tokens: TokenStream,
     inflection: Inflection,
     ident: Ident,
-    members: Vec<StructMember>,
+    members: Vec<NamedField>,
 }
 
-fn extract_members(item: &ItemStruct) -> Result<Vec<StructMember>> {
+fn extract_members(item: &ItemStruct) -> Result<Vec<NamedField>> {
     match &(item.fields) {
         syn::Fields::Named(fields) => (&fields).to_struct_members(),
-        syn::Fields::Unnamed(_) => todo!(),
+        syn::Fields::Unnamed(fieldsUnnamed) => todo!(),
         syn::Fields::Unit => todo!(),
     }
 }
@@ -67,7 +67,7 @@ impl StructDef {
                 fn inflection() -> Inflection {
                     #inflection
                 }
-                fn members() -> Vec<StructMember> {
+                fn members() -> Vec<NamedField> {
                     vec![
                         #members
                     ]

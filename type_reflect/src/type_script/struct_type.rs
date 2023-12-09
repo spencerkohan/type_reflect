@@ -1,7 +1,7 @@
 use super::to_ts_type;
-use type_reflect_core::{Inflectable, Inflection, StructMember};
+use type_reflect_core::{Inflectable, Inflection, NamedField};
 
-pub fn struct_member(member: &StructMember, inflection: Inflection) -> String {
+pub fn struct_member(member: &NamedField, inflection: Inflection) -> String {
     let name = &member.name.inflect(inflection);
     match &member.type_ {
         type_reflect_core::Type::Option(t) => {
@@ -15,7 +15,7 @@ pub fn struct_member(member: &StructMember, inflection: Inflection) -> String {
     }
 }
 
-pub fn struct_members(members: &Vec<StructMember>, inflection: Inflection) -> String {
+pub fn struct_members(members: &Vec<NamedField>, inflection: Inflection) -> String {
     let members: Vec<String> = members
         .into_iter()
         .map(|member| struct_member(member, inflection))
@@ -23,7 +23,7 @@ pub fn struct_members(members: &Vec<StructMember>, inflection: Inflection) -> St
     members.join("\n  ")
 }
 
-pub fn struct_impl(name: &str, members: &Vec<StructMember>, inflection: Inflection) -> String {
+pub fn struct_impl(name: &str, members: &Vec<NamedField>, inflection: Inflection) -> String {
     let members = struct_members(members, inflection);
     return format!(
         r#"

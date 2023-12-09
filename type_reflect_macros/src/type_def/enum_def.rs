@@ -48,17 +48,17 @@ fn extract_cases(item: &ItemEnum) -> Result<Vec<EnumCase>> {
             match &case.fields {
                 syn::Fields::Named(fileds) => Ok(EnumCase {
                     name,
-                    type_: EnumCaseType::Struct(fileds.to_struct_members()?),
+                    type_: TypeFieldDefinition::Named(fileds.to_struct_members()?),
                     inflection,
                 }),
                 syn::Fields::Unnamed(fields) => Ok(EnumCase {
                     name,
-                    type_: EnumCaseType::Tuple(fields.to_tuple_members()?),
+                    type_: TypeFieldDefinition::Tuple(fields.to_tuple_members()?),
                     inflection,
                 }),
                 syn::Fields::Unit => Ok(EnumCase {
                     name,
-                    type_: EnumCaseType::Simple,
+                    type_: TypeFieldDefinition::Unit,
                     inflection,
                 }),
             }
@@ -75,7 +75,7 @@ impl EnumDef {
 
         let enum_type = match (&cases).into_iter().fold(false, |input, case| {
             input
-                || if let EnumCaseType::Simple = case.type_ {
+                || if let TypeFieldDefinition::Unit = case.type_ {
                     false
                 } else {
                     true
