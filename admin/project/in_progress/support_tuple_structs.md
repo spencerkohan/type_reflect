@@ -60,3 +60,6 @@ We can rename this to `TypeFieldDefinition`
 - [x] Rename `TypeFieldDefinition::Struct` to `TypeFieldDefinition::Named`
 - [x] Rename `StructMember` to `NamedField`
 - [x] Rename `StructType.members` to `StructType.fields`
+- [ ] Modify `StructType.fields` to return `TypeFieldDefinition`
+    - [ ] Modify trait definition
+    - [ ] Modify proc macro

@@ -27,7 +27,6 @@ fn extract_members(item: &ItemStruct) -> Result<Vec<NamedField>> {
 impl StructDef {
     pub fn new(item: &ItemStruct) -> Result<Self> {
         let rename_attr = RenameAllAttr::from_attrs(&item.attrs)?;
-
         Ok(Self {
             tokens: quote! { #item },
             inflection: rename_attr.rename_all,
