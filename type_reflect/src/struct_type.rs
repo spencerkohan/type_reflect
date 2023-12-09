@@ -5,6 +5,6 @@ use type_reflect_core::{type_description::NamedField, Inflection};
 pub trait StructType {
     fn name() -> &'static str;
     fn inflection() -> Inflection;
-    fn members() -> Vec<NamedField>;
+    fn fields() -> Vec<NamedField>;
     fn rust() -> String;
 }

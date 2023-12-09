@@ -60,7 +60,7 @@ impl TypeEmitter for TypeScript {
         T: StructType,
     {
         let name = T::name();
-        struct_impl(&name, &T::members(), T::inflection())
+        struct_impl(&name, &T::fields(), T::inflection())
     }
 
     fn emit_enum<T>(&mut self) -> String

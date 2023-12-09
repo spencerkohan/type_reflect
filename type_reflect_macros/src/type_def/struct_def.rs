@@ -67,7 +67,7 @@ impl StructDef {
                 fn inflection() -> Inflection {
                     #inflection
                 }
-                fn members() -> Vec<NamedField> {
+                fn fields() -> Vec<NamedField> {
                     vec![
                         #members
                     ]

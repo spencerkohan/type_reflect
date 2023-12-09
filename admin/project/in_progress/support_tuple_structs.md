@@ -59,3 +59,4 @@ We can rename this to `TypeFieldDefinition`
 - [x] Rename `TypeFieldDefinition::Simple` to `TypeFieldDefinition::Unit`
 - [x] Rename `TypeFieldDefinition::Struct` to `TypeFieldDefinition::Named`
 - [x] Rename `StructMember` to `NamedField`
+- [x] Rename `StructType.members` to `StructType.fields`
