@@ -1,6 +1,6 @@
 [package]
 name = "type_reflect_macros"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["Spencer Kohan <spencerkohan@gmail.com>"]
 edition = "2021"
 description = "derive macro for type_reflect"
@@ -13,7 +13,7 @@ documentation = "https://docs.rs/type_reflect_macros"
 proc-macro = true
 
 [dependencies]
-type_reflect_core = "0.3.0"
+type_reflect_core = "0.4.0"
 proc-macro2 = "1.0.69"
 quote = "1"
 syn = { version = "1", features = ["full", "extra-traits"] }
