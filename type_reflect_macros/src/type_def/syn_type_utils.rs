@@ -1,5 +1,5 @@
 use syn::{Field, GenericArgument, PathArguments, Result, Type as SynType, TypePath};
-use type_reflect_core::{syn_err, NamedField, Type, TypeFieldsDefinition};
+use type_reflect_core::{syn_err, NamedField, NamedType, Type, TypeFieldsDefinition};
 
 fn leading_segment(path: &TypePath) -> String {
     path.path.segments[0].ident.to_string()
@@ -29,7 +29,10 @@ fn simple_type(name: String) -> Type {
         "u8" | "u16" | "u32" | "u64" => Type::UnsignedInt,
         "i8" | "i16" | "i32" | "i64" => Type::Int,
         "f8" | "f16" | "f32" | "f64" => Type::Float,
-        _ => Type::Named(name),
+        _ => Type::Named(NamedType {
+            name,
+            generic_args: vec![],
+        }),
     }
 }
 
@@ -46,6 +49,7 @@ pub trait SynTypeBridge {
                 let generics = generic_args(type_path)?;
                 match leading.as_str() {
                     "Option" if generics.len() == 1 => Ok(Type::Option(generics[0].clone().into())),
+                    "Box" if generics.len() == 1 => Ok(Type::Box(generics[0].clone().into())),
                     "Vec" if generics.len() == 1 => Ok(Type::Array(generics[0].clone().into())),
                     "HashMap" if generics.len() == 2 => Ok(Type::Map {
                         key: generics[0].clone().into(),

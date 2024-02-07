@@ -8,7 +8,6 @@ mod array;
 pub use array::*;
 
 mod map;
-pub use map::*;
 
 mod tuple;
 pub use tuple::*;

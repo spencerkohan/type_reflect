@@ -6,8 +6,8 @@ use crate::attribute_utils::RenameAllAttr;
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 use syn::{ItemStruct, Result};
+use type_reflect_core::Inflection;
 use type_reflect_core::TypeFieldsDefinition;
-use type_reflect_core::{type_description::NamedField, Inflection};
 
 #[derive(Clone, Debug)]
 pub struct StructDef {

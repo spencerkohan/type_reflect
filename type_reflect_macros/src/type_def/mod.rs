@@ -8,7 +8,6 @@ mod type_alias_def;
 pub use type_alias_def::*;
 
 pub mod syn_type_utils;
-pub use syn_type_utils::*;
 
 pub mod type_utils;
 

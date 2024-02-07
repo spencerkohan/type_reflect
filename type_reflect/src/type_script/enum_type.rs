@@ -1,6 +1,6 @@
 use type_reflect_core::{EnumCase, EnumType, Inflection};
 
-use crate::type_script::{struct_type, type_fields};
+use crate::type_script::type_fields;
 use crate::EnumReflectionType;
 
 use super::to_ts_type;

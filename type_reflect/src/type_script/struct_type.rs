@@ -1,6 +1,6 @@
-use super::{named_fields, to_ts_type, tuple_fields};
+use super::{named_fields, tuple_fields};
 use ts_quote::ts_string;
-use type_reflect_core::{Inflectable, Inflection, NamedField, TypeFieldsDefinition};
+use type_reflect_core::{Inflection, TypeFieldsDefinition};
 
 pub fn struct_impl(name: &str, fields: &TypeFieldsDefinition, inflection: Inflection) -> String {
     let fields = match fields {

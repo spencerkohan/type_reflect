@@ -1,5 +1,7 @@
 use type_reflect_core::Type;
 
+use crate::type_script::to_ts_type;
+
 use super::{array_validation, map::map_validation, primitive_type_validation};
 
 pub fn type_validation(var_name: &str, type_: &Type) -> String {
@@ -23,9 +25,8 @@ pub fn type_validation(var_name: &str, type_: &Type) -> String {
                 type_validation = type_validation
             )
         }
-        Type::Named(n) => {
-            // let value_type = to_ts_type(t);
-            let value_type = n;
+        Type::Named(_) => {
+            let value_type = to_ts_type(type_);
             format!(
                 r#"
                 {value_type}.validate({var_name});
@@ -34,5 +35,6 @@ pub fn type_validation(var_name: &str, type_: &Type) -> String {
                 value_type = value_type
             )
         }
+        Type::Box(type_) => type_validation(var_name, &*type_),
     }
 }

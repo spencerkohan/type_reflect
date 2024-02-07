@@ -35,7 +35,8 @@ pub trait TypeExporter {
 
 pub fn to_ts_type(t: &Type) -> String {
     match t {
-        Type::Named(t) => format!("{}", t),
+        // TODO: Support generics
+        Type::Named(t) => format!("{}", t.name),
         Type::String => "string".to_string(),
         Type::Int => "number".to_string(),
         Type::UnsignedInt => "number".to_string(),
@@ -50,6 +51,7 @@ pub fn to_ts_type(t: &Type) -> String {
                 v = to_ts_type(value)
             )
         }
+        Type::Box(t) => to_ts_type(&*t),
     }
 }
 

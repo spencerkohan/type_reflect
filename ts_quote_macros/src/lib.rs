@@ -35,7 +35,7 @@ This is aliased to the ts_quote::TS type
 
 usage:
 
-let ts: TS = ts_string!{
+let ts: TS = ts_quote!{
 const x = 7;
 }?;
 assert_eq!(ts.formatted(None), "const x = 7;".to_string());

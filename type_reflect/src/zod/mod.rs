@@ -22,7 +22,8 @@ pub trait TypeExporter {
 
 fn to_zod_type(t: &Type) -> String {
     match t {
-        Type::Named(t) => format!("{}Schema", t),
+        // TODO: support generics
+        Type::Named(t) => format!("{}Schema", t.name),
         Type::String => "z.string()".to_string(),
         Type::Int => "z.number()".to_string(),
         Type::UnsignedInt => "z.number()".to_string(),
@@ -31,6 +32,7 @@ fn to_zod_type(t: &Type) -> String {
         Type::Option(t) => format!("{}.optional()", to_zod_type(t)),
         Type::Array(t) => format!("z.array({})", to_zod_type(t)),
         Type::Map { key, value } => format!("z.map({}, {})", to_zod_type(key), to_zod_type(value)),
+        Type::Box(_t) => unimplemented!("Boxed types not yet implemented for Zod"),
     }
 }
 

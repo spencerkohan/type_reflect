@@ -1,13 +1,20 @@
 use crate::Inflection;
 
 #[derive(Clone, Debug)]
+pub struct NamedType {
+    pub name: String,
+    pub generic_args: Vec<Box<Type>>,
+}
+
+#[derive(Clone, Debug)]
 pub enum Type {
-    Named(String),
+    Named(NamedType),
     String,
     Int,
     UnsignedInt,
     Float,
     Boolean,
+    Box(Box<Type>),
     Option(Box<Type>),
     Array(Box<Type>),
     Map { key: Box<Type>, value: Box<Type> },
