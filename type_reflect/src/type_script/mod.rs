@@ -51,7 +51,7 @@ pub fn to_ts_type(t: &Type) -> String {
                 v = to_ts_type(value)
             )
         }
-        Type::Box(t) => to_ts_type(&*t),
+        Type::Transparent(t) => to_ts_type(&*(t.type_)),
     }
 }
 

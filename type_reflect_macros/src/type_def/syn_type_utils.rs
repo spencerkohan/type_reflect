@@ -1,5 +1,8 @@
 use syn::{Field, GenericArgument, PathArguments, Result, Type as SynType, TypePath};
-use type_reflect_core::{syn_err, NamedField, NamedType, Type, TypeFieldsDefinition};
+use type_reflect_core::{
+    syn_err, NamedField, NamedType, TransparentType, TransparentTypeCase, Type,
+    TypeFieldsDefinition,
+};
 
 fn leading_segment(path: &TypePath) -> String {
     path.path.segments[0].ident.to_string()
@@ -49,7 +52,18 @@ pub trait SynTypeBridge {
                 let generics = generic_args(type_path)?;
                 match leading.as_str() {
                     "Option" if generics.len() == 1 => Ok(Type::Option(generics[0].clone().into())),
-                    "Box" if generics.len() == 1 => Ok(Type::Box(generics[0].clone().into())),
+                    "Box" if generics.len() == 1 => Ok(Type::Transparent(TransparentType {
+                        case: TransparentTypeCase::Box,
+                        type_: generics[0].clone().into(),
+                    })),
+                    "Rc" if generics.len() == 1 => Ok(Type::Transparent(TransparentType {
+                        case: TransparentTypeCase::Rc,
+                        type_: generics[0].clone().into(),
+                    })),
+                    "Arc" if generics.len() == 1 => Ok(Type::Transparent(TransparentType {
+                        case: TransparentTypeCase::Arc,
+                        type_: generics[0].clone().into(),
+                    })),
                     "Vec" if generics.len() == 1 => Ok(Type::Array(generics[0].clone().into())),
                     "HashMap" if generics.len() == 2 => Ok(Type::Map {
                         key: generics[0].clone().into(),

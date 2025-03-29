@@ -32,7 +32,7 @@ fn to_zod_type(t: &Type) -> String {
         Type::Option(t) => format!("{}.optional()", to_zod_type(t)),
         Type::Array(t) => format!("z.array({})", to_zod_type(t)),
         Type::Map { key, value } => format!("z.map({}, {})", to_zod_type(key), to_zod_type(value)),
-        Type::Box(_t) => unimplemented!("Boxed types not yet implemented for Zod"),
+        Type::Transparent(_t) => unimplemented!("Transparent types not yet implemented for Zod"),
     }
 }
 

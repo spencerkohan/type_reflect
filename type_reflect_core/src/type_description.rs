@@ -7,6 +7,19 @@ pub struct NamedType {
 }
 
 #[derive(Clone, Debug)]
+pub enum TransparentTypeCase {
+    Box,
+    Rc,
+    Arc,
+}
+
+#[derive(Clone, Debug)]
+pub struct TransparentType {
+    pub case: TransparentTypeCase,
+    pub type_: Box<Type>,
+}
+
+#[derive(Clone, Debug)]
 pub enum Type {
     Named(NamedType),
     String,
@@ -14,7 +27,7 @@ pub enum Type {
     UnsignedInt,
     Float,
     Boolean,
-    Box(Box<Type>),
+    Transparent(TransparentType),
     Option(Box<Type>),
     Array(Box<Type>),
     Map { key: Box<Type>, value: Box<Type> },

@@ -2,37 +2,6 @@ use proc_macro2::TokenStream;
 use quote::*;
 use type_reflect_core::*;
 
-pub trait NamedTypeBridge {
-    fn named_type(&self) -> &NamedType;
-    fn emit_named_type(&self) -> TokenStream {
-        let name = &self.named_type().name;
-        let generics: Vec<TokenStream> = self
-            .named_type()
-            .generic_args
-            .iter()
-            .map(|arg| {
-                let type_ = arg.emit_type();
-                quote! {
-                    Box<#type_>
-                }
-            })
-            .collect();
-
-        quote! {
-            NamedType {
-                name: #name.to_string(),
-                generic_args: vec![#(#generics,)*],
-            }
-        }
-    }
-}
-
-impl NamedTypeBridge for NamedType {
-    fn named_type(&self) -> &NamedType {
-        self
-    }
-}
-
 pub trait TypeBridge {
     fn type_(&self) -> &Type;
     fn emit_type(&self) -> TokenStream {
@@ -59,9 +28,9 @@ pub trait TypeBridge {
                 let value = value.emit_type();
                 quote! { Type::Map{ key: #key.into(), value: #value.into() } }
             }
-            Type::Box(t) => {
-                let boxed = t.emit_type();
-                quote! { Type::Box( #boxed.into() ) }
+            Type::Transparent(t) => {
+                let inner = t.emit_transparent_type();
+                quote! { Type::Transparent( #inner ) }
             }
         }
     }
@@ -125,6 +94,62 @@ pub trait NamedFieldBridge {
 
 impl NamedFieldBridge for NamedField {
     fn member(&self) -> &NamedField {
+        self
+    }
+}
+
+pub trait NamedTypeBridge {
+    fn named_type(&self) -> &NamedType;
+    fn emit_named_type(&self) -> TokenStream {
+        let name = &self.named_type().name;
+        let generics: Vec<TokenStream> = self
+            .named_type()
+            .generic_args
+            .iter()
+            .map(|arg| {
+                let type_ = arg.emit_type();
+                quote! {
+                    Box<#type_>
+                }
+            })
+            .collect();
+
+        quote! {
+            NamedType {
+                name: #name.to_string(),
+                generic_args: vec![#(#generics,)*],
+            }
+        }
+    }
+}
+
+impl NamedTypeBridge for NamedType {
+    fn named_type(&self) -> &NamedType {
+        self
+    }
+}
+
+pub trait TransparentTypeBridge {
+    fn transparent_type(&self) -> &TransparentType;
+    fn emit_transparent_type(&self) -> TokenStream {
+        let case = match &self.transparent_type().case {
+            TransparentTypeCase::Box => quote! { TransparentTypeCase::Box },
+            TransparentTypeCase::Rc => quote! { TransparentTypeCase::Rc },
+            TransparentTypeCase::Arc => quote! { TransparentTypeCase::Arc },
+        };
+        let inner = &self.transparent_type().type_.emit_type();
+
+        quote! {
+            TransparentType {
+                case: #case,
+                type_: #inner.into(),
+            }
+        }
+    }
+}
+
+impl TransparentTypeBridge for TransparentType {
+    fn transparent_type(&self) -> &TransparentType {
         self
     }
 }

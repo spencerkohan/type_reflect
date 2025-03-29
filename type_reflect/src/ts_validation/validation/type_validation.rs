@@ -35,6 +35,6 @@ pub fn type_validation(var_name: &str, type_: &Type) -> String {
                 value_type = value_type
             )
         }
-        Type::Box(type_) => type_validation(var_name, &*type_),
+        Type::Transparent(type_) => type_validation(var_name, &*(type_.type_)),
     }
 }
