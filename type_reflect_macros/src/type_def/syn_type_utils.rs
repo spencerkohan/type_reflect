@@ -69,6 +69,10 @@ pub trait SynTypeBridge {
                         key: generics[0].clone().into(),
                         value: generics[1].clone().into(),
                     }),
+                    "BTreeMap" if generics.len() == 2 => Ok(Type::Map {
+                        key: generics[0].clone().into(),
+                        value: generics[1].clone().into(),
+                    }),
                     _ if generics.len() == 0 => Ok(simple_type(leading)),
                     _ => syn_err!("Unsupported type type: {:#?}", &self.syn_type()),
                 }
