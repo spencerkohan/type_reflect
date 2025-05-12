@@ -44,30 +44,33 @@ fn test_validation() -> Result<()> {
     )?;
 
     output.write_jest(
-        "Shape, Rectangle, ShapeCase",
+        "Shape, Rectangle, ShapeCase, ShapeCaseKey",
         ts_string! {
             describe("ADT Validation", ()=>{
-                it("Validates a Null variant: {_case: ShapeCase.Null}", ()=>{
+                it("Validates a Null variant: ShapeCaseKey.Null", ()=>{
                     expect(() => {
-                        Shape.validate({
-                            _case: ShapeCase.Null
-                        })
+                        Shape.validate(ShapeCaseKey.Null)
                     }).not.toThrow();
                 });
-                it("Validates a Circle variant: {_case: ShapeCase.Circle, data: { radius: 1.7} }", ()=>{
+                it("Validates a Null variant literal: 'Null'", ()=>{
+                    expect(() => {
+                        Shape.validate("Null")
+                    }).not.toThrow();
+                });
+                it("Validates a Circle variant: {_case: ShapeCaseKey.Circle, data: { radius: 1.7} }", ()=>{
                     expect(() => {
                         Shape.validate({
-                            _case: ShapeCase.Circle,
+                            _case: ShapeCaseKey.Circle,
                             data: {
                                 radius: 1.7
                             }
                         })
                     }).not.toThrow();
                 });
-                it("Validates a Rectangle variant: {_case: ShapeCase.Rectangle, data: { width: 1, height: 2} }", ()=>{
+                it("Validates a Rectangle variant: {_case: ShapeCaseKey.Rectangle, data: { width: 1, height: 2} }", ()=>{
                     expect(() => {
                         Shape.validate({
-                            _case: ShapeCase.Rectangle,
+                            _case: ShapeCaseKey.Rectangle,
                             data: {
                                 width: 1,
                                 height: 2
@@ -75,10 +78,10 @@ fn test_validation() -> Result<()> {
                         })
                     }).not.toThrow();
                 });
-                it("Validates a ScaledRectangle variant: {_case: ShapeCase.ScaledRectangle, data: [{ width: 1, height: 2}, 0.5] }", ()=>{
+                it("Validates a ScaledRectangle variant: {_case: ShapeCaseKey.ScaledRectangle, data: [{ width: 1, height: 2}, 0.5] }", ()=>{
                     expect(() => {
                         Shape.validate({
-                            _case: ShapeCase.ScaledRectangle,
+                            _case: ShapeCaseKey.ScaledRectangle,
                             data: [
                                 {
                                     width: 1,
@@ -89,10 +92,10 @@ fn test_validation() -> Result<()> {
                         })
                     }).not.toThrow();
                 });
-                it("Doesn't Validate an incorrect ScaledRectangle variant: {_case: ShapeCase.Circle, data: [{ width: 1, height: 2}, 0.5] }", ()=>{
+                it("Doesn't Validate an incorrect ScaledRectangle variant: {_case: ShapeCaseKey.Circle, data: [{ width: 1, height: 2}, 0.5] }", ()=>{
                     expect(() => {
                         Shape.validate({
-                            _case: ShapeCase.Circle,
+                            _case: ShapeCaseKey.Circle,
                             data: [
                                 {
                                     width: 1,

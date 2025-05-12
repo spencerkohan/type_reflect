@@ -65,17 +65,17 @@ impl RustTypeEmitter for TypeDef {
 pub trait RustTypeEmitter {
     fn ident(&self) -> &Ident;
     fn tokens(&self) -> &TokenStream;
-    fn emit_type_def_impl(&self) -> TokenStream {
-        let ident = &self.ident();
-        let token_string = format!("{}", self.tokens());
-        quote! {
-            impl RustType for #ident {
-                fn emit_rust(&self) -> String {
-                    #token_string.to_string()
-                }
-            }
-        }
-    }
+    // fn emit_type_def_impl(&self) -> TokenStream {
+    //     let ident = &self.ident();
+    //     let token_string = format!("{}", self.tokens());
+    //     quote! {
+    //         impl RustType for #ident {
+    //             fn emit_rust(&self) -> String {
+    //                 #token_string.to_string()
+    //             }
+    //         }
+    //     }
+    // }
 }
 
 pub trait InflectionTokenProvider {

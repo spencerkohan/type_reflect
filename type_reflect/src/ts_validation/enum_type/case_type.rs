@@ -11,10 +11,10 @@ pub fn emit_complex_enum_case_type(
     content_key: &Option<String>,
     case: EnumCase,
 ) -> String {
-    let case_key_value: String = format!("{}Case.{}", enum_name, case.name);
+    let case_key_value: String = format!("{}CaseKey.{}", enum_name, case.name);
     let case_type_name: String = format!("{}Case{}", enum_name, case.name);
 
-    let validator = match case.type_ {
+    let validator = match &case.type_ {
         type_reflect_core::TypeFieldsDefinition::Unit => emit_simple_case_type_validator(),
         type_reflect_core::TypeFieldsDefinition::Tuple(members) => {
             emit_tuple_case_type_validator(content_key, &members)
@@ -24,15 +24,31 @@ pub fn emit_complex_enum_case_type(
         }
     };
 
-    let validation_impl = ts_string! {
-        if (!isRecord(input)) {
-            throw new Error(#"`Error parsing #case_type_name: expected: Record, found: ${typeof input}`");
+    let validation_impl = match &case.type_ {
+        type_reflect_core::TypeFieldsDefinition::Unit => {
+            ts_string! {
+                if (#"'string'" !== typeof input) {
+                    throw new Error(#"`Error parsing #case_type_name: expected: string, found: ${typeof input}`");
+                }
+                if (input !== #case_key_value) {
+                    throw new Error(#"`Error parsing #case_type_name: expected key: #case_key_value, found: ${typeof input}`");
+                }
+                #validator
+                return input as #case_type_name
+            }
         }
-        if (input.#case_key !== #case_key_value) {
-            throw new Error(#"`Error parsing #case_type_name: expected key: #case_key_value, found: ${typeof input}`");
+        _ => {
+            ts_string! {
+                if (!isRecord(input)) {
+                    throw new Error(#"`Error parsing #case_type_name: expected: Record, found: ${typeof input}`");
+                }
+                if (input.#case_key !== #case_key_value) {
+                    throw new Error(#"`Error parsing #case_type_name: expected key: #case_key_value, found: ${typeof input}`");
+                }
+                #validator
+                return input as #case_type_name
+            }
         }
-        #validator
-        return input as #case_type_name
     };
 
     return validation_namespace(case_type_name.as_str(), validation_impl.as_str());

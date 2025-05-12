@@ -140,7 +140,7 @@ fn test_nested_box() -> Result<()> {
     )?;
 
     output.write_jest(
-        "Tree, TreeCase",
+        "Tree, TreeCase, TreeCaseKey",
         ts_quote! {
 
             describe("Nested Box Validation", ()=>{
@@ -149,14 +149,14 @@ fn test_nested_box() -> Result<()> {
                 expect(() => {
                     Tree.validate(
                         {
-                            _case: TreeCase.Subtree,
+                            _case: TreeCaseKey.Subtree,
                             data: {
-                                left: { _case: TreeCase.Leaf, data: true },
+                                left: { _case: TreeCaseKey.Leaf, data: true },
                                 right: {
-                                    _case: TreeCase.Subtree,
+                                    _case: TreeCaseKey.Subtree,
                                     data: {
-                                        left: { _case: TreeCase.Leaf, data: true },
-                                        right: { _case: TreeCase.Leaf, data: false }
+                                        left: { _case: TreeCaseKey.Leaf, data: true },
+                                        right: { _case: TreeCaseKey.Leaf, data: false }
                                     }
                                 }
                             }
