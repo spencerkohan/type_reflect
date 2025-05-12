@@ -1,6 +1,6 @@
 [package]
 name = "type_reflect"
-version = "0.4.1"
+version = "0.5.0"
 authors = ["Spencer Kohan <spencerkohan@gmail.com>"]
 edition = "2021"
 description = "Extensible runtime reflection through a Derive macro"
