@@ -1,6 +1,3 @@
-#![allow(incomplete_features)]
-#![feature(specialization)]
-#![feature(let_chains)]
 pub use core::convert::AsRef;
 use std::ffi::OsStr;
 use type_reflect_macros;

@@ -113,13 +113,12 @@ fn emit_tuple_case_type_name(
     tuple_fields: &Vec<Type>,
     parent_name: &str,
 ) -> String {
-    if let Some(field) = tuple_fields.first()
-        && tuple_fields.len() == 1
-    {
-        to_ts_type(&field)
-    } else {
-        union_case_type_name(case, parent_name)
+    if let Some(field) = tuple_fields.first() {
+        if tuple_fields.len() == 1 {
+            return to_ts_type(&field);
+        }
     }
+    union_case_type_name(case, parent_name)
 }
 
 fn emit_case_type(case: &EnumCase, parent_name: &str) -> String {
@@ -152,20 +151,20 @@ fn emit_tuple_case_type_contentns(
     tuple_fields: &Vec<Type>,
     parent_name: &str,
 ) -> String {
-    if let Some(field) = tuple_fields.first()
-        && tuple_fields.len() == 1
-    {
-        to_ts_type(&field)
-    } else {
-        let members: Vec<String> = tuple_fields
-            .into_iter()
-            .map(|field| to_ts_type(&field))
-            .collect();
-        let members = members.join(", ");
-
-        ts_string! {
-            [ #members ]
+    if let Some(field) = tuple_fields.first() {
+        if tuple_fields.len() == 1 {
+            return to_ts_type(&field);
         }
+    }
+
+    let members: Vec<String> = tuple_fields
+        .into_iter()
+        .map(|field| to_ts_type(&field))
+        .collect();
+    let members = members.join(", ");
+
+    ts_string! {
+        [ #members ]
     }
 }
 
