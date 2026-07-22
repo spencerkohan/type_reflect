@@ -1,6 +1,3 @@
-#![allow(incomplete_features)]
-#![feature(specialization)]
-#![feature(let_chains)]
 pub use core::convert::AsRef;
 use std::ffi::OsStr;
 use type_reflect_macros;
@@ -10,8 +7,8 @@ pub use std::io::Write;
 pub use std::path::Path;
 
 pub use ts_quote::ts_string;
-pub use type_reflect_macros::export_types;
 pub use type_reflect_macros::Reflect;
+pub use type_reflect_macros::export_types;
 pub mod struct_type;
 pub use struct_type::*;
 pub use type_reflect_core::*;

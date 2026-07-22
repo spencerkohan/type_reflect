@@ -59,7 +59,7 @@ pub fn struct_impl(name: &str, fields: &TypeFieldsDefinition, inflection: Inflec
         }
         TypeFieldsDefinition::Named(_) => ts_string! {
             if (!isRecord(input)) {
-                throw new Error(#r#"`Error parsing #name#: expected: Record, found: ${typeof input}`"#);
+                throw new Error(# "`Error parsing #name: expected: Record, found: ${typeof input}`");
             }
             #validations
             return input as #name;

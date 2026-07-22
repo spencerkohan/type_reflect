@@ -94,10 +94,10 @@ fn test_ident_substitution() -> Result<()> {
     let bar = 4;
 
     let prefix = ts_string! {
-        const val = #hola + #{foo + bar};
-        const lemon = #"`egg salad sandwich ${val}`";
-        const peas = #"`egg salad sandwich ${val} == #foo`";
-        const soup = #"`egg salad sandwich ${val} == #{foo - bar} something something`";
+        const val = # hola + #{foo + bar};
+        const lemon = # "`egg salad sandwich ${val}`";
+        const peas = # "`egg salad sandwich ${val} == #foo`";
+        const soup = # "`egg salad sandwich ${val} == #{foo - bar} something something`";
     };
 
     export_types!(

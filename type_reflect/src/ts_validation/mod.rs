@@ -81,7 +81,7 @@ pub fn validation_namespace(name: &str, validation_impl: &str) -> String {
 
             export function validateArray(input: any): Array<#name> {
                 if (!Array.isArray(input)) {
-                    throw new Error(#"`Error validating Array<#name>: expected: Array, found: ${ typeof input }`");
+                    throw new Error(# "`Error validating Array<#name>: expected: Array, found: ${ typeof input }`");
                 }
                 for (const item of input) {
                     validate(item);

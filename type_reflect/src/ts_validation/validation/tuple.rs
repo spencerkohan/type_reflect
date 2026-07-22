@@ -23,7 +23,7 @@ pub fn tuple_validation(var_name: &str, member_types: &Vec<Type>) -> String {
 
     ts_string! {
         if (!Array.isArray(#var_name)) {
-            throw new Error(#"`Error parsing #var_name: expected: Array, found: ${ typeof #var_name }`");
+            throw new Error(# "`Error parsing #var_name: expected: Array, found: ${ typeof #var_name }`");
         }
         #member_validations
     }

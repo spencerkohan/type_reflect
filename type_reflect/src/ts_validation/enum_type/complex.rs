@@ -1,6 +1,6 @@
 use type_reflect_core::EnumCase;
 
-use crate::{ts_validation::validation_namespace, EnumReflectionType};
+use crate::{EnumReflectionType, ts_validation::validation_namespace};
 
 use super::case_type::emit_complex_enum_case_type;
 use ts_quote::ts_string;
@@ -23,7 +23,7 @@ where
 
     let namespace = validation_namespace(T::name(), ts_string! {
         #case_validations
-        throw new Error(#"`Error validating #name: value ${JSON.stringify(input)} does not match any variant`");
+        throw new Error(# "`Error validating #name: value ${JSON.stringify(input)} does not match any variant`");
     }.as_str());
 
     ts_string! {

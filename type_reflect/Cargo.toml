@@ -2,7 +2,7 @@
 name = "type_reflect"
 version = "0.6.2"
 authors = ["Spencer Kohan <spencerkohan@gmail.com>"]
-edition = "2021"
+edition = "2024"
 description = "Extensible runtime reflection through a Derive macro"
 license = "Apache-2.0"
 

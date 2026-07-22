@@ -21,7 +21,7 @@ pub fn emit_case_type(case: &EnumCase, parent_name: &str) -> String {
             let val = named_field_validations("input", &fields, case.inflection);
             ts_string! {
                 if (!isRecord(input)) {
-                    throw new Error(#r#"`Error parsing #case_type: expected: Record, found: ${typeof input}`"#);
+                    throw new Error(# "`Error parsing #case_type: expected: Record, found: ${typeof input}`");
                 }
                 #val
             }

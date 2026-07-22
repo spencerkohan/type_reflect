@@ -28,10 +28,10 @@ pub fn emit_complex_enum_case_type(
         type_reflect_core::TypeFieldsDefinition::Unit => {
             ts_string! {
                 if (!isRecord(input)) {
-                    throw new Error(#"`Error parsing #case_type_name: expected: Record, found: ${typeof input}`");
+                    throw new Error(# "`Error parsing #case_type_name: expected: Record, found: ${typeof input}`");
                 }
                 if (input.#case_key !== #case_key_value) {
-                    throw new Error(#"`Error parsing #case_type_name: expected key: #case_key_value, found: ${typeof input}`");
+                    throw new Error(# "`Error parsing #case_type_name: expected key: #case_key_value, found: ${typeof input}`");
                 }
                 return input as #case_type_name
             }
@@ -39,10 +39,10 @@ pub fn emit_complex_enum_case_type(
         _ => {
             ts_string! {
                 if (!isRecord(input)) {
-                    throw new Error(#"`Error parsing #case_type_name: expected: Record, found: ${typeof input}`");
+                    throw new Error(# "`Error parsing #case_type_name: expected: Record, found: ${typeof input}`");
                 }
                 if (input.#case_key !== #case_key_value) {
-                    throw new Error(#"`Error parsing #case_type_name: expected key: #case_key_value, found: ${typeof input}`");
+                    throw new Error(# "`Error parsing #case_type_name: expected key: #case_key_value, found: ${typeof input}`");
                 }
                 #validator
                 return input as #case_type_name
