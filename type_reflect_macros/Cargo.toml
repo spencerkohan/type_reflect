@@ -1,6 +1,6 @@
 [package]
 name = "type_reflect_macros"
-version = "0.5.1"
+version = "0.6.0"
 authors = ["Spencer Kohan <spencerkohan@gmail.com>"]
 edition = "2021"
 description = "derive macro for type_reflect"
