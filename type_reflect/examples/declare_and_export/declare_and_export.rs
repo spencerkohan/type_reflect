@@ -120,7 +120,7 @@ fn main() {
         destinations: [
             TypeScript(
                 "./type_reflect/examples/declare_and_export/output/type_2.ts"
-                prefix: "import { Bar } from './bar.ts'",
+                prefix: "import { Bar } from './bar.ts';",
                 tab_size: 2,
 
             ),
