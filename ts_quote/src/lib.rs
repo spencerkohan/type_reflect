@@ -1,4 +1,6 @@
-use deno_ast::{parse_module, Diagnostic, SourceTextInfo};
+use std::sync::Arc;
+
+use deno_ast::{parse_module, ParseDiagnostic};
 use dprint_plugin_typescript::{
     configuration::{Configuration, ConfigurationBuilder, NextControlFlowPosition, QuoteStyle},
     format_parsed_source,
@@ -23,7 +25,7 @@ pub trait TSSource: Sized {
 
     Returns a ParsedSource, or an error diagnostic if source is not valid TypeScript
     **/
-    fn from_source(source: String) -> Result<Self, Diagnostic>;
+    fn from_source(source: String) -> Result<Self, ParseDiagnostic>;
 
     /**
     Returns a formatted TypeScript string.
@@ -48,10 +50,10 @@ pub trait TSSource: Sized {
 }
 
 impl TSSource for TS {
-    fn from_source(source: String) -> Result<Self, Diagnostic> {
+    fn from_source(source: String) -> Result<Self, ParseDiagnostic> {
         parse_module(deno_ast::ParseParams {
-            specifier: "".to_string(),
-            text_info: SourceTextInfo::from_string(source),
+            specifier: url::Url::parse("file:///dummy.ts").unwrap(),
+            text: Arc::from(source),
             media_type: deno_ast::MediaType::TypeScript,
             capture_tokens: true,
             scope_analysis: false,
@@ -61,7 +63,7 @@ impl TSSource for TS {
 
     fn formatted(&self, config: Option<&Configuration>) -> anyhow::Result<String> {
         match config {
-            Some(config) => Ok(format_parsed_source(self, config)?.unwrap_or(String::new())),
+            Some(config) => Ok(format_parsed_source(self, config, None)?.unwrap_or(String::new())),
             None => {
                 let config = ConfigurationBuilder::new()
                     .indent_width(2)
@@ -72,7 +74,7 @@ impl TSSource for TS {
                     .next_control_flow_position(NextControlFlowPosition::SameLine)
                     .build();
 
-                Ok(format_parsed_source(self, &config)?.unwrap_or(String::new()))
+                Ok(format_parsed_source(self, &config, None)?.unwrap_or(String::new()))
             }
         }
     }
