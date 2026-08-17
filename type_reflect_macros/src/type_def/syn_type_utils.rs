@@ -149,7 +149,7 @@ impl FieldsNamedBridge for syn::FieldsNamed {
     }
 }
 
-pub trait FieldsUnmnamedBridge {
+pub trait FieldsUnnamedBridge {
     fn fields_unnamed(&self) -> &syn::FieldsUnnamed;
     fn to_tuple_members(&self) -> Result<Vec<Type>> {
         (&self.fields_unnamed().unnamed)
@@ -159,7 +159,7 @@ pub trait FieldsUnmnamedBridge {
     }
 }
 
-impl FieldsUnmnamedBridge for syn::FieldsUnnamed {
+impl FieldsUnnamedBridge for syn::FieldsUnnamed {
     fn fields_unnamed(&self) -> &syn::FieldsUnnamed {
         self
     }

@@ -58,14 +58,14 @@ pub trait TypeFieldsDefinitionBridge {
                 quote! { TypeFieldsDefinition::Tuple(vec![#types]) }
             }
             TypeFieldsDefinition::Named(inner) => {
-                let mut mermbers = quote! {};
+                let mut members = quote! {};
 
                 for member in inner {
                     let m = member.emit_member();
-                    mermbers.extend(quote! {#m, });
+                    members.extend(quote! {#m, });
                 }
 
-                quote! { TypeFieldsDefinition::Named(vec![#mermbers]) }
+                quote! { TypeFieldsDefinition::Named(vec![#members]) }
             }
         }
     }

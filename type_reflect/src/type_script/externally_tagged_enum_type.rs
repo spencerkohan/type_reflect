@@ -104,7 +104,7 @@ fn emit_member_case(case: &EnumCase, parent_name: &str, inflection: Inflection) 
 
 pub fn emit_case_type_name(case: &EnumCase, parent_name: &str) -> String {
     match &case.type_ {
-        TypeFieldsDefinition::Unit => unreachable!("unit cases don't have a a case type"),
+        TypeFieldsDefinition::Unit => unreachable!("unit cases don't have a case type"),
         TypeFieldsDefinition::Tuple(items) => emit_tuple_case_type_name(&case, &items, parent_name),
         TypeFieldsDefinition::Named(_named_fields) => union_case_type_name(case, parent_name),
     }
@@ -139,17 +139,17 @@ pub fn emit_case_type(case: &EnumCase, parent_name: &str) -> String {
 
 fn emit_case_type_contents(case: &EnumCase, parent_name: &str) -> String {
     match &case.type_ {
-        TypeFieldsDefinition::Unit => unreachable!("unit cases don't have a a case type"),
+        TypeFieldsDefinition::Unit => unreachable!("unit cases don't have a case type"),
         TypeFieldsDefinition::Tuple(items) => {
-            emit_tuple_case_type_contentns(&case, &items, parent_name)
+            emit_tuple_case_type_contents(&case, &items, parent_name)
         }
         TypeFieldsDefinition::Named(named_fields) => {
-            emit_struct_case_type_contentns(case, named_fields)
+            emit_struct_case_type_contents(case, named_fields)
         }
     }
 }
 
-fn emit_tuple_case_type_contentns(
+fn emit_tuple_case_type_contents(
     _case: &EnumCase,
     tuple_fields: &Vec<Type>,
     _parent_name: &str,
@@ -171,7 +171,7 @@ fn emit_tuple_case_type_contentns(
     }
 }
 
-fn emit_struct_case_type_contentns(case: &EnumCase, named_fields: &Vec<NamedField>) -> String {
+fn emit_struct_case_type_contents(case: &EnumCase, named_fields: &Vec<NamedField>) -> String {
     let struct_items = type_fields::named_fields(named_fields, case.inflection);
 
     ts_string! {
