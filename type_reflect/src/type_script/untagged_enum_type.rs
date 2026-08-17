@@ -1,7 +1,7 @@
 use crate::EnumReflectionType;
 use ts_quote::ts_string;
 use type_reflect_core::{
-    EnumCase, Inflectable, Inflection, NamedField, Type, TypeFieldsDefinition,
+    EnumCase, Inflection, NamedField, Type, TypeFieldsDefinition,
 };
 
 use super::{to_ts_type, type_fields, union_case_type_name};
@@ -90,12 +90,12 @@ where
 }
 
 fn emit_unit_case(case: &EnumCase, inflection: Inflection) -> String {
-    let name = &case.name.inflect(inflection);
+    let name = case.serialized_name(inflection);
     ts_string! { # "'#name'" }
 }
 
 fn emit_member_case(case: &EnumCase, parent_name: &str, inflection: Inflection) -> String {
-    let name = &case.name.inflect(inflection);
+    let name = case.serialized_name(inflection);
     let member_type = emit_case_type_name(&case, parent_name);
     ts_string! { #name ? : #member_type }
 }

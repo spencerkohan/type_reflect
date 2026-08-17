@@ -6,6 +6,9 @@ use type_reflect_core::impl_parse;
 #[derive(Default, Clone, Debug)]
 pub struct RenameAllAttr {
     pub rename_all: Inflection,
+    /// `#[serde(rename = "...")]` — only meaningful on enum cases
+    /// (renames the serialized case name); parsed but ignored on types.
+    pub rename: Option<String>,
 }
 
 impl RenameAllAttr {
@@ -16,13 +19,15 @@ impl RenameAllAttr {
         })
     }
 
-    fn merge(&mut self, RenameAllAttr { rename_all }: RenameAllAttr) {
+    fn merge(&mut self, RenameAllAttr { rename_all, rename }: RenameAllAttr) {
         self.rename_all = rename_all;
+        self.rename = rename;
     }
 }
 
 impl_parse! {
     RenameAllAttr(input, out) {
+        "rename" => out.rename = Some(parse_assign_str(input)?),
         "rename_all" => out.rename_all = parse_assign_inflection(input)?,
     }
 }

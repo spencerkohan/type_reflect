@@ -43,12 +43,20 @@ pub struct NamedField {
 pub struct EnumCase {
     pub name: String,
     pub type_: TypeFieldsDefinition,
+    /// Field `#[serde(rename_all)]` for this case's fields.
     pub inflection: Inflection,
+    /// Case-level `#[serde(rename = "...")]`.
+    pub rename: Option<String>,
 }
 
 impl EnumCase {
-    pub fn name_with_inflection(&self) -> String {
-        self.name.inflect(self.inflection)
+    /// The name this case appears under in serialized output: the explicit
+    /// `#[serde(rename)]` if present, else the variant name inflected with
+    /// the enum-level `rename_all`.
+    pub fn serialized_name(&self, inflection: Inflection) -> String {
+        self.rename
+            .clone()
+            .unwrap_or_else(|| self.name.inflect(inflection))
     }
 }
 

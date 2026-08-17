@@ -1,6 +1,6 @@
 use case_type::emit_case_type;
 use ts_quote::ts_string;
-use type_reflect_core::{EnumCase, Inflectable, TypeFieldsDefinition};
+use type_reflect_core::{EnumCase, TypeFieldsDefinition};
 use union_case::union_case_validation;
 use unit_case::unit_case_validation;
 
@@ -26,10 +26,7 @@ where
                 false
             }
         })
-        .map(|case| {
-            let name = case.name.inflect(inflection);
-            name
-        })
+        .map(|case| case.serialized_name(inflection))
         .collect();
 
     let unit_case_validations = if unit_cases.is_empty() {

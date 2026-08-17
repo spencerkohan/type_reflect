@@ -1,5 +1,5 @@
 use ts_quote::ts_string;
-use type_reflect_core::{EnumCase, EnumType, Inflectable, Inflection};
+use type_reflect_core::{EnumCase, EnumType, Inflection};
 
 use super::untagged_enum_type::emit_untaggedd_enum_type;
 use crate::type_script::type_fields;
@@ -29,11 +29,11 @@ where
     let simple_cases: String = T::cases()
         .into_iter()
         .map(|case| {
-            let inflected = case.name.inflect(inflection);
             format!(
-                r#"  {name} = "{inflected}",
+                r#"  {name} = "{serialized}",
 "#,
-                name = case.name
+                name = case.name,
+                serialized = case.serialized_name(inflection)
             )
         })
         .collect();
@@ -84,8 +84,8 @@ trait EnumTypeBridge: EnumReflectionType {
         let inflection = Self::inflection();
 
         for case in Self::cases() {
-            let inflected = case.name.inflect(inflection);
-            case_values.push(format!(r#""{inflected}""#));
+            let serialized = case.serialized_name(inflection);
+            case_values.push(format!(r#""{serialized}""#));
         }
 
         let case_values = case_values.join("\n  | ");
@@ -104,8 +104,8 @@ trait EnumTypeBridge: EnumReflectionType {
 
         case_values.push_str("\n  ");
         for case in Self::cases() {
-            let inflected = case.name.inflect(inflection);
-            case_values.push_str(&format!(r#"{name}: "{inflected}""#, name = case.name,));
+            let serialized = case.serialized_name(inflection);
+            case_values.push_str(&format!(r#"{name}: "{serialized}""#, name = case.name,));
             case_values.push_str(",\n  ");
         }
 
@@ -142,8 +142,7 @@ trait EnumTypeBridge: EnumReflectionType {
         inflection: Inflection,
     ) -> String {
         let case_type_name = union_case_type_name(case, Self::name());
-        // let id = Self::case_id(case);
-        let id = &case.name.inflect(inflection);
+        let id = case.serialized_name(inflection);
 
         let additional_fields = match &case.type_ {
             type_reflect_core::TypeFieldsDefinition::Unit => {

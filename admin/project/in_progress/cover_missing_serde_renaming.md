@@ -166,12 +166,23 @@ single-member guard.
       enums), so serde parsing is now the only consumer of `impl_parse!`.
       Skipped: compiler warning on skipped keys (not reachable from
       `type_reflect_core` without linking `proc_macro`).
-- [ ] G2: parse variant-level `#[serde(rename)]` (store per-case rename on
-      `EnumCase`) and apply it in all emitters
+- [x] G2: variant-level `#[serde(rename)]` parsed and stored on
+      `EnumCase.rename`; new `EnumCase::serialized_name(enum_inflection)`
+      accessor (rename wins, else enum-level `rename_all` inflected —
+      serde's precedence) is now the single source for the case name
+      wherever it appears in emitted output (TS simple/complex/untagged,
+      TSValidation untagged, zod simple/complex enum values). Tests
+      `simple_case_rename`, `complex_external_case_rename`,
+      `untagged_unit_case_rename` pass. Note: `rename` is parsed via
+      `RenameAllAttr` (also on types, where it is correctly ignored — type
+      names are not part of serde's JSON output).
 - [ ] G3: parse field-level `#[serde(rename)]` in `get_struct_member` (store
       per-field rename on `NamedField`) and apply it in all emitters
-- [ ] G1: apply `T::inflection()` to case names/values in the Zod emitter
-      (simple + complex)
+- [x] G1: resolved as a byproduct of G2 — the zod simple/complex case
+      values now go through `EnumCase::serialized_name()`, which applies the
+      enum-level inflection. Tests `simple_rename_all`,
+      `complex_external_rename_all`, `complex_internal_rename_all`,
+      `complex_combo_rename_alls` pass (zod included).
 - [ ] G4: implement (or explicitly reject with a compile error) untagged /
       default-external enums in the Zod emitter
 - [ ] G6: parse `#[serde(untagged)]` and emit the bare-content representation

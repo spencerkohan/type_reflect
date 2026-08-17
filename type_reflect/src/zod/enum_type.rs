@@ -22,13 +22,15 @@ fn emit_simple_enum_type<T>() -> String
 where
     T: EnumReflectionType,
 {
+    let inflection = T::inflection();
     let simple_cases: String = T::cases()
         .into_iter()
         .map(|case| {
             format!(
-                r#"    {name} = "{name}",
+                r#"    {name} = "{serialized}",
 "#,
-                name = case.name
+                name = case.name,
+                serialized = case.serialized_name(inflection)
             )
         })
         .collect();
@@ -95,8 +97,11 @@ trait EnumTypeBridge: EnumReflectionType {
 
     fn generate_cases_enum() -> String {
         let mut case_values = String::new();
+        let inflection = Self::inflection();
         for case in Self::cases() {
-            case_values.push_str(format!(r#"    {name} = "{name}""#, name = case.name).as_str());
+            let serialized = case.serialized_name(inflection);
+            case_values
+                .push_str(format!(r#"    {name} = "{serialized}""#, name = case.name).as_str());
             case_values.push_str(",\n");
         }
 

@@ -24,11 +24,12 @@ fn extract_cases(item: &ItemEnum) -> Result<Vec<EnumCase>> {
         .into_iter()
         .map(|case| {
             let name = format!("{}", case.ident);
-            let inflection = RenameAllAttr::from_attrs(&case.attrs).rename_all;
+            let attrs = RenameAllAttr::from_attrs(&case.attrs);
             Ok(EnumCase {
                 name,
                 type_: (&case.fields).to_fields()?,
-                inflection,
+                inflection: attrs.rename_all,
+                rename: attrs.rename,
             })
         })
         .collect()
@@ -80,11 +81,16 @@ impl EnumDef {
                 let name = &case.name;
                 let type_ = case.type_.emit_def();
                 let rename_all = &case.inflection.to_tokens();
+                let rename = match &case.rename {
+                    Some(rename) => quote! { Some(#rename.to_string()) },
+                    None => quote! { None },
+                };
                 quote! {
                     EnumCase {
                         name: #name.to_string(),
                         type_: #type_,
                         inflection: #rename_all,
+                        rename: #rename,
                     }
                 }
             })

@@ -7,7 +7,7 @@ use crate::{
 };
 
 pub fn union_case_validation(case: &EnumCase, parent_name: &str, inflection: Inflection) -> String {
-    let case_key = case.name.inflect(inflection);
+    let case_key = case.serialized_name(inflection);
     let case_type_name = emit_case_type_name(case, parent_name);
 
     let case_validation = match &case.type_ {
