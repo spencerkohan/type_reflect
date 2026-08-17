@@ -15,6 +15,7 @@ pub trait TypeBridge {
             Type::UnsignedInt => quote! { Type::UnsignedInt },
             Type::Float => quote! { Type::Float },
             Type::Boolean => quote! { Type::Boolean },
+            Type::JsonValue => quote! { Type::JsonValue },
             Type::Option(t) => {
                 let inner = t.emit_type();
                 quote! { Type::Option( #inner.into() ) }

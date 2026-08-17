@@ -19,6 +19,23 @@ pub use type_fields::*;
 mod alias_type;
 pub use alias_type::*;
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use type_reflect_core::Type;
+
+    #[test]
+    fn test_to_ts_type_built_ins() {
+        assert_eq!(to_ts_type(&Type::String), "string");
+        assert_eq!(to_ts_type(&Type::JsonValue), "any");
+        assert_eq!(to_ts_type(&Type::Option(Box::new(Type::JsonValue))), "any");
+        assert_eq!(
+            to_ts_type(&Type::Array(Box::new(Type::JsonValue))),
+            "Array<any>"
+        );
+    }
+}
+
 pub struct TypeScript {
     pub tab_size: u32,
 }
@@ -38,6 +55,7 @@ pub fn to_ts_type(t: &Type) -> String {
         Type::UnsignedInt => "number".to_string(),
         Type::Float => "number".to_string(),
         Type::Boolean => "boolean".to_string(),
+        Type::JsonValue => "any".to_string(),
         Type::Option(t) => format!("{}", to_ts_type(t)),
         Type::Array(t) => format!("Array<{}>", to_ts_type(t)),
         Type::Map { key, value } => {
