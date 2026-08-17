@@ -1,12 +1,6 @@
 use std::{ffi::OsStr, path::Path};
 
-use dprint_plugin_typescript::{
-    configuration::{
-        ConfigurationBuilder, NextControlFlowPosition, PreferHanging, QuoteStyle,
-        SameOrNextLinePosition,
-    },
-    FormatTextOptions,
-};
+use dprint_plugin_typescript::{configuration::ConfigurationBuilder, FormatTextOptions};
 
 use crate::{AliasType, EnumReflectionType, StructType, TypeEmitter};
 

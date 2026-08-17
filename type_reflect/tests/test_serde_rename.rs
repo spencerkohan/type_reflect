@@ -454,6 +454,8 @@ mod tag_and_rename_all_single_attr_classification {
     #[derive(Reflect, Serialize)]
     #[serde(tag = "_case", rename_all = "kebab-case")]
     pub enum Shape {
+        // Exported to TS but never constructed in this test.
+        #[allow(dead_code)]
         Circle { radius: f32 },
     }
 
@@ -626,6 +628,8 @@ mod untagged_unit_rename_all {
     pub enum Cmd {
         Noop,
         ReadAll,
+        // Exists only to make the enum classify as Untagged.
+        #[allow(dead_code)]
         DoIt { count: u32 },
     }
 
@@ -654,6 +658,8 @@ mod untagged_unit_case_rename {
         Noop,
         #[serde(rename = "read-all-items")]
         ReadAll,
+        // Exists only to make the enum classify as Untagged.
+        #[allow(dead_code)]
         DoIt { count: u32 },
     }
 

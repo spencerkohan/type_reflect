@@ -37,7 +37,6 @@ impl_parse! {
 /// Parsing is lenient: unknown keys are skipped (see `impl_parse!`), so an
 /// attribute only fails on malformed syntax, and a failed attribute is
 /// dropped rather than aborting the derive.
-#[allow(unused)]
 pub fn parse_serde_attrs<'a, A: TryFrom<&'a Attribute, Error = syn::Error>>(
     attrs: &'a [Attribute],
 ) -> impl Iterator<Item = A> {

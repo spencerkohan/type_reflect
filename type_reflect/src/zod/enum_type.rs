@@ -168,10 +168,6 @@ where
     let union_types = T::generate_union_types(&case_key, &content_key, T::inflection());
     let union_type = T::generate_union_schema();
 
-    // Generate case type
-
-    // let members = enum_cases(&T::cases());
-
     format!(
         r#"
 {cases_enum}

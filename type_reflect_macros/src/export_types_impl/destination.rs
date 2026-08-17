@@ -169,8 +169,6 @@ impl Parse for UnnamedDestination {
         let content;
         let _parens: Paren = parenthesized!(content in input);
 
-        // let mut args: Vec<DestinationArg> = vec![];
-
         let mut destinations: Vec<Expr> = vec![];
         let mut prefix: Option<Expr> = None;
         let mut postfix: Option<Expr> = None;

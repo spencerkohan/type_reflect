@@ -17,14 +17,6 @@ pub struct StructDef {
     fields: TypeFieldsDefinition,
 }
 
-// fn extract_members(item: &ItemStruct) -> Result<TypeFieldsDefinition> {
-//     match &(item.fields) {
-//         syn::Fields::Named(fields) => (&fields).to_named_fields(),
-//         syn::Fields::Unnamed(fieldsUnnamed) => todo!(),
-//         syn::Fields::Unit => todo!(),
-//     }
-// }
-
 impl StructDef {
     pub fn new(item: &ItemStruct) -> Result<Self> {
         if matches!(item.fields, syn::Fields::Unit) {
@@ -43,14 +35,6 @@ impl StructDef {
     }
 
     pub fn emit_fields(&self) -> TokenStream {
-        // let members: Vec<TokenStream> = (&self.fields)
-        //     .into_iter()
-        //     .map(|member| member.emit_member())
-        //     .collect();
-        // quote! {
-        //     #(#members),*
-        // }
-
         return (&self.fields).emit_def();
     }
 

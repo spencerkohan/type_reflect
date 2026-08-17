@@ -5,13 +5,7 @@ pub use super::type_description::Type;
 use super::*;
 
 pub mod struct_type;
-use dprint_plugin_typescript::{
-    configuration::{
-        ConfigurationBuilder, NextControlFlowPosition, PreferHanging, QuoteStyle,
-        SameOrNextLinePosition,
-    },
-    FormatTextOptions,
-};
+use dprint_plugin_typescript::{configuration::ConfigurationBuilder, FormatTextOptions};
 use struct_type::*;
 
 pub mod enum_type;
@@ -33,10 +27,6 @@ impl Default for TypeScript {
     fn default() -> Self {
         Self { tab_size: 2 }
     }
-}
-
-pub trait TypeExporter {
-    fn export<T>() -> String;
 }
 
 pub fn to_ts_type(t: &Type) -> String {

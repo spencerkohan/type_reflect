@@ -16,10 +16,6 @@ use alias_type::*;
 #[derive(Default)]
 pub struct Zod {}
 
-pub trait TypeExporter {
-    fn export<T>() -> String;
-}
-
 fn to_zod_type(t: &Type) -> String {
     match t {
         // TODO: support generics

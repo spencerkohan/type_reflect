@@ -1,6 +1,5 @@
 use crate::attribute_utils::*;
 use crate::type_def::InflectionTokenProvider;
-// use crate::utils::*;
 use type_reflect_core::EnumType;
 use type_reflect_core::Inflection;
 

@@ -58,17 +58,5 @@ pub fn struct_impl(name: &str, fields: &TypeFieldsDefinition, inflection: Inflec
         },
     };
 
-    //     let validation_impl = format!(
-    //         r#"
-    //         if (!isRecord(input)) {{
-    //             throw new Error(`Error parsing {name}: expected: Record, found: ${{typeof input}}`);
-    //         }}
-    //         {validations}
-    //         return input as {name};
-    // "#,
-    //         name = name,
-    //         validations = validations
-    //     );
-
     validation_namespace(name, validation_impl.as_str())
 }

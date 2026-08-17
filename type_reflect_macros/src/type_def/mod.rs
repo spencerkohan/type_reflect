@@ -30,10 +30,6 @@ impl TypeDef {
         Ok(TypeDef::Alias(TypeAliasDef::new(item)?))
     }
     pub fn enum_def(item: &ItemEnum) -> Result<Self> {
-        // println!("ATTRIBUTES:");
-        // for attr in &item.attrs {
-        //     println!("    {:?}", attr);
-        // }
         Ok(TypeDef::Enum(EnumDef::new(item)?))
     }
 
@@ -53,29 +49,11 @@ impl RustTypeEmitter for TypeDef {
     fn tokens(&self) -> &TokenStream {
         panic!("unimplemented")
     }
-    // fn emit_type_def_impl(&self) -> TokenStream {
-    //     match self {
-    //         TypeDef::Struct(s) => s.emit_type_def_impl(),
-    //         TypeDef::Enum(e) => e.emit_type_def_impl(),
-    //         TypeDef::Alias(_) => todo!(),
-    //     }
-    // }
 }
 
 pub trait RustTypeEmitter {
     fn ident(&self) -> &Ident;
     fn tokens(&self) -> &TokenStream;
-    // fn emit_type_def_impl(&self) -> TokenStream {
-    //     let ident = &self.ident();
-    //     let token_string = format!("{}", self.tokens());
-    //     quote! {
-    //         impl RustType for #ident {
-    //             fn emit_rust(&self) -> String {
-    //                 #token_string.to_string()
-    //             }
-    //         }
-    //     }
-    // }
 }
 
 pub trait InflectionTokenProvider {
