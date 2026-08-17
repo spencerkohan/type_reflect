@@ -845,6 +845,84 @@ mod serde_untagged_attribute {
     }
 }
 
+mod zod_externally_tagged_single_case {
+    use super::*;
+
+    // G8: a single-case externally-tagged enum must not emit `z.union([...])`
+    // with one member — zod v3 throws "At least two types required for
+    // union" at module load.
+    #[derive(Reflect, Serialize)]
+    pub enum Only {
+        Circle { radius: u32 },
+    }
+
+    #[test]
+    fn serde_output_is_accepted() -> Result<()> {
+        let output = init_path(SCOPE, "zod_externally_tagged_single_case");
+        export_types!(
+            types: [ Only ],
+            destinations: [
+                ( output.ts_path(), emitters: [ TypeScript(), TSValidation() ] ),
+                (
+                    output.ts_path().with_file_name("zod_externally_tagged_single_case.zod.ts"),
+                    emitters: [ Zod() ],
+                ),
+            ]
+        )?;
+        let jsons = [Only::Circle { radius: 3 }]
+            .iter()
+            .map(|v| serde_json::to_string(v).unwrap())
+            .collect();
+        run_jest(
+            "zod_externally_tagged_single_case",
+            "Only",
+            Some("OnlySchema"),
+            "Only",
+            Some("OnlySchema"),
+            jsons,
+        )
+    }
+}
+
+mod zod_complex_single_variant {
+    use super::*;
+
+    // G8 (complex side): a single-variant complex enum must not emit
+    // `z.union([...])` with one member either.
+    #[derive(Reflect, Serialize)]
+    #[serde(tag = "_case")]
+    pub enum Only {
+        A { x: u32 },
+    }
+
+    #[test]
+    fn serde_output_is_accepted() -> Result<()> {
+        let output = init_path(SCOPE, "zod_complex_single_variant");
+        export_types!(
+            types: [ Only ],
+            destinations: [
+                ( output.ts_path(), emitters: [ TypeScript(), TSValidation() ] ),
+                (
+                    output.ts_path().with_file_name("zod_complex_single_variant.zod.ts"),
+                    emitters: [ Zod() ],
+                ),
+            ]
+        )?;
+        let jsons = [Only::A { x: 1 }]
+            .iter()
+            .map(|v| serde_json::to_string(v).unwrap())
+            .collect();
+        run_jest(
+            "zod_complex_single_variant",
+            "Only",
+            Some("OnlySchema"),
+            "Only",
+            Some("OnlySchema"),
+            jsons,
+        )
+    }
+}
+
 mod zod_untagged_supported {
     use super::*;
 

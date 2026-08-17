@@ -145,6 +145,8 @@ single-member guard.
 
 ## Minor notes
 
+- `to_ts_ident` in `type_reflect_macros/src/utils.rs` is also dead code
+  (left as-is: unrelated to the rename work).
 - The untagged/default-external model was verified against real
   `serde_json` output for ALL four variant shapes (live demo, all 4
   accepted by the emitted validators): unit -> `"A"`, single-tuple ->
@@ -270,10 +272,25 @@ single-member guard.
       Skipped: TS reserved-word table in the identifier check — a rename
       to e.g. `if` still emits invalid dot access (marked with a
       `ponytail:` comment at the helper).
-- [ ] G8: guard single-member unions in the Zod emitter (`z.union` needs
-      ≥ 2 members) — covers single-variant complex enums AND single-case
-      externally-tagged enums (e.g. `enum E { Only { x: u32 } }`), both of
-      which currently emit `z.union([one])`. (The new serde-untagged
-      emitter added in G6 already has the single-member guard.)
-- [ ] Flipping the red tests green is the definition of done; the 4 passing
-      tests are the regression guard for already-covered cases
+- [x] G8: guard single-member unions in the Zod emitter. Confirmed
+      red-first: the installed zod types `z.union` as a ≥2-element tuple,
+      so a 1-member union fails the TS compile of the jest suite. Guards
+      (mirroring the G6 serde-untagged emitter's existing guard):
+      - externally-tagged (`emit_externally_tagged_enum_type`): 1 case →
+        emit the bare case schema instead of `z.union([...])`.
+      - complex (`generate_union_schema`): 1 variant →
+        `export const {Name}Schema = {Name}Case{Case}Schema;` (direct
+        alias of the case schema const).
+      Added both regression tests:
+      `zod_externally_tagged_single_case` and
+      `zod_complex_single_variant` (all three emitters, serde output
+      accepted by validator + zod). Found + fixed one G7 miss while in
+      the file: zod complex `generate_union_type`'s inline Named-field
+      emission used raw `serialized_name` (unquoted) — now `ts_key`.
+      Zero-variant enums are unguarded (`z.union([])` is equally
+      invalid) but are pathological — no value can exist to serialize.
+- [x] Flipping the red tests green is the definition of done; the 4 passing
+      tests are the regression guard for already-covered cases. DONE:
+      `test_serde_rename` is 20/20 green (18 original + 2 G8 tests; the
+      kebab_struct_field test added in G7 brought it from 17 to 18); all
+      pre-existing workspace suites stay green.

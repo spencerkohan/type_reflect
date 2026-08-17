@@ -33,14 +33,23 @@ where
         .map(|case| externally_tagged_case_schema(case, inflection))
         .collect();
 
+    // `z.union` requires at least two members; emit the bare schema otherwise.
+    let schema = if members.len() == 1 {
+        members[0].clone()
+    } else {
+        let members = members.join(",\n");
+        format!(
+            r#"z.union([
+{members}
+])"#
+        )
+    };
+
     let schema_name = format!("{}Schema", name);
-    let members = members.join(",\n");
 
     format!(
         r#"
-export const {schema_name} = z.union([
-{members}
-]);
+export const {schema_name} = {schema};
 export type {name} = z.infer<typeof {schema_name}>
 "#
     )
@@ -270,7 +279,7 @@ export enum {name} {{
                     .map(|item| {
                         format!(
                             "    {}: {},\n",
-                            item.serialized_name(case.inflection),
+                            crate::ts_key(&item.serialized_name(case.inflection)),
                             to_zod_type(&item.type_)
                         )
                     })
@@ -308,19 +317,30 @@ export type {name} = z.infer<typeof {schema_name}>
 
     fn generate_union_schema() -> String {
         let schema_name = Self::union_schema_name();
-        let mut cases = String::new();
+        let cases = Self::cases();
+        // `z.union` requires at least two members; emit the single case
+        // schema directly otherwise.
+        let schema = if cases.len() == 1 {
+            union_type_name(&cases[0], Self::name())
+        } else {
+            let mut case_schemas = String::new();
 
-        for case in Self::cases() {
-            cases.push_str(format!("    {},\n", union_type_name(&case, Self::name())).as_str());
-        }
+            for case in &cases {
+                case_schemas.push_str(format!("    {},\n", union_type_name(case, Self::name())).as_str());
+            }
+
+            format!(
+                r#"z.union([
+{case_schemas}])"#
+            )
+        };
 
         format!(
             r#"
-export const {schema_name} = z.union([
-{cases}]);
+export const {schema_name} = {schema};
 export type {name} = z.infer<typeof {schema_name}>
             "#,
-            cases = cases,
+            schema = schema,
             schema_name = schema_name,
             name = Self::name()
         )
