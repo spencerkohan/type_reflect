@@ -156,10 +156,16 @@ single-member guard.
 
 ## Todo
 
-- [ ] G5: make `impl_parse!`-based serde parsing skip unknown keys instead of
-      rejecting the whole attribute (and/or surface a warning) — unblocks
-      correct handling of `tag` + `rename_all` in one attribute and of
-      `untagged`
+- [x] G5: lenient serde parsing — `impl_parse!` now skips unknown keys
+      (and their values: `key`, `key = "lit"`, `key(...)`) instead of
+      rejecting the whole attribute. `#[serde(tag = "_case", rename_all =
+      "kebab-case")]` in one attribute parses correctly (test
+      `tag_and_rename_all_single_attr_classification` now passes). Design
+      decision made along the way: the vestigial `#[ts]` attribute was
+      removed entirely (unused anywhere, hard-error on any use of it on
+      enums), so serde parsing is now the only consumer of `impl_parse!`.
+      Skipped: compiler warning on skipped keys (not reachable from
+      `type_reflect_core` without linking `proc_macro`).
 - [ ] G2: parse variant-level `#[serde(rename)]` (store per-case rename on
       `EnumCase`) and apply it in all emitters
 - [ ] G3: parse field-level `#[serde(rename)]` in `get_struct_member` (store

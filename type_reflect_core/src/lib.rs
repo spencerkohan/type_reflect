@@ -30,7 +30,20 @@ macro_rules! impl_parse {
 
                     match &*key.to_string() {
                         $($k => $e,)*
-                        _ => syn_err!($input.span(); "unexpected attribute")
+                        _ => {
+                            // Unknown key: skip it (and its value, if any)
+                            // instead of failing the whole attribute. serde
+                            // has many keys we don't model (untagged,
+                            // flatten, alias, ...).
+                            if $input.peek(syn::Token![=]) {
+                                $input.parse::<syn::Token![=]>()?;
+                                let _: syn::Lit = $input.parse()?;
+                            } else if $input.peek(syn::token::Paren) {
+                                let _content;
+                                syn::parenthesized!(_content in $input);
+                                let _: proc_macro2::TokenStream = _content.parse()?;
+                            }
+                        }
                     };
 
                     #[allow(unreachable_code)]

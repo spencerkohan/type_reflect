@@ -1,7 +1,7 @@
 use syn::parse::{Parse, ParseStream};
 use syn::{Attribute, Ident, Lit, Result, Token};
 pub use type_reflect_core::inflection::*;
-use type_reflect_core::{impl_parse, syn_err};
+use type_reflect_core::impl_parse;
 
 #[derive(Default, Clone, Debug)]
 pub struct RenameAllAttr {
@@ -9,11 +9,11 @@ pub struct RenameAllAttr {
 }
 
 impl RenameAllAttr {
-    pub fn from_attrs(attrs: &[Attribute]) -> Result<Self> {
-        let mut result = Self::default();
-        parse_attrs(attrs)?.for_each(|a| result.merge(a));
-        parse_serde_attrs::<RenameAllAttr>(attrs).for_each(|a| result.merge(a));
-        Ok(result)
+    pub fn from_attrs(attrs: &[Attribute]) -> Self {
+        parse_serde_attrs::<RenameAllAttr>(attrs).fold(Self::default(), |mut result, a| {
+            result.merge(a);
+            result
+        })
     }
 
     fn merge(&mut self, RenameAllAttr { rename_all }: RenameAllAttr) {
@@ -27,21 +27,11 @@ impl_parse! {
     }
 }
 
-/// Parse all `#[ts(..)]` attributes from the given slice.
-pub fn parse_attrs<'a, A>(attrs: &'a [Attribute]) -> Result<impl Iterator<Item = A>>
-where
-    A: TryFrom<&'a Attribute, Error = syn::Error>,
-{
-    Ok(attrs
-        .iter()
-        .filter(|a| a.path.is_ident("ts"))
-        .map(A::try_from)
-        .collect::<Result<Vec<A>>>()?
-        .into_iter())
-}
-
 /// Parse all `#[serde(..)]` attributes from the given slice.
-// #[cfg(feature = "serde-compat")]
+///
+/// Parsing is lenient: unknown keys are skipped (see `impl_parse!`), so an
+/// attribute only fails on malformed syntax, and a failed attribute is
+/// dropped rather than aborting the derive.
 #[allow(unused)]
 pub fn parse_serde_attrs<'a, A: TryFrom<&'a Attribute, Error = syn::Error>>(
     attrs: &'a [Attribute],
@@ -49,19 +39,7 @@ pub fn parse_serde_attrs<'a, A: TryFrom<&'a Attribute, Error = syn::Error>>(
     attrs
         .iter()
         .filter(|a| a.path.is_ident("serde"))
-        .flat_map(|attr| match A::try_from(attr) {
-            Ok(attr) => Some(attr),
-            Err(_) => {
-                use quote::ToTokens;
-                // warning::print_warning(
-                //     "failed to parse serde attribute",
-                //     format!("{}", attr.to_token_stream()),
-                //     "ts-rs failed to parse this attribute. It will be ignored.",
-                // )
-                // .unwrap();
-                None
-            }
-        })
+        .flat_map(|attr| A::try_from(attr).ok())
         .collect::<Vec<_>>()
         .into_iter()
 }
