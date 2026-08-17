@@ -3,7 +3,7 @@ use type_reflect_core::{EnumCase, Inflection, Type};
 
 use crate::{
     ts_validation::validation::type_validation,
-    type_script::untagged_enum_type::emit_case_type_name,
+    type_script::externally_tagged_enum_type::emit_case_type_name,
 };
 
 pub fn union_case_validation(case: &EnumCase, parent_name: &str, inflection: Inflection) -> String {

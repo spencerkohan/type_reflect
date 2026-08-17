@@ -101,6 +101,11 @@ pub enum EnumType {
         case_key: String,
         content_key: Option<String>,
     },
+    /// Serde's default (external) representation: unit cases serialize to
+    /// the case-name string, tuple/struct cases to `{ "CASE": content }`.
+    ExternallyTagged,
+    /// `#[serde(untagged)]`: variant content serializes bare, with no case
+    /// name (struct -> `{ fields }`, tuple -> `[a, b]`, unit -> `null`).
     Untagged,
 }
 

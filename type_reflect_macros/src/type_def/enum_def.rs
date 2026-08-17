@@ -53,15 +53,21 @@ impl EnumDef {
             // false indicates it is not complex
             false => EnumType::Simple,
             // true indicates the type is complex
-            true => match attributes.tag {
-                Some(case_key) => {
-                    let content_key = attributes.content;
-                    EnumType::Complex {
-                        case_key,
-                        content_key,
+            true => {
+                if attributes.untagged {
+                    EnumType::Untagged
+                } else {
+                    match attributes.tag {
+                        Some(case_key) => {
+                            let content_key = attributes.content;
+                            EnumType::Complex {
+                                case_key,
+                                content_key,
+                            }
+                        }
+                        None => EnumType::ExternallyTagged,
                     }
                 }
-                None => EnumType::Untagged,
             },
         };
 
@@ -122,6 +128,7 @@ impl EnumDef {
                     EnumType::Complex { case_key: #case_key.to_string(), content_key: None }
                 },
             },
+            EnumType::ExternallyTagged => quote! { EnumType::ExternallyTagged },
             EnumType::Untagged => quote! { EnumType::Untagged },
         };
 
@@ -172,6 +179,7 @@ impl RustTypeEmitter for EnumDef {
 pub struct EnumAttr {
     tag: Option<String>,
     content: Option<String>,
+    untagged: bool,
 }
 
 impl EnumAttr {
@@ -182,9 +190,10 @@ impl EnumAttr {
         })
     }
 
-    fn merge(&mut self, EnumAttr { tag, content }: EnumAttr) {
+    fn merge(&mut self, EnumAttr { tag, content, untagged }: EnumAttr) {
         self.tag = self.tag.take().or(tag);
         self.content = self.content.take().or(content);
+        self.untagged = self.untagged || untagged;
     }
 }
 
@@ -192,6 +201,6 @@ impl_parse! {
     EnumAttr(input, out) {
         "tag" => out.tag = Some(parse_assign_str(input)?),
         "content" => out.content = Some(parse_assign_str(input)?),
-        // "untagged" => out.untagged = true  (todo: G6)
+        "untagged" => out.untagged = true,
     }
 }

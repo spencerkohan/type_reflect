@@ -781,6 +781,10 @@ mod serde_untagged_attribute {
             types: [ Shape ],
             destinations: [
                 ( output.ts_path(), emitters: [ TypeScript(), TSValidation() ] ),
+                (
+                    output.ts_path().with_file_name("serde_untagged_attribute.zod.ts"),
+                    emitters: [ Zod() ],
+                ),
             ]
         )?;
         let jsons = [
@@ -793,9 +797,9 @@ mod serde_untagged_attribute {
         run_jest(
             "serde_untagged_attribute",
             "Shape",
-            None,
+            Some("ShapeSchema"),
             "Shape",
-            None,
+            Some("ShapeSchema"),
             jsons,
         )
     }

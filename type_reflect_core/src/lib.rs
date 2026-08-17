@@ -33,8 +33,8 @@ macro_rules! impl_parse {
                         _ => {
                             // Unknown key: skip it (and its value, if any)
                             // instead of failing the whole attribute. serde
-                            // has many keys we don't model (untagged,
-                            // flatten, alias, ...).
+                            // has many keys we don't model (flatten,
+                            // alias, ...).
                             if $input.peek(syn::Token![=]) {
                                 $input.parse::<syn::Token![=]>()?;
                                 let _: syn::Lit = $input.parse()?;

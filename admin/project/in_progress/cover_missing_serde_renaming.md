@@ -109,12 +109,12 @@ validators.
 
 Evidence: `serde_untagged_attribute`.
 
-### G7. Kebab-case case names in untagged member cases emit invalid TypeScript
+### G7. Kebab-case case names in externally-tagged member cases emit invalid TypeScript
 
 Unquoted object key in
-`type_reflect/src/type_script/untagged_enum_type.rs::emit_member_case`
+`type_reflect/src/type_script/externally_tagged_enum_type.rs::emit_member_case`
 (`get-max?: …`) and unquoted property access in
-`type_reflect/src/ts_validation/enum_type/untagged/union_case.rs`
+`type_reflect/src/ts_validation/enum_type/externally_tagged/union_case.rs`
 (`input.get-max`). The whole emitted file fails to compile.
 Only kebab-case among the 7 serde inflection forms is affected; the rest
 produce valid identifiers.
@@ -211,9 +211,38 @@ single-member guard.
       cover zod). The `zod_untagged_supported` test was upgraded from a
       no-panic assert to the suite's standard pattern (TS + zod both
       checked against real serde output).
-- [ ] G6: parse `#[serde(untagged)]` and emit the bare-content representation
-      (needs an `EnumType::SerdeUntagged` variant distinct from the current
-      Untagged class, which models serde's default external representation)
+- [x] G6: `#[serde(untagged)]` parsed and emitted as the bare-content
+      representation. Design (user decision, option B): the old
+      `EnumType::Untagged` class was renamed `EnumType::ExternallyTagged`
+      (it models serde's DEFAULT external form: unit -> `"Name"`, others
+      -> `{ "Name": content }`); the name `Untagged` now belongs to the new
+      serde-untagged class (bare content: struct -> `{ fields }`,
+      tuple -> `[a, b]`, unit -> `null`). Emitter modules/functions renamed
+      to match (`type_script/externally_tagged_enum_type.rs`,
+      `ts_validation/enum_type/externally_tagged/`, renamed functions in
+      `zod/enum_type.rs`).
+      - macro: `EnumAttr.untagged: bool` parsed by `impl_parse!` (bare key);
+        classification: complex + untagged -> `Untagged` (wins over `tag` —
+        serde errors on that combination, so unobservable in correct code),
+        complex + tag -> `Complex`, complex + neither ->
+        `ExternallyTagged`.
+      - TS: `export type Shape = ShapeCaseCircle | null` — bare-content
+        union (unit -> `null`), reusing the shared case-type machinery
+        (multi-tuple/named cases keep their helper types).
+      - TSValidation: first-match-wins try/catch chain over the case
+        contents in declaration order (mirrors serde's untagged
+        deserialization); per-case content validators reused from the
+        externally_tagged module; unit -> `input === null`; single-tuple ->
+        inline `type_validation`.
+      - zod: union of bare content schemas (unit -> `z.null()`); a
+        single-case enum emits the bare schema instead of an invalid
+        1-member `z.union` (G8's guard, applied to the new emitter — the
+        OLD emitters are G8's remaining scope).
+      Test `serde_untagged_attribute` extended to also emit + check the Zod
+      schema; now passes (TS + zod both accept `{"my_radius":5}` and
+      `null`). Skipped: `#[serde(untagged)]` on an all-unit enum stays
+      `Simple` (serde would serialize every variant to `null` — degenerate
+      in serde itself; revisit if ever needed).
 - [ ] G7: quote non-identifier names wherever they are emitted as unquoted
       TS keys / property access: untagged member-case keys (`['get-max']`)
       in both the typescript and ts_validation emitters, and — same class,
@@ -223,7 +252,8 @@ single-member guard.
       already exists in `type_reflect_macros/src/utils.rs` (unused).
 - [ ] G8: guard single-member unions in the Zod emitter (`z.union` needs
       ≥ 2 members) — covers single-variant complex enums AND single-case
-      untagged enums (e.g. `enum E { Only { x: u32 } }`), both of which
-      currently emit `z.union([one])`
+      externally-tagged enums (e.g. `enum E { Only { x: u32 } }`), both of
+      which currently emit `z.union([one])`. (The new serde-untagged
+      emitter added in G6 already has the single-member guard.)
 - [ ] Flipping the red tests green is the definition of done; the 4 passing
       tests are the regression guard for already-covered cases
