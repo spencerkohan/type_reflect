@@ -13,6 +13,7 @@ pub fn emit_complex_enum_case_type(
 ) -> String {
     let case_key_value: String = format!("{}CaseKey.{}", enum_name, case.name);
     let case_type_name: String = format!("{}Case{}", enum_name, case.name);
+    let case_key_access: String = crate::ts_access("input", case_key);
 
     let validator = match &case.type_ {
         type_reflect_core::TypeFieldsDefinition::Unit => emit_simple_case_type_validator(),
@@ -30,7 +31,7 @@ pub fn emit_complex_enum_case_type(
                 if (!isRecord(input)) {
                     throw new Error(# "`Error parsing #case_type_name: expected: Record, found: ${typeof input}`");
                 }
-                if (input.#case_key !== #case_key_value) {
+                if (#case_key_access !== #case_key_value) {
                     throw new Error(# "`Error parsing #case_type_name: expected key: #case_key_value, found: ${typeof input}`");
                 }
                 return input as #case_type_name
@@ -41,7 +42,7 @@ pub fn emit_complex_enum_case_type(
                 if (!isRecord(input)) {
                     throw new Error(# "`Error parsing #case_type_name: expected: Record, found: ${typeof input}`");
                 }
-                if (input.#case_key !== #case_key_value) {
+                if (#case_key_access !== #case_key_value) {
                     throw new Error(# "`Error parsing #case_type_name: expected key: #case_key_value, found: ${typeof input}`");
                 }
                 #validator
@@ -64,7 +65,7 @@ fn emit_struct_case_type_validator(
 ) -> String {
     let member_prefix = match content_key {
         None => "input".to_string(),
-        Some(key) => format!("input.{}", key),
+        Some(key) => crate::ts_access("input", key),
     };
     named_field_validations(member_prefix.as_str(), members, inflection)
 }
@@ -72,7 +73,7 @@ fn emit_struct_case_type_validator(
 fn emit_tuple_case_type_validator(content_key: &Option<String>, members: &Vec<Type>) -> String {
     let member_prefix = match content_key {
         None => "input".to_string(),
-        Some(key) => format!("input.{}", key),
+        Some(key) => crate::ts_access("input", key),
     };
     tuple_validation(member_prefix.as_str(), members)
 }

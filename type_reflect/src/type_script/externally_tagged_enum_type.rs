@@ -97,7 +97,7 @@ fn emit_unit_case(case: &EnumCase, inflection: Inflection) -> String {
 }
 
 fn emit_member_case(case: &EnumCase, parent_name: &str, inflection: Inflection) -> String {
-    let name = case.serialized_name(inflection);
+    let name = crate::ts_key(&case.serialized_name(inflection));
     let member_type = emit_case_type_name(&case, parent_name);
     ts_string! { #name ? : #member_type }
 }

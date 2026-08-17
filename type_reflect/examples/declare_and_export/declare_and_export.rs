@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
 use type_reflect::*;
-use type_reflect::{export_types, Reflect};
+use type_reflect::{Reflect, export_types};
 
 #[derive(Debug, Reflect, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

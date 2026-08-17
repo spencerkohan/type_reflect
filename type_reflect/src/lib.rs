@@ -33,6 +33,37 @@ pub use ts_format::TSFormat;
 pub use serde::{Deserialize, Serialize};
 pub use serde_json;
 
+/// Quote a serialized name for use as a TypeScript object key / type key if
+/// it is not a valid identifier (e.g. kebab-case `get-max`).
+///
+/// `ponytail:` no TS reserved-word table — a `#[serde(rename = "if")]` still
+/// emits invalid dot access. Kebab-case (the only serde inflection form that
+/// produces non-identifiers) and special-character renames are covered.
+pub fn ts_key(name: &str) -> String {
+    if is_ts_identifier(name) {
+        name.to_string()
+    } else {
+        format!("\"{name}\"")
+    }
+}
+
+/// `prefix.name` for identifiers, `prefix["name"]` otherwise.
+pub fn ts_access(prefix: &str, name: &str) -> String {
+    if is_ts_identifier(name) {
+        format!("{prefix}.{name}")
+    } else {
+        format!("{prefix}[\"{name}\"]")
+    }
+}
+
+fn is_ts_identifier(name: &str) -> bool {
+    let mut chars = name.chars();
+    matches!(
+        chars.next(),
+        Some(first) if first.is_alphabetic() || first == '_' || first == '$'
+    ) && chars.all(|c| c.is_alphanumeric() || c == '_' || c == '$')
+}
+
 /// Any type implementing the `Emittable` trait
 /// can be used with a `TypeEmitter` to generate
 /// the target representation.

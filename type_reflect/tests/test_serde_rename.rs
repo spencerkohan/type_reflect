@@ -759,6 +759,46 @@ mod untagged_kebab_case_key {
     }
 }
 
+mod kebab_struct_field {
+    use super::*;
+
+    // Non-identifier (kebab-case) field names must be quoted as object keys
+    // and property accesses in all three emitters (this is the field-side
+    // twin of untagged_kebab_case_key, which covers case keys).
+    #[derive(Reflect, Serialize)]
+    #[serde(rename_all = "kebab-case")]
+    pub struct Size {
+        min_width: u32,
+    }
+
+    #[test]
+    fn serde_output_is_accepted() -> Result<()> {
+        let output = init_path(SCOPE, "kebab_struct_field");
+        export_types!(
+            types: [ Size ],
+            destinations: [
+                ( output.ts_path(), emitters: [ TypeScript(), TSValidation() ] ),
+                (
+                    output.ts_path().with_file_name("kebab_struct_field.zod.ts"),
+                    emitters: [ Zod() ],
+                ),
+            ]
+        )?;
+        let jsons = [Size { min_width: 5 }]
+            .iter()
+            .map(|v| serde_json::to_string(v).unwrap())
+            .collect();
+        run_jest(
+            "kebab_struct_field",
+            "Size",
+            Some("SizeSchema"),
+            "Size",
+            Some("SizeSchema"),
+            jsons,
+        )
+    }
+}
+
 mod serde_untagged_attribute {
     use super::*;
 

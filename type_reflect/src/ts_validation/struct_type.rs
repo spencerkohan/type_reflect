@@ -15,18 +15,8 @@ pub fn named_field_validations(
         .into_iter()
         .map(|member| {
             let member_name = member.serialized_name(inflection);
-            type_validation(
-                ts_string! {
-                    #{member_prefix}.#{member_name}
-                }
-                .as_str(),
-                &member.type_,
-            )
-
-            // type_validation(
-            //     format!("{}.{}", member_prefix, member_name).as_str(),
-            //     &member.type_,
-            // )
+            let member_var = crate::ts_access(member_prefix, &member_name);
+            type_validation(&member_var, &member.type_)
         })
         .collect();
     members.join("\n  ")

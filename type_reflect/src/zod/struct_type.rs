@@ -3,7 +3,7 @@ use ts_quote::*;
 use type_reflect_core::{Inflection, NamedField, TypeFieldsDefinition};
 
 pub fn struct_member(member: &NamedField, inflection: Inflection) -> String {
-    let name = member.serialized_name(inflection);
+    let name = crate::ts_key(&member.serialized_name(inflection));
     let value = to_zod_type(&member.type_);
     ts_string! { #name: #value, }
 

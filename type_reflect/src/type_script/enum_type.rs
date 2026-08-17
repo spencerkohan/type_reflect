@@ -145,6 +145,10 @@ trait EnumTypeBridge: EnumReflectionType {
     ) -> String {
         let case_type_name = union_case_type_name(case, Self::name());
         let id = case.serialized_name(inflection);
+        // tag/content keys are user-supplied strings: quote them if they
+        // aren't valid identifiers
+        let case_key = crate::ts_key(case_key);
+        let content_key = content_key.as_ref().map(|k| crate::ts_key(k));
 
         let additional_fields = match &case.type_ {
             type_reflect_core::TypeFieldsDefinition::Unit => {

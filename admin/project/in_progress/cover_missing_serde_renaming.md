@@ -243,13 +243,33 @@ single-member guard.
       `null`). Skipped: `#[serde(untagged)]` on an all-unit enum stays
       `Simple` (serde would serialize every variant to `null` — degenerate
       in serde itself; revisit if ever needed).
-- [ ] G7: quote non-identifier names wherever they are emitted as unquoted
-      TS keys / property access: untagged member-case keys (`['get-max']`)
-      in both the typescript and ts_validation emitters, and — same class,
-      same fix — renamed struct/variant *fields* (e.g.
-      `#[serde(rename = "my-field")]` currently emits `my-field: number`,
-      invalid TS, in all three emitters). A `raw_name_to_ts_field` helper
-      already exists in `type_reflect_macros/src/utils.rs` (unused).
+- [x] G7: quote non-identifier names wherever they are emitted as unquoted
+      TS keys / property access. New runtime-crate helpers in
+      `type_reflect/src/lib.rs`: `ts_key(name)` (object key: `Circle` or
+      `"get-max"`) and `ts_access(prefix, name)` (`input.Circle` or
+      `input["get-max"]`); valid identifiers pass through unchanged, so
+      existing output is byte-identical. The old dead
+      `raw_name_to_ts_field` in `type_reflect_macros/src/utils.rs` was
+      deleted (a proc-macro crate can't be a normal dependency, so the
+      logic lives in the runtime crate instead).
+      Sites fixed:
+      - TS object keys: type_script `named_member` (struct + variant
+        fields), `emit_member_case` (externally-tagged case key), complex
+        `generate_union_type` (tag + content keys); zod `struct_member`
+        (fields), complex `generate_union_type` (tag + content keys).
+        (Zod externally-tagged / serde-untagged case keys were already
+        always quoted in G4/G6.)
+      - TS property access: ts_validation `named_field_validations`
+        (fields), externally-tagged `union_case` (case key), complex
+        `case_type` (tag key + content-key prefixes).
+      Added regression test `kebab_struct_field` (kebab-case field via
+      struct `rename_all`, all three emitters) — the pre-existing
+      `untagged_kebab_case_key` test only covered case keys. Both green.
+      Tag/content-key sites use the same helpers but are not separately
+      tested (would require a non-identifier `#[serde(tag = "...")]`).
+      Skipped: TS reserved-word table in the identifier check — a rename
+      to e.g. `if` still emits invalid dot access (marked with a
+      `ponytail:` comment at the helper).
 - [ ] G8: guard single-member unions in the Zod emitter (`z.union` needs
       ≥ 2 members) — covers single-variant complex enums AND single-case
       externally-tagged enums (e.g. `enum E { Only { x: u32 } }`), both of

@@ -4,7 +4,7 @@ use type_reflect_core::{Inflection, NamedField, Type};
 use crate::type_script::to_ts_type;
 
 pub fn named_member(member: &NamedField, inflection: Inflection) -> String {
-    let name = member.serialized_name(inflection);
+    let name = crate::ts_key(&member.serialized_name(inflection));
 
     match &member.type_ {
         type_reflect_core::Type::Option(t) => {
