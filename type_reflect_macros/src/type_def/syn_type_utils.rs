@@ -33,6 +33,10 @@ fn simple_type(name: String) -> Type {
         "u8" | "u16" | "u32" | "u64" => Type::UnsignedInt,
         "i8" | "i16" | "i32" | "i64" => Type::Int,
         "f8" | "f16" | "f32" | "f64" => Type::Float,
+        // Serde serializes both to a JSON string
+        "Path" | "PathBuf" => Type::String,
+        // Any JSON value
+        "Value" => Type::JsonValue,
         _ => Type::Named(NamedType {
             name,
             generic_args: vec![],
@@ -44,11 +48,27 @@ pub trait SynTypeBridge {
     fn syn_type(&self) -> &syn::Type;
     fn to_type(&self) -> Result<Type> {
         match self.syn_type() {
-            SynType::Path(type_path)
-                if type_path.qself.is_none()
-                    && type_path.path.leading_colon.is_none()
-                    && type_path.path.segments.len() == 1 =>
-            {
+            SynType::Path(type_path) if type_path.qself.is_none() => {
+                if type_path.path.segments.len() > 1 {
+                    // Fully-qualified built-ins. Joining the segments drops
+                    // any leading `::`, so `std::path::Path` and
+                    // `::std::path::Path` normalize identically.
+                    let name = type_path
+                        .path
+                        .segments
+                        .iter()
+                        .map(|segment| segment.ident.to_string())
+                        .collect::<Vec<_>>()
+                        .join("::");
+                    return match name.as_str() {
+                        "std::path::Path" | "std::path::PathBuf" => Ok(Type::String),
+                        "serde_json::Value" => Ok(Type::JsonValue),
+                        _ => syn_err!("Unsupported type: {:#?}", &self.syn_type()),
+                    };
+                }
+                if type_path.path.leading_colon.is_some() {
+                    syn_err!("Unsupported type: {:#?}", &self.syn_type())
+                }
                 let leading = leading_segment(type_path);
                 let generics = generic_args(type_path)?;
                 match leading.as_str() {

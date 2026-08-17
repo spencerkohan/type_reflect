@@ -27,6 +27,8 @@ pub enum Type {
     UnsignedInt,
     Float,
     Boolean,
+    /// Any JSON value; source type `serde_json::Value`.
+    JsonValue,
     Transparent(TransparentType),
     Option(Box<Type>),
     Array(Box<Type>),

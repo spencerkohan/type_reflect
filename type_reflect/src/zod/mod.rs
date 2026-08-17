@@ -13,6 +13,30 @@ use enum_type::*;
 mod alias_type;
 use alias_type::*;
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use type_reflect_core::Type;
+
+    #[test]
+    fn test_to_zod_type_built_ins() {
+        assert_eq!(to_zod_type(&Type::String), "z.string()");
+        assert_eq!(to_zod_type(&Type::JsonValue), "z.any()");
+        assert_eq!(to_zod_type(&Type::Option(Box::new(Type::JsonValue))), "z.any().optional()");
+        assert_eq!(
+            to_zod_type(&Type::Array(Box::new(Type::JsonValue))),
+            "z.array(z.any())"
+        );
+        assert_eq!(
+            to_zod_type(&Type::Map {
+                key: Box::new(Type::String),
+                value: Box::new(Type::JsonValue),
+            }),
+            "z.map(z.string(), z.any())"
+        );
+    }
+}
+
 #[derive(Default)]
 pub struct Zod {}
 
@@ -25,6 +49,7 @@ fn to_zod_type(t: &Type) -> String {
         Type::UnsignedInt => "z.number()".to_string(),
         Type::Float => "z.number()".to_string(),
         Type::Boolean => "z.bool()".to_string(),
+        Type::JsonValue => "z.any()".to_string(),
         Type::Option(t) => format!("{}.optional()", to_zod_type(t)),
         Type::Array(t) => format!("z.array({})", to_zod_type(t)),
         Type::Map { key, value } => format!("z.map({}, {})", to_zod_type(key), to_zod_type(value)),

@@ -2,6 +2,44 @@
 
 All notable changes to the `type_reflect` workspace.
 
+## 0.10.0 - 2026-08-17
+
+Released alongside `type_reflect_core` 0.7.0 and `type_reflect_macros`
+0.8.0 (`ts_quote` / `ts_quote_macros` unchanged).
+
+### Added
+
+- Built-in type support for `std::path::Path`, `std::path::PathBuf`, and
+  `serde_json::Value` in field positions, accepted both as bare names
+  (`Path`, `PathBuf`, `Value`) and fully-qualified (`std::path::PathBuf`,
+  `::std::path::Path`, `serde_json::Value`) — both spellings reflect
+  identically:
+  - `Path`/`PathBuf` collapse to `Type::String` (serde's wire form is a
+    string, matching the existing numeric collapsing): `string`
+    (TypeScript), `z.string()` (Zod), `typeof` string check
+    (TSValidation)
+  - `serde_json::Value` is the new `Type::JsonValue` variant: `any`
+    (TypeScript), `z.any()` (Zod), no runtime check (TSValidation)
+  - Composites (`Option<...>`, `Vec<...>`, `HashMap<...>`, …) and enum
+    variants work with both types for free
+- "Supported Types" section in the README, including the caveat that
+  `Value` is matched by bare name (a user-defined `Value` type will be
+  misread; use the fully-qualified spelling for your own)
+- Tests: unit tests asserting emitter output for the new `Type` arms; new
+  `test_built_in_types` integration suite covering bare-vs-fully-qualified
+  equivalence, Rust emitter output (qualified spellings re-emit verbatim
+  and need no extra imports), and a jest validation round-trip (structs,
+  `Box<Path>`, externally tagged enum)
+
+### Changed
+
+- **Breaking** (`type_reflect_core`): the `Type` enum gained a `JsonValue`
+  variant. The enum is not `#[non_exhaustive]`, so downstream exhaustive
+  matches on `Type` need a new arm
+- The macro parser now accepts multi-segment paths for the fully-qualified
+  built-ins above; all other multi-segment or `::`-prefixed paths remain
+  unsupported (fail fast, as before)
+
 ## 0.9.0 - 2026-08-17
 
 Released alongside `type_reflect_core` 0.6.0 and `type_reflect_macros` 0.7.0

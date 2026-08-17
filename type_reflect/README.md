@@ -59,6 +59,31 @@ Non-goals:
 
 # Important Details:
 
+## Supported Types
+
+In addition to user-declared `Reflect` types, these built-in types are
+recognized in field positions and emitted according to how Serde serializes
+them:
+
+| Rust type | Serialized as | TypeScript | Zod |
+|---|---|---|---|
+| `String`, `std::string::String` | string | `string` | `z.string()` |
+| `u8`–`u64`, `i8`–`i64`, `f32`, `f64`, `bool` | number/boolean | `number`/`boolean` | `z.number()`/`z.bool()` |
+| `std::path::PathBuf` (and `std::path::Path`, e.g. as `Box<Path>` — `Path` is a DST) | string | `string` | `z.string()` |
+| `serde_json::Value` | any JSON value | `any` | `z.any()` |
+| `Option<T>`, `Vec<T>`, `HashMap<K, V>`, `BTreeMap<K, V>` | — | see inner type | see inner type |
+
+`Path`/`PathBuf`/`Value` are accepted both as bare names (e.g. `path: PathBuf`
+with `use std::path::PathBuf;`) and fully-qualified (e.g. `path:
+std::path::PathBuf` or `path: ::std::path::PathBuf`); both spellings produce
+identical output.
+
+Note: `Value` is matched by bare name, the same convention as `Option`,
+`Vec`, and `HashMap`. The macro cannot see your imports, so a user-defined
+`Value` type will be interpreted as `serde_json::Value` — use the
+fully-qualified spelling for your own `Value` type (or file an issue for an
+opt-in attribute).
+
 ## Serde Attributes
 
 The `Reflect` macro has support for certain `serde` attributes to make it easier to keep all representations aligned with the serialized representation.
