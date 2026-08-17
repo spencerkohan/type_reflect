@@ -1,9 +1,9 @@
 use crate::zod::to_zod_type;
 use ts_quote::*;
-use type_reflect_core::{Inflectable, Inflection, NamedField, TypeFieldsDefinition};
+use type_reflect_core::{Inflection, NamedField, TypeFieldsDefinition};
 
 pub fn struct_member(member: &NamedField, inflection: Inflection) -> String {
-    let name = &member.name.inflect(inflection);
+    let name = member.serialized_name(inflection);
     let value = to_zod_type(&member.type_);
     ts_string! { #name: #value, }
 

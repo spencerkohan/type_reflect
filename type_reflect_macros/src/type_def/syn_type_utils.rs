@@ -1,3 +1,4 @@
+use crate::attribute_utils::RenameAllAttr;
 use syn::{Field, GenericArgument, PathArguments, Result, Type as SynType, TypePath};
 use type_reflect_core::{
     syn_err, NamedField, NamedType, TransparentType, TransparentTypeCase, Type,
@@ -95,9 +96,10 @@ fn get_struct_member(field: &Field) -> Result<NamedField> {
         Some(ident) => format!("{}", ident),
     };
 
+    let rename = RenameAllAttr::from_attrs(&field.attrs).rename;
     let type_ = field.ty.to_type()?;
 
-    Ok(NamedField { name, type_ })
+    Ok(NamedField { name, rename, type_ })
 }
 
 fn get_field_type(field: &Field) -> Result<Type> {

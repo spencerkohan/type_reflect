@@ -176,8 +176,14 @@ single-member guard.
       `untagged_unit_case_rename` pass. Note: `rename` is parsed via
       `RenameAllAttr` (also on types, where it is correctly ignored — type
       names are not part of serde's JSON output).
-- [ ] G3: parse field-level `#[serde(rename)]` in `get_struct_member` (store
-      per-field rename on `NamedField`) and apply it in all emitters
+- [x] G3: field-level `#[serde(rename)]` parsed in `get_struct_member` via
+      `RenameAllAttr::from_attrs(&field.attrs).rename`, stored on
+      `NamedField.rename`; new `NamedField::serialized_name(inflection)`
+      accessor (same rename-wins-over-`rename_all` rule as G2) is now the
+      single source for field names in all emitters (TS `named_member`,
+      TSValidation `named_field_validations`, zod `struct_member` + complex
+      variant fields). Tests `struct_field_rename`,
+      `complex_external_field_rename` pass (TS + zod).
 - [x] G1: resolved as a byproduct of G2 — the zod simple/complex case
       values now go through `EnumCase::serialized_name()`, which applies the
       enum-level inflection. Tests `simple_rename_all`,
@@ -188,9 +194,13 @@ single-member guard.
 - [ ] G6: parse `#[serde(untagged)]` and emit the bare-content representation
       (needs an `EnumType::SerdeUntagged` variant distinct from the current
       Untagged class, which models serde's default external representation)
-- [ ] G7: quote non-identifier case names in untagged member-case keys /
-      property access (`['get-max']`), in both the typescript and
-      ts_validation emitters
+- [ ] G7: quote non-identifier names wherever they are emitted as unquoted
+      TS keys / property access: untagged member-case keys (`['get-max']`)
+      in both the typescript and ts_validation emitters, and — same class,
+      same fix — renamed struct/variant *fields* (e.g.
+      `#[serde(rename = "my-field")]` currently emits `my-field: number`,
+      invalid TS, in all three emitters). A `raw_name_to_ts_field` helper
+      already exists in `type_reflect_macros/src/utils.rs` (unused).
 - [ ] G8: guard single-variant complex enums in the Zod emitter
       (`z.union` needs ≥ 2 members)
 - [ ] Flipping the red tests green is the definition of done; the 4 passing

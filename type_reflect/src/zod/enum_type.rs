@@ -1,4 +1,4 @@
-use type_reflect_core::{EnumCase, EnumType, Inflectable, Inflection};
+use type_reflect_core::{EnumCase, EnumType, Inflection};
 
 use crate::EnumReflectionType;
 
@@ -177,7 +177,7 @@ export enum {name} {{
                     .map(|item| {
                         format!(
                             "    {}: {},\n",
-                            item.name.inflect(case.inflection),
+                            item.serialized_name(case.inflection),
                             to_zod_type(&item.type_)
                         )
                     })

@@ -1,4 +1,4 @@
-use type_reflect_core::{Inflectable, Inflection, NamedField, TypeFieldsDefinition};
+use type_reflect_core::{Inflection, NamedField, TypeFieldsDefinition};
 
 use super::{
     validation::{tuple_validation, type_validation},
@@ -14,7 +14,7 @@ pub fn named_field_validations(
     let members: Vec<String> = members
         .into_iter()
         .map(|member| {
-            let member_name = member.name.inflect(inflection);
+            let member_name = member.serialized_name(inflection);
             type_validation(
                 ts_string! {
                     #{member_prefix}.#{member_name}

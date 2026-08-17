@@ -1,5 +1,5 @@
 use ts_quote::ts_string;
-use type_reflect_core::{EnumCase, Inflectable, Inflection, Type};
+use type_reflect_core::{EnumCase, Inflection, Type};
 
 use crate::{
     ts_validation::validation::type_validation,

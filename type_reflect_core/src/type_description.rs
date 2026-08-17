@@ -36,7 +36,20 @@ pub enum Type {
 #[derive(Clone, Debug)]
 pub struct NamedField {
     pub name: String,
+    /// Field-level `#[serde(rename = "...")]`.
+    pub rename: Option<String>,
     pub type_: Type,
+}
+
+impl NamedField {
+    /// The name this field appears under in serialized output: the explicit
+    /// `#[serde(rename)]` if present, else the field name inflected with
+    /// the containing type's (or variant's) `rename_all`.
+    pub fn serialized_name(&self, inflection: Inflection) -> String {
+        self.rename
+            .clone()
+            .unwrap_or_else(|| self.name.inflect(inflection))
+    }
 }
 
 #[derive(Clone, Debug)]

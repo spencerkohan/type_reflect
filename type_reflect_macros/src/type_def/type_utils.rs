@@ -83,9 +83,14 @@ pub trait NamedFieldBridge {
         let member = &self.member();
         let name = &member.name;
         let type_ = member.type_.emit_type();
+        let rename = match &member.rename {
+            Some(rename) => quote! { Some(#rename.to_string()) },
+            None => quote! { None },
+        };
         quote! {
             NamedField {
                 name: #name.to_string(),
+                rename: #rename,
                 type_: #type_,
             }
         }
