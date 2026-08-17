@@ -45,19 +45,34 @@ impl TypeEmitter for Zod {
     where
         T: StructType,
     {
-        let members = struct_fields(&T::fields(), T::inflection());
         let name = T::name();
+
+        // Tuple structs mirror serde: a single field serializes as the bare
+        // value, multiple fields as an array — so no `z.object` wrapper.
+        let schema = match &T::fields() {
+            TypeFieldsDefinition::Tuple(tuple) if tuple.len() > 1 => {
+                let items: Vec<String> = tuple.iter().map(|t| to_zod_type(t)).collect();
+                format!("z.tuple([{}])", items.join(", "))
+            }
+            TypeFieldsDefinition::Tuple(tuple) => to_zod_type(&tuple[0]),
+            fields => {
+                let members = struct_fields(fields, T::inflection());
+                format!(
+                    r#"z.object({{
+{members}}})"#
+                )
+            }
+        };
 
         format!(
             r#"
 
-export const {name}Schema = z.object({{
-{members}}});
+export const {name}Schema = {schema};
 
 export type {name} = z.infer<typeof {name}Schema>;
 
 "#,
-            members = members,
+            schema = schema,
             name = name
         )
     }

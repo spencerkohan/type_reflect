@@ -20,8 +20,13 @@ pub fn named_fields(fields: &Vec<NamedField>, inflection: Inflection) -> String 
 
 pub fn struct_fields(fields: &TypeFieldsDefinition, inflection: Inflection) -> String {
     match fields {
-        TypeFieldsDefinition::Unit => todo!(),
-        TypeFieldsDefinition::Tuple(_) => todo!(),
+        // Unit structs are rejected at derive time; tuple structs are
+        // handled directly by `emit_struct` (they must not be wrapped in
+        // `z.object`).
+        TypeFieldsDefinition::Unit => panic!("unit structs are not supported"),
+        TypeFieldsDefinition::Tuple(_) => {
+            panic!("tuple structs are handled by emit_struct, not struct_fields")
+        }
         TypeFieldsDefinition::Named(named) => named_fields(named, inflection),
     }
 }

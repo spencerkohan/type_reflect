@@ -143,6 +143,22 @@ single-member guard.
 - All 7 serde inflection spellings map correctly to `Inflection` variants;
   the mapping itself (`Inflection::try_from` / `apply`) is faithful.
 
+## Post-review fix: emitter landmines (todo!/panic!)
+
+- Unit structs: `StructDef::new` now rejects them with a localized syn
+  error ("unit structs are not supported" at the ident). The `todo!()`
+  arms in the three emitters became defensive panics with messages.
+- Tagged enums with tuple variants and no `content` key:
+  `EnumDef::new` now rejects with a syn error at the variant
+  (serde: multi-tuple = compile error, newtype = runtime panic —
+  verified empirically). The emitters' `panic!("Content key required...")`
+  kept as a defensive invariant; stale `//TODO` comments removed.
+- Zod tuple-struct support IMPLEMENTED (was the last `todo!()`): single
+  field -> bare schema, multiple -> `z.tuple([...])` (mirrors serde and
+  the existing TS/TSValidation tuple paths). New tests:
+  `tuple_struct` + `newtype_struct` (red first: "not yet implemented"
+  panic). `test_serde_rename` is now 22/22; workspace green.
+
 ## Minor notes
 
 - `to_ts_ident` in `type_reflect_macros/src/utils.rs` is also dead code

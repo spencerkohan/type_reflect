@@ -248,7 +248,8 @@ export enum {name} {{
                 let content_key = match content_key {
                     Some(content_key) => content_key,
                     None => {
-                        //TODO: make this a localized Syn error
+                        // Rejected at derive time (see EnumDef::new); only
+                        // reachable through hand-written impls.
                         panic!("Content key required on enums containing at least one tuple-type variant.")
                     }
                 };

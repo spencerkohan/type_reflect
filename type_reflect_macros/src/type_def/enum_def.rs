@@ -71,6 +71,25 @@ impl EnumDef {
             },
         };
 
+        // `#[serde(tag = ...)]` (internally tagged) enums can only represent
+        // tuple variants through the `content` key. Serde rejects
+        // multi-field tuples at compile time and panics at runtime for
+        // newtypes, so reject the shape here, at the variant, with an
+        // actionable message.
+        if let EnumType::Complex {
+            content_key: None, ..
+        } = &enum_type
+        {
+            for variant in &item.variants {
+                if let syn::Fields::Unnamed(_) = variant.fields {
+                    return Err(syn::Error::new(
+                        variant.ident.span(),
+                        "tuple variants in a tagged enum require a `content` key, e.g. #[serde(tag = \"_case\", content = \"_\")].",
+                    ));
+                }
+            }
+        }
+
         Ok(Self {
             tokens: quote! { #item },
             ident: item.ident.clone(),

@@ -28,7 +28,8 @@ pub fn struct_field_validations(
     inflection: Inflection,
 ) -> String {
     match fields {
-        TypeFieldsDefinition::Unit => todo!(),
+        // Unit structs are rejected at derive time.
+        TypeFieldsDefinition::Unit => panic!("unit structs are not supported"),
         TypeFieldsDefinition::Tuple(tuple) => tuple_validation(member_prefix, tuple),
         TypeFieldsDefinition::Named(named) => {
             named_field_validations(member_prefix, named, inflection)
@@ -40,7 +41,8 @@ pub fn struct_impl(name: &str, fields: &TypeFieldsDefinition, inflection: Inflec
     let validations = struct_field_validations("input", fields, inflection);
 
     let validation_impl = match fields {
-        TypeFieldsDefinition::Unit => todo!(),
+        // Unit structs are rejected at derive time.
+        TypeFieldsDefinition::Unit => panic!("unit structs are not supported"),
         TypeFieldsDefinition::Tuple(_) => {
             ts_string! {
                 #validations

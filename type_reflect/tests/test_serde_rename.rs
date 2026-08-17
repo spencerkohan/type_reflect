@@ -966,3 +966,74 @@ mod zod_untagged_supported {
         )
     }
 }
+
+// ---------------------------------------------------------------------------
+// Struct shapes
+// ---------------------------------------------------------------------------
+
+mod tuple_struct {
+    use super::*;
+
+    // Multi-field tuple struct: serde serializes it as a bare array.
+    #[derive(Reflect, Serialize)]
+    pub struct Pair(u32, String);
+
+    #[test]
+    fn serde_output_is_accepted() -> Result<()> {
+        let output = init_path(SCOPE, "tuple_struct");
+        export_types!(
+            types: [ Pair ],
+            destinations: [
+                ( output.ts_path(), emitters: [ TypeScript(), TSValidation() ] ),
+                (
+                    output.ts_path().with_file_name("tuple_struct.zod.ts"),
+                    emitters: [ Zod() ],
+                ),
+            ]
+        )?;
+        let jsons = [Pair(1, "x".to_string())]
+            .iter()
+            .map(|v| serde_json::to_string(v).unwrap())
+            .collect();
+        run_jest(
+            "tuple_struct",
+            "Pair",
+            Some("PairSchema"),
+            "Pair",
+            Some("PairSchema"),
+            jsons,
+        )
+    }
+}
+
+mod newtype_struct {
+    use super::*;
+
+    // Single-field (newtype) struct: serde serializes the bare value.
+    #[derive(Reflect, Serialize)]
+    pub struct Id(u32);
+
+    #[test]
+    fn serde_output_is_accepted() -> Result<()> {
+        let output = init_path(SCOPE, "newtype_struct");
+        export_types!(
+            types: [ Id ],
+            destinations: [
+                ( output.ts_path(), emitters: [ TypeScript(), TSValidation() ] ),
+                (
+                    output.ts_path().with_file_name("newtype_struct.zod.ts"),
+                    emitters: [ Zod() ],
+                ),
+            ]
+        )?;
+        let jsons = [Id(5)].iter().map(|v| serde_json::to_string(v).unwrap()).collect();
+        run_jest(
+            "newtype_struct",
+            "Id",
+            Some("IdSchema"),
+            "Id",
+            Some("IdSchema"),
+            jsons,
+        )
+    }
+}

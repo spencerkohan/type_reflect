@@ -4,7 +4,8 @@ use type_reflect_core::{Inflection, TypeFieldsDefinition};
 
 pub fn struct_impl(name: &str, fields: &TypeFieldsDefinition, inflection: Inflection) -> String {
     let fields = match fields {
-        TypeFieldsDefinition::Unit => todo!(),
+        // Unit structs are rejected at derive time.
+        TypeFieldsDefinition::Unit => panic!("unit structs are not supported"),
         TypeFieldsDefinition::Tuple(tuple) => {
             let fields = tuple_fields(tuple);
             ts_string! {

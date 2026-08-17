@@ -27,6 +27,12 @@ pub struct StructDef {
 
 impl StructDef {
     pub fn new(item: &ItemStruct) -> Result<Self> {
+        if matches!(item.fields, syn::Fields::Unit) {
+            return Err(syn::Error::new(
+                item.ident.span(),
+                "unit structs are not supported",
+            ));
+        }
         let rename_attr = RenameAllAttr::from_attrs(&item.attrs);
         Ok(Self {
             tokens: quote! { #item },
