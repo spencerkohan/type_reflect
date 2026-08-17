@@ -145,6 +145,17 @@ single-member guard.
 
 ## Minor notes
 
+- The untagged/default-external model was verified against real
+  `serde_json` output for ALL four variant shapes (live demo, all 4
+  accepted by the emitted validators): unit -> `"A"`, single-tuple ->
+  `{"B":1}`, multi-tuple -> `{"C":[1,2]}` (object keyed by case, array
+  value — NOT `["C",1,2]`), struct -> `{"D":{"x":3}}`. The emitters' model
+  (`'A' | { B?: T; C?: [A, B]; D?: { fields } }` + key-presence
+  validation) matches serde exactly for every shape; no divergence. (An
+  earlier draft of this note claimed a multi-element tuple divergence —
+  that was a mis-memory of serde's encoding, retracted.) Multi-element
+  tuple variants remain untested in the suite (no TODO, low risk).
+
 - `parse_assign_inflection` maps unknown `rename_all` values to
   `Inflection::None` silently (typo → raw names, no error).
 - Type-level `#[serde(rename)]` on the enum/struct itself is not applied to
@@ -189,8 +200,17 @@ single-member guard.
       enum-level inflection. Tests `simple_rename_all`,
       `complex_external_rename_all`, `complex_internal_rename_all`,
       `complex_combo_rename_alls` pass (zod included).
-- [ ] G4: implement (or explicitly reject with a compile error) untagged /
-      default-external enums in the Zod emitter
+- [x] G4: Zod untagged (default-external) enums implemented in
+      `type_reflect/src/zod/enum_type.rs::emit_untagged_enum_type` — mirrors
+      the TS/TSValidation untagged model: unit case -> `z.literal("Name")`,
+      single-tuple -> `z.object({ "Name": <inner type> })`, multi-tuple ->
+      `z.object({ "Name": z.tuple([...]) })`, struct ->
+      `z.object({ "Name": z.object({...}) })` combined in `z.union`.
+      Case keys are always quoted (`"CIRCLE"`), so kebab-case names are
+      valid from the start (the TS-side kebab fix, G7, does not need to
+      cover zod). The `zod_untagged_supported` test was upgraded from a
+      no-panic assert to the suite's standard pattern (TS + zod both
+      checked against real serde output).
 - [ ] G6: parse `#[serde(untagged)]` and emit the bare-content representation
       (needs an `EnumType::SerdeUntagged` variant distinct from the current
       Untagged class, which models serde's default external representation)
@@ -201,7 +221,9 @@ single-member guard.
       `#[serde(rename = "my-field")]` currently emits `my-field: number`,
       invalid TS, in all three emitters). A `raw_name_to_ts_field` helper
       already exists in `type_reflect_macros/src/utils.rs` (unused).
-- [ ] G8: guard single-variant complex enums in the Zod emitter
-      (`z.union` needs ≥ 2 members)
+- [ ] G8: guard single-member unions in the Zod emitter (`z.union` needs
+      ≥ 2 members) — covers single-variant complex enums AND single-case
+      untagged enums (e.g. `enum E { Only { x: u32 } }`), both of which
+      currently emit `z.union([one])`
 - [ ] Flipping the red tests green is the definition of done; the 4 passing
       tests are the regression guard for already-covered cases

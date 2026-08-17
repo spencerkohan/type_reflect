@@ -804,6 +804,8 @@ mod serde_untagged_attribute {
 mod zod_untagged_supported {
     use super::*;
 
+    // The Zod emitter must support the untagged (default external) class:
+    // unit cases -> string literal, struct cases -> { "CASE": { fields } }.
     #[derive(Reflect, Serialize)]
     pub enum Shape {
         Circle { radius: f32 },
@@ -811,20 +813,34 @@ mod zod_untagged_supported {
     }
 
     #[test]
-    fn zod_can_emit_untagged() {
-        let result = std::panic::catch_unwind(|| {
-            let output = init_path(SCOPE, "zod_untagged");
-            export_types!(
-                types: [ Shape ],
-                destinations: [(
-                    output.ts_path().with_file_name("zod_untagged.zod.ts"),
-                    emitters: [Zod()],
-                )]
-            )
-        });
-        assert!(
-            result.is_ok(),
-            "Zod emitter should support untagged enums (it currently panics: unimplemented!)"
-        );
+    fn serde_output_is_accepted() -> Result<()> {
+        let output = init_path(SCOPE, "zod_untagged");
+        export_types!(
+            types: [ Shape ],
+            destinations: [
+                ( output.ts_path(), emitters: [ TypeScript(), TSValidation() ] ),
+                (
+                    output
+                        .ts_path()
+                        .with_file_name("zod_untagged.zod.ts"),
+                    emitters: [ Zod() ],
+                ),
+            ]
+        )?;
+        let jsons = [
+            &Shape::Circle { radius: 5.0 },
+            &Shape::Null,
+        ]
+        .iter()
+        .map(|v| serde_json::to_string(v).unwrap())
+        .collect();
+        run_jest(
+            "zod_untagged",
+            "Shape",
+            Some("ShapeSchema"),
+            "Shape",
+            Some("ShapeSchema"),
+            jsons,
+        )
     }
 }

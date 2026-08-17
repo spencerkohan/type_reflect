@@ -1,8 +1,8 @@
-use type_reflect_core::{EnumCase, EnumType, Inflection};
+use type_reflect_core::{EnumCase, EnumType, Inflection, TypeFieldsDefinition};
 
 use crate::EnumReflectionType;
 
-use super::to_zod_type;
+use super::{named_fields, to_zod_type};
 
 pub fn emit_enum_type<T>() -> String
 where
@@ -14,7 +14,57 @@ where
             case_key,
             content_key,
         } => emit_complex_enum_type::<T>(&case_key, &content_key),
-        EnumType::Untagged => unimplemented!("untagged enums not supported by the Zod generator"),
+        EnumType::Untagged => emit_untagged_enum_type::<T>(),
+    }
+}
+
+/// Serde's default (external) representation: unit cases serialize to the
+/// case-name string, tuple/struct cases to `{ "CASE": content }`.
+/// Mirrors the untagged model of the TypeScript / TSValidation emitters.
+fn emit_untagged_enum_type<T>() -> String
+where
+    T: EnumReflectionType,
+{
+    let name = T::name();
+    let inflection = T::inflection();
+    let members: Vec<String> = T::cases()
+        .iter()
+        .map(|case| untagged_case_schema(case, inflection))
+        .collect();
+
+    let schema_name = format!("{}Schema", name);
+    let members = members.join(",\n");
+
+    format!(
+        r#"
+export const {schema_name} = z.union([
+{members}
+]);
+export type {name} = z.infer<typeof {schema_name}>
+"#
+    )
+}
+
+fn untagged_case_schema(case: &EnumCase, inflection: Inflection) -> String {
+    let key = case.serialized_name(inflection);
+    match &case.type_ {
+        TypeFieldsDefinition::Unit => format!(r#"z.literal({key:?})"#),
+        TypeFieldsDefinition::Tuple(items) => {
+            let inner = if items.len() == 1 {
+                to_zod_type(&items[0])
+            } else {
+                let items: Vec<String> = items.iter().map(|t| to_zod_type(t)).collect();
+                format!("z.tuple([{}])", items.join(", "))
+            };
+            format!(r#"z.object({{ "{key}": {inner} }})"#)
+        }
+        TypeFieldsDefinition::Named(fields) => {
+            let inner = format!(
+                "z.object({{ {} }})",
+                named_fields(fields, case.inflection)
+            );
+            format!(r#"z.object({{ "{key}": {inner} }})"#)
+        }
     }
 }
 
